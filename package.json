@@ -1,0 +1,19 @@
+{
+  "name": "beehive-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:tinymce/beehive-cli.git",
+  "author": "Dylan Just",
+  "license": "MIT",
+  "dependencies": {
+    "@types/yargs": "^15.0.5",
+    "yargs": "^16.0.3"
+  },
+  "scripts": {
+    "beehive": "yarn ts-node src/main/ts/Main.ts"
+  },
+  "devDependencies": {
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
+  }
+}
