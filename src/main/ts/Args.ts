@@ -1,7 +1,7 @@
 import * as yargs from "yargs";
 
 export interface FreezeCommand {
-  kind: 'freeze'
+  readonly kind: 'freeze'
 }
 
 export const freezeCommand = (): FreezeCommand => ({
