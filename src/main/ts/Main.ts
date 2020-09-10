@@ -1,8 +1,9 @@
 import * as Args from './Args';
+import * as Dispatch from './Dispatch';
 
 const main = async () => {
   const actualArgs = await Args.parseProcessArgs();
-  console.log(actualArgs);
+  await Dispatch.dispatch(actualArgs);
 }
 
 main();

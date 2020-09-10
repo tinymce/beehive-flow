@@ -10,6 +10,15 @@ export const freezeCommand = (): FreezeCommand => ({
 
 export type BeehiveCommand = FreezeCommand;
 
+export const fold = <T> (bh: BeehiveCommand, ifFreeze: () => T): T => {
+  if (bh.kind === 'freeze') {
+    return ifFreeze();
+  } else {
+    throw new TypeError('Invalid command');
+  }
+}
+
+
 const argParser =
   yargs
   .scriptName('beehive')
