@@ -14,10 +14,18 @@ export const freeze = (): Promise<void> =>
 const logb = (message: string): void =>
   console.log(' - ' + message);
 
-export const runFreeze = async (gitUrl: string): Promise<void> => {
-  console.log("Creating release branch based on 'master' branch (in temp folder)");
+const freezeHeader = `
+Freeze
+----------------------------------------------------------------
+This process code 'freezes' the current master branch, in preparation for merging develop to master.
+Master will be branched as releases/x.y, some settings tweaked and pushed.
+----------------------------------------------------------------
+`
 
-  logb('Cloning ' + gitUrl)
+export const runFreeze = async (gitUrl: string): Promise<void> => {
+  console.log(freezeHeader);
+
+  logb('Cloning ' + gitUrl + ' to temp folder');
   const { dir, git } = await Git.cloneInTempFolder(gitUrl);
   logb('Cloned to ' + dir)
 
