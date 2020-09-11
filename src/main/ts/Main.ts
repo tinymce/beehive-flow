@@ -6,4 +6,8 @@ const main = async () => {
   await Dispatch.dispatch(actualArgs);
 }
 
-main();
+main().then(() => {
+  console.log('Complete')
+}, (e) => {
+  console.error(e);
+});
