@@ -1,0 +1,34 @@
+import * as gitP from "simple-git/promise";
+import { tempFolder } from "./TempFiles";
+
+type SimpleGit = gitP.SimpleGit;
+
+export const isClean = async (git: SimpleGit): Promise<boolean> => {
+  const status = await git.status();
+  return status.isClean();
+};
+
+export interface TempGit {
+  git: SimpleGit;
+  dir: string;
+}
+
+// TODO: are we removing these folders on exit?
+
+export const initInTempFolder = async (bare: boolean = false): Promise<TempGit> => {
+  const { dir, git } = await tempGitP();
+  await git.init(bare);
+  return { dir, git };
+};
+
+export const cloneInTempFolder  = async (repoPath: string): Promise<TempGit> => {
+  const { dir, git } = await tempGitP();
+  await git.clone(repoPath, dir);
+  return { dir, git };
+}
+
+const tempGitP = async (): Promise<TempGit> => {
+  const dir = await tempFolder();
+  const git = gitP(dir);
+  return { dir, git };
+}
