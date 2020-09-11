@@ -26,7 +26,7 @@ export const runFreeze = async (gitUrl: string): Promise<void> => {
   logb('Checking out master');
   await git.checkout('master');
 
-  let pjFileName = path.resolve(dir, 'modules', 'tinymce', 'package.json');
+  const pjFileName = path.resolve(dir, 'modules', 'tinymce', 'package.json');
 
   logb('Parsing package.json file: ' + pjFileName);
   const pj = await PackageJson.parsePackageJsonFile(pjFileName);
