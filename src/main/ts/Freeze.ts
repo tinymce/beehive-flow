@@ -2,6 +2,7 @@ import * as Git from './Git';
 import * as Hardcoded from './Hardcoded';
 import * as PackageJson from "./PackageJson";
 import * as Version from "./Version";
+import * as Files from "./Files";
 import * as path from "path";
 import * as PropertiesReader from "properties-reader";
 
@@ -39,6 +40,11 @@ export const runFreeze = async (gitUrl: string): Promise<void> => {
   await Git.checkoutNewBranch(git, releaseBranchName);
 
   const buildPropertiesFile = path.resolve(dir, 'build.properties');
+  if (!await Files.exists(buildPropertiesFile)) {
+    logb(buildPropertiesFile + ' does not exist: creating');
+    await Files.writeFile(buildPropertiesFile, '');
+  }
+
   logb('Updating properties file: ' + buildPropertiesFile);
   const props = PropertiesReader(buildPropertiesFile);
   props.set('primaryBranch', releaseBranchName);

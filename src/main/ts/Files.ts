@@ -17,3 +17,5 @@ export const readFileAsString = async (filename: string): Promise<string> => {
 }
 
 export const writeFile = util.promisify(fs.writeFile);
+
+export const exists = util.promisify(fs.exists);
