@@ -4,6 +4,8 @@ import { PushResult } from "simple-git";
 
 type SimpleGit = gitP.SimpleGit;
 
+const ASSUMED_REMOTE = 'origin'; // This module assumes a single remote called 'origin'
+
 export const isClean = async (git: SimpleGit): Promise<boolean> => {
   const status = await git.status();
   return status.isClean();
@@ -44,5 +46,10 @@ export const currentBranch = async (git: SimpleGit): Promise<string> => {
 
 export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
   const cur = await currentBranch(git);
-  return git.push('origin', cur, { '--set-upstream': null });
+  return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
 }
+
+export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
+  const b = await git.branch();
+  return b.branches.hasOwnProperty('remotes/origin/' + branchName);
+};

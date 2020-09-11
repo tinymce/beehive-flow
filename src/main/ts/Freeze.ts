@@ -33,6 +33,11 @@ export const runFreeze = async (gitUrl: string): Promise<void> => {
   logb('package.json has version: ' + Version.versionToString(pj.version));
 
   const releaseBranchName = Version.releaseBranchName(pj.version);
+
+  if (await Git.doesRemoteBranchExist(git, releaseBranchName)) {
+    throw new Error('Remote branch already exists: ' + releaseBranchName);
+  }
+
   logb('Creating release branch: ' + releaseBranchName);
   await Git.checkoutNewBranch(git, releaseBranchName);
 
