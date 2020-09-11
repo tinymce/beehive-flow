@@ -13,10 +13,6 @@ const pbFileName = 'primaryBranch';
 export const freeze = (): Promise<void> =>
   runFreeze(Hardcoded.tinymceGitUrl)
 
-async function writePrimaryBranchFileInDir(dir: string, b: string) {
-  await Files.writeFile(path.resolve(dir, pbFileName), `primaryBranch = '$b'`);
-}
-
 const logb = (message: string): void =>
   console.log(' - ' + message);
 
@@ -30,21 +26,22 @@ export const runFreeze = async (gitUrl: string): Promise<void> => {
   logb('Checking out master');
   await git.checkout('master');
 
-  await PackageJson.parsePackageJsonFileInFolder(dir).then((a) => {
-    console.log('ok', a);
-  }, (e) => {
-    console.log('err', e);
-  });
+  let pjFileName = path.resolve(dir, 'modules', 'tinymce', 'package.json');
 
-  logb('Parsing package.json file');
-  const pj = await PackageJson.parsePackageJsonFileInFolder(dir);
-  logb('package.json has version: ' + pj.version);
+  logb('Parsing package.json file: ' + pjFileName);
+  const pj = await PackageJson.parsePackageJsonFile(pjFileName);
+  logb('package.json has version: ' + Version.versionToString(pj.version));
 
   const releaseBranchName = Version.releaseBranchName(pj.version);
+  logb('Creating release branch: ' + releaseBranchName);
+  await Git.checkoutNewBranch(git, releaseBranchName);
 
-  await git.checkout(releaseBranchName);
-  await writePrimaryBranchFileInDir(dir, releaseBranchName);
+  const pbFile = path.resolve(dir, pbFileName);
+  logb('Writing primaryBranch file: ' + pbFile);
+  await Files.writeFile(pbFile, `primaryBranch = '${releaseBranchName}'`);
+
+  logb('Committing and pushing');
   await git.add(pbFileName);
-  await git.commit(`Creating release branch: $releaseBranchName`);
-  await git.push();
+  await git.commit("Creating release branch: " + releaseBranchName);
+  await Git.pushNewBranch(git);
 };

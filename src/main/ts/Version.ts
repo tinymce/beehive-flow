@@ -63,7 +63,7 @@ export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T,
 };
 
 // TODO: Test
-export const showVersion = (v: Version): string =>
+export const versionToString = (v: Version): string =>
   foldVersion(
     v,
     (r) => [ r.major, r.minor, r.patch ].join('.'),

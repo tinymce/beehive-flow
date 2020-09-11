@@ -1,10 +1,10 @@
 import * as O from 'fp-ts/lib/Option';
 import { JsonDecoder, Result } from 'ts.data.json';
 import * as E from 'fp-ts/lib/Either';
-import Either = E.Either;
 import * as TE from 'fp-ts/lib/TaskEither';
-import TaskEither = TE.TaskEither;
 import { pipe } from 'fp-ts/lib/pipeable';
+import Either = E.Either;
+import TaskEither = TE.TaskEither;
 import Option = O.Option;
 import Decoder = JsonDecoder.Decoder;
 
@@ -30,14 +30,7 @@ export const decodeStringAsEither = <T>(d: Decoder<T>, s: string): Either<string
   );
 
 export const decodeStringAsPromise = <T> (d: Decoder<T>, s: string): Promise<T> => new Promise<T>((resolve, reject) => {
-  const e: Either<string, T> = decodeStringAsEither(d, s);
-  E.fold<string, T, void>((e) => {
-    console.log("Parse error: ", e);
-    reject(e);
-  }, (a) => {
-    console.log("Parse ok: ", a);
-    resolve(a);
-  })(e);
+  E.fold<string, T, void>(reject, resolve)(decodeStringAsEither(d, s));
 });
 
 export const decodeStringAsTaskEither = <T>(d: Decoder<T>, s: string): TaskEither<string, T> =>

@@ -1,9 +1,11 @@
 import * as fs from "fs";
 import * as util from 'util';
 
-export const fileMustExist = (filename: string): Promise<void> => new Promise<void>((resolve, reject) => {
+export const fileMustExist = (filename: string): Promise<string> => new Promise<string>((resolve, reject) => {
   if (!fs.existsSync(filename)) {
     reject(new Error('file not found: ' + filename));
+  } else {
+    resolve(filename);
   }
 });
 

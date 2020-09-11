@@ -23,9 +23,9 @@ export const parsePackageJson = (s: string): Promise<PackageJson> =>
 export const parsePackageJsonFile = async (filename: string): Promise<PackageJson> => {
   await Files.fileMustExist(filename);
   const content = await Files.readFileAsString(filename);
-  console.log(content);
-  return await parsePackageJson(content);
+  return parsePackageJson(content);
 };
 
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
   parsePackageJsonFile(folder + '/package.json');
+
