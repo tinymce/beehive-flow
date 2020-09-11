@@ -6,8 +6,10 @@
   "author": "Dylan Just",
   "license": "MIT",
   "dependencies": {
+    "@types/properties-reader": "^0.0.2",
     "@types/yargs": "^15.0.5",
     "fp-ts": "^2.8.2",
+    "properties-reader": "^2.1.1",
     "simple-git": "^2.20.1",
     "tmp": "^0.2.1",
     "ts.data.json": "^1.2.0",

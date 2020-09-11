@@ -24,6 +24,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.4.tgz#a145cc0bb14ef9c4777361b7bbafa5cf8e3acb5a"
   integrity sha512-Wk7nG1JSaMfMpoMJDKUsWYugliB2Vy55pdjLpmLixeyMi7HizW2I/9QoxsPCkXl3dO+ZOVqPumKaDUv5zJu2uQ==
 
+"@types/properties-reader@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@types/properties-reader/-/properties-reader-0.0.2.tgz#7ee65104e055cdc33bf02b75612c2029aab42d30"
+  integrity sha512-8YLK7Kq3Zrj6vN4j0o+Zssu3esIRUIxY3a38Ahw8VjwML7d1nq/V6y9ov0fNtEeDv0qzoagTuxMf5veootvVpA==
+
 "@types/tmp@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.2.0.tgz#e3f52b4d7397eaa9193592ef3fdd44dc0af4298c"
@@ -182,6 +187,18 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
+minimist@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
+  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+
+mkdirp@~0.5.1:
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.5.tgz#d91cefd62d1436ca0f41620e251288d420099def"
+  integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
+  dependencies:
+    minimist "^1.2.5"
+
 ms@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
@@ -198,6 +215,13 @@ path-is-absolute@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
   integrity sha1-F0uSaHNVNP+8es5r9TpanhtcX18=
+
+properties-reader@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/properties-reader/-/properties-reader-2.1.1.tgz#9b1bee1538352595f218f3578b3d3cf8fbfd2f6d"
+  integrity sha512-1t9JG6aMQn/I6ZzwbusXJB4pvHLbi43cQVZj56CuBq7tUmLe1S/HtSN5iqw4qg26UxOQLj0IEfikD5Zcrc3XvA==
+  dependencies:
+    mkdirp "~0.5.1"
 
 require-directory@^2.1.1:
   version "2.1.1"
