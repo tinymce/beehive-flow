@@ -125,6 +125,11 @@ escalade@^3.0.2:
   resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.0.2.tgz#6a580d70edb87880f22b4c91d0d56078df6962c4"
   integrity sha512-gPYAU37hYCUhW5euPeR+Y74F7BL+IBsV93j5cvGriSaD1aG6MGsqsV1yamRdrWrb2j3aiZvb0X+UBOWpx3JWtQ==
 
+fp-ts@^2.8.2:
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.8.2.tgz#7948dea1ceef32e487d7f7f47bd2d3c4fcccfc0d"
+  integrity sha512-YKLBW75Rp+L9DuY1jr7QO6mZLTmJjy7tOqSAMcB2q2kBomqLjBMyV7dotpcnZmUYY6khMsfgYWtPbUDOFcNmkA==
+
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
@@ -261,6 +266,11 @@ ts-node@^9.0.0:
     make-error "^1.1.1"
     source-map-support "^0.5.17"
     yn "3.1.1"
+
+ts.data.json@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/ts.data.json/-/ts.data.json-1.2.0.tgz#dbfd14d3d788f5267da15ca23ad436e386a58c1e"
+  integrity sha512-b18x3gxnysu6ZnysqphPECstZGhi/BxSQqnCE3xsVT4pJhXkboUxqUYZSYdkTF2Fa/oe5cSC4UGbdCDDXd3gOA==
 
 tslib@^2.0.1:
   version "2.0.1"

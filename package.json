@@ -7,8 +7,10 @@
   "license": "MIT",
   "dependencies": {
     "@types/yargs": "^15.0.5",
+    "fp-ts": "^2.8.2",
     "simple-git": "^2.20.1",
     "tmp": "^0.2.1",
+    "ts.data.json": "^1.2.0",
     "tslib": "^2.0.1",
     "yargs": "^16.0.3"
   },
