@@ -18,21 +18,16 @@ export interface TempGit {
 
 // TODO: are we removing these folders on exit?
 
-export const initInTempFolder = async (bare: boolean = false): Promise<TempGit> => {
-  const { dir, git } = await tempGitP();
-  await git.init(bare);
-  return { dir, git };
-};
+export const initInTempFolder = (bare: boolean = false): Promise<TempGit> =>
+  withTempGit((dir, git) => git.init(bare));
 
-export const cloneInTempFolder = async (repoPath: string): Promise<TempGit> => {
-  const { dir, git } = await tempGitP();
-  await git.clone(repoPath, dir);
-  return { dir, git };
-}
+export const cloneInTempFolder = async (repoPath: string): Promise<TempGit> =>
+  withTempGit((dir, git) => git.clone(repoPath, dir));
 
-const tempGitP = async (): Promise<TempGit> => {
+const withTempGit = async <T> (f: (dir: string, git: SimpleGit) => Promise<T>): Promise<TempGit> => {
   const dir = await tempFolder();
   const git = gitP(dir);
+  f(dir, git);
   return { dir, git };
 }
 
