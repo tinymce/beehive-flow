@@ -11,10 +11,8 @@ export const fileMustExist = (filename: string): Promise<string> => new Promise<
 
 export const readFile = util.promisify(fs.readFile);
 
-export const readFileAsString = async (filename: string): Promise<string> => {
-  const content = await readFile(filename);
-  return content.toString();
-}
+export const readFileAsString = (filename: string): Promise<string> =>
+  readFile(filename).then((c) => c.toString());
 
 export const writeFile = util.promisify(fs.writeFile);
 
