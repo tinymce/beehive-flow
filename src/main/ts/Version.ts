@@ -39,9 +39,9 @@ export const parseVersion = (input: string): Either<string, Version> => {
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
-    const major = Number(g['major']);
-    const minor = Number(g['minor']);
-    const patch = Number(g['patch']);
+    const major = parseInt(g['major'], 10);
+    const minor = parseInt(g['minor'], 10);
+    const patch = parseInt(g['patch'], 10);
     const preid = r.groups['prerelease'];
 
     const v = preid === undefined
