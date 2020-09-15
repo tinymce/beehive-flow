@@ -6,9 +6,7 @@ const main = async () => {
   await Dispatch.dispatch(actualArgs);
 }
 
-main().then(() => {
-  console.log('Complete')
-}, (e) => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
