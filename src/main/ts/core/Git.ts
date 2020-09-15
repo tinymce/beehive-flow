@@ -25,7 +25,7 @@ export const cloneInTempFolder = (repoPath: string): Promise<TempGit> =>
 const withTempGit = async <T> (f: (dir: string, git: SimpleGit) => Promise<T>): Promise<TempGit> => {
   const dir = await Files.tempFolder();
   const git = gitP(dir);
-  f(dir, git);
+  await f(dir, git);
   return { dir, git };
 }
 
