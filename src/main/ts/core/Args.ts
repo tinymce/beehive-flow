@@ -40,7 +40,7 @@ const argParser =
     .option('dry-run', {
       type: 'boolean',
       default: false,
-      description: 'Don\'t push to upstream git repo.'
+      description: 'Don\'t push changes to remote systems and only make local changes.'
     })
     .command(
       "freeze",
