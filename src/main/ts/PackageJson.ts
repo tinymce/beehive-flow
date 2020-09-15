@@ -1,9 +1,10 @@
-import { parseVersion, Version } from "./Version";
-import { JsonDecoder } from "ts.data.json";
-import Decoder = JsonDecoder.Decoder;
-import { decodeStringAsPromise, eitherToDecoder } from "./Json";
-import * as Files from "./Files";
-import * as path from "path";
+import { parseVersion, Version } from './Version';
+import { JsonDecoder } from 'ts.data.json';
+import { decodeStringAsPromise, eitherToDecoder } from './Json';
+import * as Files from './Files';
+import * as path from 'path';
+
+type Decoder<A> = JsonDecoder.Decoder<A>;
 
 export interface PackageJson {
   readonly version: Version;

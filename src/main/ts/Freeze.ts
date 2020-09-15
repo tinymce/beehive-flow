@@ -1,10 +1,10 @@
 import * as Git from './Git';
 import * as Hardcoded from './Hardcoded';
-import * as PackageJson from "./PackageJson";
-import * as Version from "./Version";
-import * as Files from "./Files";
-import * as path from "path";
-import * as PropertiesReader from "properties-reader";
+import * as PackageJson from './PackageJson';
+import * as Version from './Version';
+import * as Files from './Files';
+import * as path from 'path';
+import * as PropertiesReader from 'properties-reader';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 

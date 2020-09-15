@@ -1,6 +1,6 @@
-import * as gitP from "simple-git/promise";
-import { tempFolder } from "./TempFiles";
-import { PushResult } from "simple-git";
+import * as gitP from 'simple-git/promise';
+import { tempFolder } from './TempFiles';
+import { PushResult } from 'simple-git';
 
 type SimpleGit = gitP.SimpleGit;
 

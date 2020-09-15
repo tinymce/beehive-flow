@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from 'fs';
 import * as util from 'util';
 
 export const fileMustExist = (filename: string): Promise<string> => new Promise<string>((resolve, reject) => {
