@@ -7,9 +7,9 @@
   "dependencies": {
     "fp-ts": "^2.8.2",
     "properties-reader": "^2.1.1",
+    "read-pkg": "^5.2.0",
     "simple-git": "^2.20.1",
     "tmp": "^0.2.1",
-    "ts.data.json": "^1.2.0",
     "tslib": "^2.0.1",
     "yargs": "^16.0.3"
   },

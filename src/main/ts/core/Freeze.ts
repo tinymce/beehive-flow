@@ -5,6 +5,7 @@ import * as Version from './Version';
 import * as Files from './Files';
 import * as path from 'path';
 import * as PropertiesReader from 'properties-reader';
+import { eitherToPromise } from './PromiseUtils';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 
@@ -24,13 +25,17 @@ export const runFreeze = async (gitUrl: string): Promise<void> => {
   logb('Checking out master');
   await git.checkout('master');
 
-  const pjFileName = path.resolve(dir, 'modules', 'tinymce', 'package.json');
+  const pjDir = path.resolve(dir, 'modules', 'tinymce');
 
-  logb(`Parsing package.json file: ${pjFileName}`);
-  const pj = await PackageJson.parsePackageJsonFile(pjFileName);
-  logb(`package.json has version: ${Version.versionToString(pj.version)}`);
+  logb(`Parsing package.json file in dir: ${pjDir}`);
+  const pj = await PackageJson.parsePackageJsonFileInFolder(pjDir);
+  if (pj.version === undefined) {
+    throw new Error('package.json file has no version');
+  }
+  logb(`package.json has version: ${pj.version}`);
 
-  const releaseBranchName = Version.releaseBranchName(pj.version);
+  const version = await eitherToPromise(Version.parseVersion(pj.version));
+  const releaseBranchName = Version.releaseBranchName(version);
 
   if (await Git.doesRemoteBranchExist(git, releaseBranchName)) {
     throw new Error(`Remote branch already exists: ${releaseBranchName}`);
