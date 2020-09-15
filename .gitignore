@@ -1,0 +1,7 @@
+/.idea
+node_modules
+yarn-error.log
+*.d.ts
+*.d.ts.map
+*.tsbuildinfo
+/lib
