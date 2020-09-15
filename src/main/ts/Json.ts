@@ -3,10 +3,11 @@ import { JsonDecoder, Result } from 'ts.data.json';
 import * as E from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/pipeable';
-import Either = E.Either;
-import TaskEither = TE.TaskEither;
-import Option = O.Option;
-import Decoder = JsonDecoder.Decoder;
+
+type Either<E, A> = E.Either<E, A>;
+type TaskEither<E, A> = TE.TaskEither<E, A>;
+type Option<A> = O.Option<A>;
+type Decoder<A> = JsonDecoder.Decoder<A>;
 
 export const optionToDecoder = <T>(o: Option<T>, error: string = ""): Decoder<T> =>
   O.fold<T, Decoder<T>>(
