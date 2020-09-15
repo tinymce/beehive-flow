@@ -1,4 +1,5 @@
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { impossible } from './Impossible';
 
 export interface ReleaseVersion {
   readonly kind: 'ReleaseVersion';
@@ -51,14 +52,16 @@ export const parseVersion = (input: string): Either<string, Version> => {
   }
 };
 
+
 // TODO: Test
 export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T, ifPreRelease: (r: PreReleaseVersion) => T): T => {
-  if (v.kind === 'ReleaseVersion') {
-    return ifRelease(v);
-  } else if (v.kind === 'PreReleaseVersion') {
-    return ifPreRelease(v);
-  } else {
-    throw new Error('Unknown version type');
+  switch (v.kind) {
+    case 'ReleaseVersion':
+      return ifRelease(v);
+    case 'PreReleaseVersion':
+      return ifPreRelease(v);
+    default:
+      return impossible(v);
   }
 };
 

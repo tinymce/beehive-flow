@@ -1,4 +1,5 @@
 import * as yargs from 'yargs';
+import { impossible } from './Impossible';
 
 export interface FreezeCommand {
   readonly kind: 'freeze'
@@ -11,13 +12,13 @@ export const freezeCommand = (): FreezeCommand => ({
 export type BeehiveCommand = FreezeCommand;
 
 export const fold = <T> (bh: BeehiveCommand, ifFreeze: () => T): T => {
-  if (bh.kind === 'freeze') {
-    return ifFreeze();
-  } else {
-    throw new TypeError('Invalid command');
+  switch (bh.kind) {
+    case 'freeze':
+      return ifFreeze();
+    default:
+      return impossible(bh.kind);
   }
 }
-
 
 const argParser =
   yargs
