@@ -1,5 +1,7 @@
-import * as Args from './Args';
-import * as Dispatch from './Dispatch';
+#!/usr/bin/env -S node -r "ts-node/register"
+
+import * as Args from './core/Args';
+import * as Dispatch from './core/Dispatch';
 
 const main = async () => {
   const actualArgs = await Args.parseProcessArgs();
