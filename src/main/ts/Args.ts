@@ -23,7 +23,7 @@ const argParser =
   yargs
   .scriptName('beehive')
   .demandCommand(1)
-  .command("freeze", "freezes the master branch");
+  .command("freeze", "'freezes' the current master branch, in preparation for merging develop to master. Master will be branched as releases/x.y, some settings tweaked and pushed.");
 
 export const getRealArgs = (): string[] =>
   process.argv.slice(2)

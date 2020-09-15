@@ -14,16 +14,8 @@ export const freeze = (): Promise<void> =>
 const logb = (message: string): void =>
   console.log(' - ' + message);
 
-const freezeHeader = `
-Freeze
-----------------------------------------------------------------
-This process code 'freezes' the current master branch, in preparation for merging develop to master.
-Master will be branched as releases/x.y, some settings tweaked and pushed.
-----------------------------------------------------------------
-`
-
 export const runFreeze = async (gitUrl: string): Promise<void> => {
-  console.log(freezeHeader);
+  console.log("Freeze");
 
   logb('Cloning ' + gitUrl + ' to temp folder');
   const { dir, git } = await Git.cloneInTempFolder(gitUrl);
