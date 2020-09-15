@@ -3,6 +3,7 @@ import { JsonDecoder } from "ts.data.json";
 import Decoder = JsonDecoder.Decoder;
 import { decodeStringAsPromise, eitherToDecoder } from "./Json";
 import * as Files from "./Files";
+import * as path from "path";
 
 export interface PackageJson {
   readonly version: Version;
@@ -24,4 +25,4 @@ export const parsePackageJsonFile = async (filename: string): Promise<PackageJso
   Files.readFileAsString(filename).then(parsePackageJson);
 
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
-  parsePackageJsonFile(folder + '/package.json');
+  parsePackageJsonFile(path.resolve(folder, 'package.json'));
