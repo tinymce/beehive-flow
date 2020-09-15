@@ -12,8 +12,8 @@ export const isClean = async (git: SimpleGit): Promise<boolean> => {
 };
 
 export interface TempGit {
-  git: SimpleGit;
-  dir: string;
+  readonly git: SimpleGit;
+  readonly dir: string;
 }
 
 // TODO: are we removing these folders on exit?
