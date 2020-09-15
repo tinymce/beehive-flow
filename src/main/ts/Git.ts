@@ -42,5 +42,5 @@ export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
 
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
-  return b.branches.hasOwnProperty('remotes/origin/' + branchName);
+  return Object.prototype.hasOwnProperty.call(b.branches, 'remotes/origin/' + branchName);
 };
