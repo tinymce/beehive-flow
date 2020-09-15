@@ -20,12 +20,8 @@ const packageJsonDecoder: Decoder<PackageJson> =
 export const parsePackageJson = (s: string): Promise<PackageJson> =>
   decodeStringAsPromise(packageJsonDecoder, s);
 
-export const parsePackageJsonFile = async (filename: string): Promise<PackageJson> => {
-  await Files.fileMustExist(filename);
-  const content = await Files.readFileAsString(filename);
-  return parsePackageJson(content);
-};
+export const parsePackageJsonFile = async (filename: string): Promise<PackageJson> =>
+  Files.readFileAsString(filename).then(parsePackageJson);
 
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
   parsePackageJsonFile(folder + '/package.json');
-
