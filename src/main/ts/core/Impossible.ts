@@ -1,3 +1,3 @@
-export const impossible = (v: never): never => {
+export const impossible = (_v: never): never => {
   throw new Error('Should not happen');
-}
+};

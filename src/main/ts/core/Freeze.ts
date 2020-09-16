@@ -1,27 +1,27 @@
+import * as path from 'path';
+import * as PropertiesReader from 'properties-reader';
 import * as Git from './Git';
 import * as Hardcoded from './Hardcoded';
 import * as PackageJson from './PackageJson';
 import * as Version from './Version';
 import * as Files from './Files';
-import * as path from 'path';
-import * as PropertiesReader from 'properties-reader';
 import { eitherToPromise } from './PromiseUtils';
 import { FreezeCommand } from './Args';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 
 export const freeze = (fc: FreezeCommand): Promise<void> =>
-  runFreeze(fc, Hardcoded.tinymceGitUrl)
+  runFreeze(fc, Hardcoded.tinymceGitUrl);
 
 const logb = (message: string): void =>
   console.log(` - ${message}`);
 
 export const runFreeze = async (fc: FreezeCommand, gitUrl: string): Promise<void> => {
-  console.log("Freeze" + (fc.dryRun ? " (dry-run)" : ""));
+  console.log('Freeze' + (fc.dryRun ? ' (dry-run)' : ''));
 
   logb(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl);
-  logb(`Cloned to ${dir}`)
+  logb(`Cloned to ${dir}`);
 
   logb('Checking out master');
   await git.checkout('master');
@@ -63,7 +63,7 @@ export const runFreeze = async (fc: FreezeCommand, gitUrl: string): Promise<void
   if (fc.dryRun) {
     logb(`dry-run - not pushing. To complete, run "git push" from ${dir}`);
   } else {
-    logb('git push')
+    logb('git push');
     await Git.pushNewBranch(git);
   }
 };
