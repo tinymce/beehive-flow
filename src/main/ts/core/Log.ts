@@ -1,7 +1,7 @@
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
 import { eqString } from 'fp-ts/Eq';
-import * as l4js from 'log4js'
+import * as log4js from 'log4js'
 
 type Option<A> = O.Option<A>;
 
@@ -33,7 +33,7 @@ export const isLevel = (s: string): s is Level =>
   A.elem(eqString)(s)(allLevels);
 
 export const get = (level: Level): Log => {
-  const l = l4js.getLogger();
+  const l = log4js.getLogger();
   l.level = level;
   return l;
 };
