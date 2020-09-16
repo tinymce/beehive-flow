@@ -1,26 +1,25 @@
 import * as yargs from 'yargs';
 import { impossible } from './Impossible';
 import * as Log from './Log';
-import { LogLevel } from './Log';
 
-interface BaseCommand {
+interface BaseArgs {
   readonly dryRun: boolean;
-  readonly logLevel: LogLevel;
+  readonly logLevel: Log.Level;
 }
 
-export interface FreezeCommand extends BaseCommand {
+export interface FreezeArgs extends BaseArgs {
   readonly kind: 'freeze';
 }
 
-export const freezeCommand = (dryRun: boolean, logLevel: LogLevel): FreezeCommand => ({
+export const freezeArgs = (dryRun: boolean, logLevel: Log.Level): FreezeArgs => ({
   kind: 'freeze',
   dryRun,
   logLevel
 });
 
-export type BeehiveCommand = FreezeCommand;
+export type BeehiveArgs = FreezeArgs;
 
-export const fold = <T> (bh: BeehiveCommand, ifFreeze: (dryRun: boolean) => T): T => {
+export const fold = <T> (bh: BeehiveArgs, ifFreeze: (dryRun: boolean) => T): T => {
   switch (bh.kind) {
     case 'freeze':
       return ifFreeze(bh.dryRun);
@@ -29,7 +28,7 @@ export const fold = <T> (bh: BeehiveCommand, ifFreeze: (dryRun: boolean) => T): 
   }
 };
 
-export const fold_ = <T> (bh: BeehiveCommand, ifFreeze: (f: FreezeCommand) => T): T => {
+export const fold_ = <T> (bh: BeehiveArgs, ifFreeze: (f: FreezeArgs) => T): T => {
   switch (bh.kind) {
     case 'freeze':
       return ifFreeze(bh);
@@ -48,7 +47,7 @@ const argParser =
     .option('loglevel', {
       type: 'string',
       default: Log.defaultLevel,
-      choices: Log.getLogLevels(),
+      choices: Log.getAllLevels(),
       description: 'Log level'
     })
     .option('dry-run', {
@@ -67,7 +66,7 @@ Removes the first two args, which are "node" and the script filename
 export const getRealArgs = (): string[] =>
   process.argv.slice(2);
 
-export const parseArgs = (args: string[]): Promise<BeehiveCommand> => new Promise((resolve, reject) => {
+export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((resolve, reject) => {
   const a = argParser
     .strict()
     .parse(args);
@@ -75,16 +74,16 @@ export const parseArgs = (args: string[]): Promise<BeehiveCommand> => new Promis
   const dryRun = a['dry-run'];
   const logLevel = a['loglevel'];
 
-  if (!Log.isLogLevel(logLevel)) {
+  if (!Log.isLevel(logLevel)) {
     throw new Error('Invalid log level');
   }
 
   if (a._[0] === 'freeze') {
-    resolve(freezeCommand(dryRun, logLevel));
+    resolve(freezeArgs(dryRun, logLevel));
   } else {
     reject();
   }
 });
 
-export const parseProcessArgs = (): Promise<BeehiveCommand> =>
+export const parseProcessArgs = (): Promise<BeehiveArgs> =>
   parseArgs(getRealArgs());

@@ -6,17 +6,17 @@ import * as PackageJson from './PackageJson';
 import * as Version from './Version';
 import * as Files from './Files';
 import { eitherToPromise } from './PromiseUtils';
-import { FreezeCommand } from './Args';
+import { FreezeArgs } from './Args';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 
-export const freeze = (fc: FreezeCommand): Promise<void> =>
+export const freeze = (fc: FreezeArgs): Promise<void> =>
   runFreeze(fc, Hardcoded.tinymceGitUrl);
 
 const logb = (message: string): void =>
   console.log(` - ${message}`);
 
-export const runFreeze = async (fc: FreezeCommand, gitUrl: string): Promise<void> => {
+export const runFreeze = async (fc: FreezeArgs, gitUrl: string): Promise<void> => {
   console.log('Freeze' + (fc.dryRun ? ' (dry-run)' : ''));
 
   logb(`Cloning ${gitUrl} to temp folder`);
