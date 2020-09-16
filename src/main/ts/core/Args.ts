@@ -44,7 +44,7 @@ const freezeDescription =
 const argParser =
   yargs
     .scriptName('beehive')
-    .option('loglevel', {
+    .option('log-level', {
       type: 'string',
       default: Log.defaultLevel,
       choices: Log.getAllLevels(),
@@ -72,7 +72,7 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
     .parse(args);
 
   const dryRun = a['dry-run'];
-  const logLevel = a['loglevel'];
+  const logLevel = a['log-level'];
 
   if (!Log.isLevel(logLevel)) {
     throw new Error('Invalid log level');

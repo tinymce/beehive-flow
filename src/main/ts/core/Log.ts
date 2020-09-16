@@ -32,7 +32,7 @@ export const defaultLevel = 'INFO';
 export const isLevel = (s: string): s is Level =>
   A.elem(eqString)(s)(allLevels);
 
-export const getLogger = (level: Level): Log => {
+export const get = (level: Level): Log => {
   const l = l4js.getLogger();
   l.level = level;
   return l;
