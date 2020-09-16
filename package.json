@@ -39,5 +39,8 @@
     "mocha-junit-reporter": "^2.0.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2"
+  },
+  "publishConfig": {
+    "@tiny-premium:registry": "https://npm.cloudsmith.io/tiny/tiny-premium/"
   }
 }
