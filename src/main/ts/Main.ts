@@ -6,7 +6,7 @@ import * as Dispatch from './core/Dispatch';
 const main = async () => {
   const actualArgs = await Args.parseProcessArgs();
   await Dispatch.dispatch(actualArgs);
-}
+};
 
 main().catch((e) => {
   console.error(e);

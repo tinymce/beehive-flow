@@ -6,7 +6,7 @@ interface BaseCommand {
 }
 
 export interface FreezeCommand extends BaseCommand {
-  readonly kind: 'freeze'
+  readonly kind: 'freeze';
 }
 
 export const freezeCommand = (dryRun: boolean): FreezeCommand => ({
@@ -43,8 +43,8 @@ const argParser =
       description: 'Don\'t push changes to remote systems and only make local changes.'
     })
     .command(
-      "freeze",
-      "'freezes' the current master branch, in preparation for merging develop to master. Master will be branched as releases/x.y, some settings tweaked and pushed."
+      'freeze',
+      '\'freezes\' the current master branch, in preparation for merging develop to master. Master will be branched as releases/x.y, some settings tweaked and pushed.'
     );
 
 /**
@@ -65,5 +65,5 @@ export const parseArgs = (args: string[]): Promise<BeehiveCommand> => new Promis
   }
 });
 
-export const parseProcessArgs = async () =>
-  await parseArgs(getRealArgs())
+export const parseProcessArgs = (): Promise<BeehiveCommand> =>
+  parseArgs(getRealArgs());

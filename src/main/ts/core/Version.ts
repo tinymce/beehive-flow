@@ -33,17 +33,17 @@ export const parseVersion = (input: string): Either<string, Version> => {
   // based on https://semver.org/
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 
-  const r = input.match(regexp);
+  const r = regexp.exec(input);
 
   if (r === null || r.groups === undefined) {
     return left('Could not parse version string');
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
-    const major = parseInt(g['major'], 10);
-    const minor = parseInt(g['minor'], 10);
-    const patch = parseInt(g['patch'], 10);
-    const preRelease = r.groups['prerelease'];
+    const major = parseInt(g.major, 10);
+    const minor = parseInt(g.minor, 10);
+    const patch = parseInt(g.patch, 10);
+    const preRelease = r.groups.prerelease;
 
     const v = preRelease === undefined
       ? releaseVersion(major, minor, patch)

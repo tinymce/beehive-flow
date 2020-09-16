@@ -7,7 +7,7 @@ type SimpleGit = gitP.SimpleGit;
 const ASSUMED_REMOTE = 'origin'; // This module assumes a single remote called 'origin'
 
 export const isClean = (git: SimpleGit): Promise<boolean> =>
-  git.status().then((s) => s.isClean())
+  git.status().then((s) => s.isClean());
 
 export interface TempGit {
   readonly git: SimpleGit;
@@ -27,7 +27,7 @@ const withTempGit = async <T> (f: (dir: string, git: SimpleGit) => Promise<T>): 
   const git = gitP(dir);
   await f(dir, git);
   return { dir, git };
-}
+};
 
 export const checkoutNewBranch = (git: SimpleGit, branchName: string): Promise<string> =>
   git.checkout([ '-b', branchName ]);
@@ -38,7 +38,7 @@ export const currentBranch = (git: SimpleGit): Promise<string> =>
 export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
   const cur = await currentBranch(git);
   return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
-}
+};
 
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
