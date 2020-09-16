@@ -8,6 +8,6 @@ export const eitherToPromise = <R, A> (e: Either<R, A>): Promise<A> => new Promi
   E.fold(reject, resolve)(e);
 });
 
-export const optionToPromise = <A> (o: Option<A>, reason: any = "Option.none"): Promise<A> => new Promise((resolve, reject) => {
+export const optionToPromise = <A> (o: Option<A>, reason: any = 'Option.none'): Promise<A> => new Promise((resolve, reject) => {
   O.fold(() => reject(reason), resolve)(o);
 });

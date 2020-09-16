@@ -1,7 +1,7 @@
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
 import { eqString } from 'fp-ts/Eq';
-import * as log4js from 'log4js'
+import * as log4js from 'log4js';
 
 type Option<A> = O.Option<A>;
 
@@ -19,7 +19,7 @@ export interface Log {
 export type Level = 'ALL' | 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL' | 'MARK' | 'OFF';
 
 const allLevels: Level[] =
-  ['ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'MARK', 'OFF'];
+  [ 'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'MARK', 'OFF' ];
 
 export const getAllLevels = (): readonly Level[] =>
   allLevels;
