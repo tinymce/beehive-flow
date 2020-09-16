@@ -1,17 +1,21 @@
 import * as yargs from 'yargs';
 import { impossible } from './Impossible';
+import * as Log from './Log';
+import { LogLevel } from './Log';
 
 interface BaseCommand {
   readonly dryRun: boolean;
+  readonly logLevel: LogLevel;
 }
 
 export interface FreezeCommand extends BaseCommand {
   readonly kind: 'freeze';
 }
 
-export const freezeCommand = (dryRun: boolean): FreezeCommand => ({
+export const freezeCommand = (dryRun: boolean, logLevel: LogLevel): FreezeCommand => ({
   kind: 'freeze',
-  dryRun
+  dryRun,
+  logLevel
 });
 
 export type BeehiveCommand = FreezeCommand;
@@ -37,6 +41,12 @@ export const fold_ = <T> (bh: BeehiveCommand, ifFreeze: (f: FreezeCommand) => T)
 const argParser =
   yargs
     .scriptName('beehive')
+    .option('loglevel', {
+      type: 'string',
+      default: Log.defaultLevel,
+      choices: Log.getLogLevels(),
+      description: 'Log level'
+    })
     .option('dry-run', {
       type: 'boolean',
       default: false,
@@ -58,8 +68,15 @@ export const parseArgs = (args: string[]): Promise<BeehiveCommand> => new Promis
     .strict()
     .parse(args);
 
+  const dryRun = a['dry-run'];
+  const logLevel = a['loglevel'];
+
+  if (!Log.isLogLevel(logLevel)) {
+    throw new Error('Invalid log level');
+  }
+
   if (a._[0] === 'freeze') {
-    resolve(freezeCommand(a['dry-run']));
+    resolve(freezeCommand(dryRun, logLevel));
   } else {
     reject();
   }
