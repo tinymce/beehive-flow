@@ -31,6 +31,7 @@ export const preReleaseVersion = (major: number, minor: number, patch: number, p
 // TODO: capture the "build metadata" in the semver spec
 export const parseVersion = (input: string): Either<string, Version> => {
   // based on https://semver.org/
+  // eslint-disable-next-line max-len
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 
   const r = regexp.exec(input);

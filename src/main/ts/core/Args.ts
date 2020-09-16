@@ -38,6 +38,10 @@ export const fold_ = <T> (bh: BeehiveCommand, ifFreeze: (f: FreezeCommand) => T)
   }
 };
 
+const freezeDescription =
+  '\'freezes\' the current master branch, in preparation for merging develop to master. ' +
+  'Master will be branched as releases/x.y, some settings tweaked and pushed.';
+
 const argParser =
   yargs
     .scriptName('beehive')
@@ -54,7 +58,7 @@ const argParser =
     })
     .command(
       'freeze',
-      '\'freezes\' the current master branch, in preparation for merging develop to master. Master will be branched as releases/x.y, some settings tweaked and pushed.'
+      freezeDescription
     );
 
 /**
