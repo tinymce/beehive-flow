@@ -10,8 +10,7 @@
     "sourceMap": true,
     "composite": true,
     "outDir": "lib",
-    "rootDir": ".",
-    "baseUrl": ".",
+    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -20,5 +19,10 @@
     "types": [
       "node"
     ]
-  }
+  },
+  "include": [
+    "src/main/ts",
+    "src/test/ts",
+    "src/typings/ts"
+  ]
 }
