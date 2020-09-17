@@ -17,7 +17,7 @@
     "beehive": "./src/main/ts/Main.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
-    "test": "yarn build && mocha -r esm --reporter mocha-junit-reporter --reporter-options mochaFile=scratch/junit.xml lib/test/ts/**/*Test.js",
+    "test": "yarn build && yarn lint && mocha -r esm --reporter mocha-junit-reporter --reporter-options mochaFile=scratch/junit.xml lib/test/ts/**/*Test.js",
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
