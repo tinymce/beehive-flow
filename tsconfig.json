@@ -22,7 +22,6 @@
   },
   "include": [
     "src/main/ts",
-    "src/test/ts",
-    "src/typings/ts"
+    "src/test/ts"
   ]
 }
