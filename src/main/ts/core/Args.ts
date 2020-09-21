@@ -1,22 +1,22 @@
 import * as yargs from 'yargs';
 import { impossible } from './Impossible';
 
-interface BaseCommand {
+interface BaseArgs {
   readonly dryRun: boolean;
 }
 
-export interface FreezeCommand extends BaseCommand {
+export interface FreezeArgs extends BaseArgs {
   readonly kind: 'freeze';
 }
 
-export const freezeCommand = (dryRun: boolean): FreezeCommand => ({
+export const freezeCommand = (dryRun: boolean): FreezeArgs => ({
   kind: 'freeze',
   dryRun
 });
 
-export type BeehiveCommand = FreezeCommand;
+export type BeehiveArgs = FreezeArgs;
 
-export const fold = <T> (bh: BeehiveCommand, ifFreeze: (dryRun: boolean) => T): T => {
+export const fold = <T> (bh: BeehiveArgs, ifFreeze: (dryRun: boolean) => T): T => {
   switch (bh.kind) {
     case 'freeze':
       return ifFreeze(bh.dryRun);
@@ -25,7 +25,7 @@ export const fold = <T> (bh: BeehiveCommand, ifFreeze: (dryRun: boolean) => T): 
   }
 };
 
-export const fold_ = <T> (bh: BeehiveCommand, ifFreeze: (f: FreezeCommand) => T): T => {
+export const fold_ = <T> (bh: BeehiveArgs, ifFreeze: (f: FreezeArgs) => T): T => {
   switch (bh.kind) {
     case 'freeze':
       return ifFreeze(bh);
@@ -57,7 +57,7 @@ Removes the first two args, which are "node" and the script filename
 export const getRealArgs = (): string[] =>
   process.argv.slice(2);
 
-export const parseArgs = (args: string[]): Promise<BeehiveCommand> => new Promise((resolve, reject) => {
+export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((resolve, reject) => {
   const a = argParser
     .strict()
     .parse(args);
@@ -69,5 +69,5 @@ export const parseArgs = (args: string[]): Promise<BeehiveCommand> => new Promis
   }
 });
 
-export const parseProcessArgs = (): Promise<BeehiveCommand> =>
+export const parseProcessArgs = (): Promise<BeehiveArgs> =>
   parseArgs(getRealArgs());

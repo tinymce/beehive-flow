@@ -1,4 +1,4 @@
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, left, right } from 'fp-ts/Either';
 import { impossible } from './Impossible';
 
 export interface ReleaseVersion {

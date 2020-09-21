@@ -5,3 +5,5 @@ yarn-error.log
 *.d.ts.map
 *.tsbuildinfo
 /lib
+test-results.xml
+/scratch
