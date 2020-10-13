@@ -29,6 +29,7 @@ export const preReleaseVersion = (major: number, minor: number, patch: number, p
 });
 
 // TODO: capture the "build metadata" in the semver spec
+// TODO: maybe use the "semver" package instead
 export const parseVersion = (input: string): Either<string, Version> => {
   // based on https://semver.org/
   // eslint-disable-next-line max-len

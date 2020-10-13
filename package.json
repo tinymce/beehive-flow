@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "fp-ts": "^2.8.2",
+    "kind-of": "^6.0.3",
     "properties-reader": "^2.1.1",
     "read-pkg": "^5.2.0",
     "simple-git": "^2.20.1",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@tinymce/eslint-plugin": "^1.4.1",
     "@types/chai": "^4.2.12",
+    "@types/kind-of": "^6.0.0",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.6.4",
     "@types/properties-reader": "^0.0.2",

@@ -16,7 +16,7 @@ export const readFile: (filename: string) => Promise<Buffer> =
 export const readFileAsString = (filename: string): Promise<string> =>
   readFile(filename).then((c) => c.toString());
 
-export const writeFile: (filename: string, contents: string) => Promise<unknown> =
+export const writeFile: (filename: string, contents: string) => Promise<void> =
   util.promisify(fs.writeFile);
 
 export const exists: (filename: string) => Promise<boolean> =

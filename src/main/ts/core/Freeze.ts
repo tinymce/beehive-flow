@@ -5,7 +5,7 @@ import * as Hardcoded from './Hardcoded';
 import * as PackageJson from './PackageJson';
 import * as Version from './Version';
 import * as Files from './Files';
-import { eitherToPromise } from './PromiseUtils';
+import { optionToPromise } from './PromiseUtils';
 import { FreezeArgs } from './Args';
 
 // TODO: Pass in git repo / git url? Use current checkout?
@@ -23,16 +23,14 @@ export const runFreeze = async (fc: FreezeArgs, gitUrl: string): Promise<void> =
   console.log('Checking out master');
   await git.checkout('master');
 
+  // TODO: where do we get the "primary" version from?
   const pjDir = path.resolve(dir, 'modules', 'tinymce');
 
   console.log(`Parsing package.json file in dir: ${pjDir}`);
   const pj = await PackageJson.parsePackageJsonFileInFolder(pjDir);
-  if (pj.version === undefined) {
-    throw new Error('package.json file has no version');
-  }
-  console.log(`package.json has version: ${pj.version}`);
 
-  const version = await eitherToPromise(Version.parseVersion(pj.version));
+  const version = await optionToPromise(pj.version, "Version missing in package.json file");
+  console.log(`package.json has version: ${pj.version}`);
   const releaseBranchName = Version.releaseBranchName(version);
 
   if (await Git.doesRemoteBranchExist(git, releaseBranchName)) {
