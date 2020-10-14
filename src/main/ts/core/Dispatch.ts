@@ -1,5 +1,5 @@
 import * as Args from './Args';
-import * as Freeze from './Freeze';
+import * as Prep from './Prep';
 
 export const dispatch = (args: Args.BeehiveArgs): Promise<void> =>
-  Args.fold_<Promise<void>>(args, Freeze.freeze);
+  Args.fold_<Promise<void>>(args, Prep.prep);

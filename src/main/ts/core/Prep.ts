@@ -10,7 +10,7 @@ import { FreezeArgs } from './Args';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 
-export const freeze = (fc: FreezeArgs): Promise<void> =>
+export const prep = (fc: FreezeArgs): Promise<void> =>
   runFreeze(fc, Hardcoded.testGitUrl);
 
 export const runFreeze = async (fc: FreezeArgs, gitUrl: string): Promise<void> => {
