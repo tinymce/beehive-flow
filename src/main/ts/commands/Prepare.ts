@@ -3,7 +3,7 @@ import * as PropertiesReader from 'properties-reader';
 import * as Git from '../utils/Git';
 import * as Hardcoded from '../args/Hardcoded';
 import * as PackageJson from '../data/PackageJson';
-import * as Version from '../data/Version';
+import * as BranchRules from '../logic/BranchRules';
 import * as Files from '../utils/Files';
 import { optionToPromise } from '../utils/PromiseUtils';
 import { PrepareArgs } from '../args/BeehiveArgs';
@@ -44,7 +44,6 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
     await Git.pushNewBranch(git);
   }
 };
-
 export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Freeze${dryRunMessage}`);
@@ -61,7 +60,7 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
 
   const version = await optionToPromise(pj.version, "Version missing in package.json file");
   console.log(`package.json has version: ${pj.version}`);
-  const releaseBranchName = Version.releaseBranchName(version);
+  const releaseBranchName = BranchRules.releaseBranchName(version);
 
   if (await Git.doesRemoteBranchExist(git, releaseBranchName)) {
     throw new Error(`Remote branch already exists: ${releaseBranchName}`);
@@ -71,7 +70,5 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
 
   console.log(`Checking out ${Hardcoded.mainBranch}`);
   await git.checkout(Hardcoded.mainBranch);
-
-
 
 };

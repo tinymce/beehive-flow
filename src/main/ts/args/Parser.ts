@@ -36,7 +36,7 @@ const argParser =
           .positional('majorDotMinor', {
             describe: 'major.minor version',
             type: 'string',
-            coerce: Version.parseMajorMinorVersionOrDie
+            coerce: Version.parseMajorMinorVersionOrThrow
           });
       }
     )
@@ -47,7 +47,7 @@ const argParser =
           .positional('majorDotMinor', {
             describe: 'major.minor version',
             type: 'string',
-            coerce: Version.parseMajorMinorVersionOrDie
+            coerce: Version.parseMajorMinorVersionOrThrow
           });
       }
     )

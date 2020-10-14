@@ -1,38 +1,26 @@
 import * as E from 'fp-ts/Either';
 import * as EitherUtils from '../utils/EitherUtils';
-import { impossible } from '../utils/Impossible';
 
 type Either<R, A> = E.Either<R, A>;
 
-export interface ReleaseVersion {
-  readonly kind: 'ReleaseVersion';
+export interface Version {
   readonly major: number;
   readonly minor: number;
   readonly patch: number;
+  readonly preRelease?: string;
+  readonly buildMetaData?: string;
 }
-
-export interface PreReleaseVersion {
-  readonly kind: 'PreReleaseVersion';
-  readonly major: number;
-  readonly minor: number;
-  readonly patch: number;
-  readonly preRelease: string;
-}
-
-export type Version = ReleaseVersion | PreReleaseVersion;
 
 export interface MajorMinorVersion {
   readonly major: number;
   readonly minor: number;
 }
 
-export const releaseVersion = (major: number, minor: number, patch: number): ReleaseVersion => ({
-  kind: 'ReleaseVersion',
+export const releaseVersion = (major: number, minor: number, patch: number): Version => ({
   major, minor, patch
 });
 
-export const preReleaseVersion = (major: number, minor: number, patch: number, preRelease: string): PreReleaseVersion => ({
-  kind: 'PreReleaseVersion',
+export const preReleaseVersion = (major: number, minor: number, patch: number, preRelease: string): Version => ({
   major, minor, patch, preRelease
 });
 
@@ -54,11 +42,15 @@ export const parseVersion = (input: string): Either<string, Version> => {
     const minor = parseInt(g.minor, 10);
     const patch = parseInt(g.patch, 10);
     const preRelease = r.groups.prerelease;
+    const buildMetaData = r.groups.buildMetaData
 
-    const v = preRelease === undefined
-      ? releaseVersion(major, minor, patch)
-      : preReleaseVersion(major, minor, patch, preRelease);
-    return E.right(v);
+    return E.right({
+      major,
+      minor,
+      patch,
+      preRelease,
+      buildMetaData
+    });
   }
 };
 
@@ -75,32 +67,18 @@ export const parseMajorMinorVersion = (input: string) => {
   }
 };
 
-export const parseMajorMinorVersionOrDie = (s: string): MajorMinorVersion =>
+export const parseMajorMinorVersionOrThrow = (s: string): MajorMinorVersion =>
   EitherUtils.getOrThrow(parseMajorMinorVersion(s));
 
-// TODO: Test
-export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T, ifPreRelease: (r: PreReleaseVersion) => T): T => {
-  switch (v.kind) {
-    case 'ReleaseVersion':
-      return ifRelease(v);
-    case 'PreReleaseVersion':
-      return ifPreRelease(v);
-    default:
-      return impossible(v);
-  }
-};
+export const isReleaseVersion = (v: Version): boolean =>
+  v.preRelease === undefined && v.buildMetaData === undefined;
 
 export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
   `${v.major}.${v.minor}`
 
 // TODO: Test
-export const versionToString = (v: Version): string =>
-  foldVersion(
-    v,
-    (r) => [ r.major, r.minor, r.patch ].join('.'),
-    (r) => [ r.major, r.minor, r.patch ].join('.') + '-' + r.preRelease
-  );
-
-// TODO: Test
-export const releaseBranchName = (v: Version): string =>
-  `release/${v.major}.${v.minor}`;
+export const versionToString = (v: Version): string => {
+  const preBit = v.preRelease === undefined ? '' : '-' + v.preRelease;
+  const metaBit = v.buildMetaData === undefined ? '' : '+' + v.buildMetaData;
+  return [v.major, v.minor, v.patch].join('.') + preBit + metaBit;
+};
