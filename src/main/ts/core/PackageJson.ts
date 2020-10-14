@@ -30,7 +30,7 @@ const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
   };
 };
 
-export const parsePackageJsonFileInFolder = async (folder: string): Promise<PackageJson> =>
+export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
   JsonUtils.parseJsonRecordFile(pjInFolder(folder)).then(fromJson);
 
 export const toJson = (pj: PackageJson): JsonRecord => ({
@@ -38,5 +38,5 @@ export const toJson = (pj: PackageJson): JsonRecord => ({
   ...JsonUtils.optionalToJsonRecord('version', pj.version, Version.versionToString)
 });
 
-export const writePackageJsonFileInFolder = async (folder: string, pj: PackageJson): Promise<void> =>
+export const writePackageJsonFileInFolder = (folder: string, pj: PackageJson): Promise<void> =>
   JsonUtils.writeJsonFile(pjInFolder(folder), toJson(pj));
