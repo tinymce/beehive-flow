@@ -1,6 +1,5 @@
 import * as Version from './Version';
 import * as JsonUtils from './JsonUtils';
-import * as Type from './Type';
 
 import * as O from 'fp-ts/Option';
 import * as E from 'fp-ts/Either';
@@ -16,26 +15,23 @@ interface PackageJson {
 }
 
 const parsePackageJsonVersion = (pj: JsonRecord): Promise<Option<Version>> =>
-  JsonUtils.optionalFieldSuchThat(pj, 'version', (j) =>
-    Type.isString(pj.version)
-      ? Version.parseVersion(pj.version)
-      : E.left('version field was not a string')
-  );
-
+  JsonUtils.optionalStringFieldSuchThat(pj, 'version', Version.parseVersion);
 
 const pjInFolder = (folder: string) => path.join(folder, 'package.json');
 
-export const parsePackageJsonFileInFolder = async (folder: string): Promise<PackageJson> => {
-  const pj = await JsonUtils.parseJsonRecordFile(pjInFolder(folder));
-  const parsedVersion = await parsePackageJsonVersion(pj);
+const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
+  const parsedVersion = await parsePackageJsonVersion(j);
 
-  const { version, ...other } = pj;
+  const {version, ...other} = j;
 
   return {
     version: parsedVersion,
     other
   };
 };
+
+export const parsePackageJsonFileInFolder = async (folder: string): Promise<PackageJson> =>
+  JsonUtils.parseJsonRecordFile(pjInFolder(folder)).then(fromJson);
 
 export const toJson = (pj: PackageJson): JsonRecord => ({
   ...pj.other,
