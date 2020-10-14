@@ -72,8 +72,8 @@ const pushUnlessDryRun = async (fc: PrepareArgs, dir: string, git: SimpleGit) =>
 
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {
   const branchVersion = releaseBranchVersion(version);
-  PackageJson.setVersion(pj, O.some(branchVersion));
-  await PackageJson.writePackageJsonFile(pjFile, pj);
+  const newPj = PackageJson.setVersion(pj, O.some(branchVersion));
+  await PackageJson.writePackageJsonFile(pjFile, newPj);
 };
 
 const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise<void> => {
@@ -84,13 +84,13 @@ const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise
 
 const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<Version> => {
   const newMainVersion = newMainBranchVersion(version);
-  PackageJson.setVersion(pj, O.some(newMainVersion));
-  await PackageJson.writePackageJsonFile(pjFile, pj);
+  const newPj = PackageJson.setVersion(pj, O.some(newMainVersion));
+  await PackageJson.writePackageJsonFile(pjFile, newPj);
   return newMainVersion;
 };
 export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
-  console.log(`Freeze${dryRunMessage}`);
+  console.log(`Prepare${dryRunMessage}`);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl);
@@ -106,8 +106,7 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
   const pj = await PackageJson.parsePackageJsonFile(pjFile);
 
   const version = await optionToPromise(pj.version, "Version missing in package.json file");
-  console.log(version);
-  console.log(`package.json has version: ${Version.versionToString(version)})`);
+  console.log(`package.json has version: ${Version.versionToString(version)}`);
   const releaseBranchName = BranchRules.releaseBranchName(version);
 
   await BranchRules.checkMainBranchVersion(version, 'package.json');
