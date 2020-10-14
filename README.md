@@ -54,7 +54,9 @@ All point releases for a major.minor release happen in the the branch for the re
 Operations
 ----------
 
-### prep
+Note: the "timestamp" command operates on a checkout in the current working directory, whereas the other commands make their own checkout.
+
+### prepare
 
 This signifies that the mainline is ready for stabilization.
 main is branched as release/a.b, where a.b come from package.json
@@ -70,31 +72,25 @@ This signifies that branch release/a.b is ready for release.
 Version changes:
 - release/a.b: a.b.c-rc -> a.b.c
 
-### complete a.b
+### advance a.b
 
 This signifies that branch release/a.b has been released and is ready to accept changes for the next patch release.
 
 Version changes:
 - release/a.b: a.b.c -> a.b.d-rc
 
-CI Instructions
----------------
-
-CI needs to check out a real branch, not just a detached head.
-
-### build-start
+### stamp
 
 This command should be run at the start of a build. This command does the following:
 
  1. Checks that the package.json file has a valid version for the branch.
  2. If the branch is a main branch, or a release branch in "prerelease" state, the version is changed to add the short git SHA as a suffix. 
 
+Note: this is the only command that operates on the checkout in the current working directory.
 
-### build-finish
+CI Instructions
+---------------
 
-This command should be run when the build completes. This command does the following:
+CI needs to check out a real branch, not just a detached head.
 
- 1. If the branch is a release branch in release state, runs the "complete" command to promote to new prerelease version.
-
-TODO: Should beehive-cli push tags?
-
+At the start of the build, run "timestamp". If the build is successful, run "advance".

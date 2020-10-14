@@ -18,6 +18,11 @@ export interface PreReleaseVersion {
 
 export type Version = ReleaseVersion | PreReleaseVersion;
 
+export interface MajorMinorVersion {
+  readonly major: number;
+  readonly minor: number;
+}
+
 export const releaseVersion = (major: number, minor: number, patch: number): ReleaseVersion => ({
   kind: 'ReleaseVersion',
   major, minor, patch

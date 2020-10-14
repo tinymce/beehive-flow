@@ -1,5 +1,16 @@
-import * as Args from './Args';
-import * as Prep from '../commands/Prep';
+import * as BeehiveArgs from './BeehiveArgs';
+import * as Prepare from '../commands/Prepare';
+import * as Release from '../commands/Release';
+import * as Advance from '../commands/Advance';
+import * as Stamp from '../commands/Stamp';
 
-export const dispatch = (args: Args.BeehiveArgs): Promise<void> =>
-  Args.fold_<Promise<void>>(args, Prep.prep);
+type BeehiveArgs = BeehiveArgs.BeehiveArgs;
+
+export const dispatch = (args: BeehiveArgs): Promise<void> =>
+  BeehiveArgs.fold<Promise<void>>(
+    args,
+    Prepare.prepare,
+    Release.release,
+    Advance.advance,
+    Stamp.stamp
+  );

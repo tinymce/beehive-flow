@@ -1,10 +1,10 @@
 #!/usr/bin/env -S node -r "ts-node/register"
 
-import * as Args from './args/Args';
+import * as Parser from './args/Parser';
 import * as Dispatch from './args/Dispatch';
 
 const main = async () => {
-  const actualArgs = await Args.parseProcessArgs();
+  const actualArgs = await Parser.parseProcessArgs();
   await Dispatch.dispatch(actualArgs);
 };
 
