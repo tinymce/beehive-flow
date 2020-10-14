@@ -62,6 +62,8 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
   console.log(`package.json has version: ${pj.version}`);
   const releaseBranchName = BranchRules.releaseBranchName(version);
 
+  await BranchRules.checkMainBranchVersion(version, 'package.json');
+
   if (await Git.doesRemoteBranchExist(git, releaseBranchName)) {
     throw new Error(`Remote branch already exists: ${releaseBranchName}`);
   }
