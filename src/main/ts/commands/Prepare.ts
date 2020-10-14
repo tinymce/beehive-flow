@@ -68,12 +68,24 @@ const pushUnlessDryRun = async (fc: PrepareArgs, dir: string, git: SimpleGit) =>
   }
 };
 
-const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {
+const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {
   const branchVersion = releaseBranchVersion(version);
   PackageJson.setVersion(pj, O.some(branchVersion));
   await PackageJson.writePackageJsonFileInFolder(pjFile, pj);
 };
 
+const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise<void> => {
+  if (await Git.doesRemoteBranchExist(git, branchName)) {
+    throw new Error(`Remote branch already exists: ${branchName}`);
+  }
+}
+
+const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<Version> => {
+  const newMainVersion = newMainBranchVersion(version);
+  PackageJson.setVersion(pj, O.some(newMainVersion));
+  await PackageJson.writePackageJsonFileInFolder(pjFile, pj);
+  return newMainVersion;
+};
 export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Freeze${dryRunMessage}`);
@@ -96,32 +108,21 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
   const releaseBranchName = BranchRules.releaseBranchName(version);
 
   await BranchRules.checkMainBranchVersion(version, 'package.json');
+  await branchShouldNotExist(git, releaseBranchName);
 
-  if (await Git.doesRemoteBranchExist(git, releaseBranchName)) {
-    throw new Error(`Remote branch already exists: ${releaseBranchName}`);
-  }
-
-  console.log(`Creating release branch: ${releaseBranchName}`);
+  console.log(`Creating ${releaseBranchName} branch`);
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
-  await updatePackageJsonFileForMainBranch(version, pj, pjFile);
-
-  console.log('git commit');
+  await updatePackageJsonFileForReleaseBranch(version, pj, pjFile);
   await git.add(buildPropertiesFile);
   await git.add(pjFile);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
   await pushNewBranchUnlessDryRun(fc, dir, git);
 
-  console.log(`Checking out ${mainBranch}`);
+  console.log(`Updating ${mainBranch} branch`);
   await git.checkout(mainBranch);
-
-  console.log('Updating version in package.json');
-  const newMainVersion = newMainBranchVersion(version);
-  PackageJson.setVersion(pj, O.some(newMainVersion));
-  await PackageJson.writePackageJsonFileInFolder(pjFile, pj);
-
-  await git.add(buildPropertiesFile);
+  await updatePackageJsonFileForMainBranch(version, pj, pjFile);
   await git.add(pjFile);
-  await git.commit(`Updating version to ${Version.versionToString(newMainVersion)}`);
+  await git.commit(`Updating version`);
   await pushUnlessDryRun(fc, dir, git);
 };
