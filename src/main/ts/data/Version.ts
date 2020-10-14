@@ -1,5 +1,8 @@
-import { Either, left, right } from 'fp-ts/Either';
+import * as E from 'fp-ts/Either';
+import * as EitherUtils from '../utils/EitherUtils';
 import { impossible } from '../utils/Impossible';
+
+type Either<R, A> = E.Either<R, A>;
 
 export interface ReleaseVersion {
   readonly kind: 'ReleaseVersion';
@@ -43,7 +46,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
   const r = regexp.exec(input);
 
   if (r === null || r.groups === undefined) {
-    return left('Could not parse version string');
+    return E.left('Could not parse version string');
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
@@ -55,10 +58,25 @@ export const parseVersion = (input: string): Either<string, Version> => {
     const v = preRelease === undefined
       ? releaseVersion(major, minor, patch)
       : preReleaseVersion(major, minor, patch, preRelease);
-    return right(v);
+    return E.right(v);
   }
 };
 
+export const parseMajorMinor = (input: string) => {
+  const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
+  const r = regexp.exec(input);
+  if (r === null || r.groups === undefined) {
+    return E.left('Could not parse major.minor version string');
+  } else {
+    const g = r.groups;
+    const major = parseInt(g.major, 10);
+    const minor = parseInt(g.minor, 10);
+    return E.right({ major, minor });
+  }
+};
+
+export const parseMajorMinorOrDie = (s: string): MajorMinorVersion =>
+  EitherUtils.getOrThrow(parseMajorMinor(s));
 
 // TODO: Test
 export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T, ifPreRelease: (r: PreReleaseVersion) => T): T => {

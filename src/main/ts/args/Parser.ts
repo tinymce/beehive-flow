@@ -1,7 +1,9 @@
 import * as yargs from 'yargs';
 import * as BeehiveArgs from './BeehiveArgs';
+import * as Version from '../data/Version';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
+type MajorMinorVersion = Version.MajorMinorVersion;
 
 const prepDescription =
   'Branches main as releases/x.y and tweaks versions. Run this command when you are preparing to stabilize "main" as a new release.';
@@ -33,7 +35,8 @@ const argParser =
         yargs
           .positional('majorDotMinor', {
             describe: 'major.minor version',
-            type: 'string'
+            type: 'string',
+            coerce: Version.parseMajorMinorOrDie
           });
       }
     )
@@ -43,7 +46,8 @@ const argParser =
         yargs
           .positional('majorDotMinor', {
             describe: 'major.minor version',
-            type: 'string'
+            type: 'string',
+            coerce: Version.parseMajorMinorOrDie
           });
       }
     )
@@ -52,8 +56,7 @@ const argParser =
       stampDescription
     )
     .demandCommand(1)
-    .wrap(120)
-  ;
+    .wrap(120);
 
 /**
  Removes the first two args, which are "node" and the script filename
@@ -74,12 +77,14 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
       resolve(BeehiveArgs.prepareArgs(dryRun));
 
     } else if (a._[0] === 'release') {
-      resolve(BeehiveArgs.releaseArgs(dryRun, {major: 0, minor: 0}));
+      const mm = a['majorMinorVersion'] as MajorMinorVersion;
+      resolve(BeehiveArgs.releaseArgs(dryRun, mm));
 
     } else if (a._[0] === 'advance') {
-      resolve(BeehiveArgs.advanceArgs(dryRun, {major: 0, minor: 0}));
+      const mm = a['majorMinorVersion'] as MajorMinorVersion;
+      resolve(BeehiveArgs.advanceArgs(dryRun, mm));
 
-    } else if (a._[0] === 'prepare') {
+    } else if (a._[0] === 'stamp') {
       resolve(BeehiveArgs.stampArgs(dryRun));
 
     } else {
