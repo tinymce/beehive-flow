@@ -62,7 +62,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
   }
 };
 
-export const parseMajorMinor = (input: string) => {
+export const parseMajorMinorVersion = (input: string) => {
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
   const r = regexp.exec(input);
   if (r === null || r.groups === undefined) {
@@ -75,8 +75,8 @@ export const parseMajorMinor = (input: string) => {
   }
 };
 
-export const parseMajorMinorOrDie = (s: string): MajorMinorVersion =>
-  EitherUtils.getOrThrow(parseMajorMinor(s));
+export const parseMajorMinorVersionOrDie = (s: string): MajorMinorVersion =>
+  EitherUtils.getOrThrow(parseMajorMinorVersion(s));
 
 // TODO: Test
 export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T, ifPreRelease: (r: PreReleaseVersion) => T): T => {
@@ -89,6 +89,9 @@ export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T,
       return impossible(v);
   }
 };
+
+export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
+  `${v.major}.${v.minor}`
 
 // TODO: Test
 export const versionToString = (v: Version): string =>
