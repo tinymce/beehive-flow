@@ -8,6 +8,7 @@ import * as Files from '../utils/Files';
 import { optionToPromise } from '../utils/PromiseUtils';
 import { PrepareArgs } from '../args/BeehiveArgs';
 import { SimpleGit } from 'simple-git';
+import { Version } from '../data/Version';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 
@@ -28,10 +29,26 @@ const writeBuildPropertiesFile = async (dir: string, releaseBranchName: string):
   return buildPropertiesFile;
 };
 
+export const newMainBranchVersion = (oldMainBranchVersion: Version): Version => ({
+  major: oldMainBranchVersion.major,
+  minor: oldMainBranchVersion.minor + 1,
+  patch: 0,
+  preRelease: 'main'
+});
+
+export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => ({
+  major: oldMainBranchVersion.major,
+  minor: oldMainBranchVersion.minor,
+  patch: 0,
+  preRelease: 'rc'
+});
+
 const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, dir: string, fc: PrepareArgs): Promise<void> => {
   console.log(`Creating release branch: ${releaseBranchName}`);
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
+
+  // TODO: change release branch version in package.json
 
   console.log('git commit');
   await git.add(buildPropertiesFile);
@@ -44,6 +61,7 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
     await Git.pushNewBranch(git);
   }
 };
+
 export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Freeze${dryRunMessage}`);
@@ -52,8 +70,9 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
   const { dir, git } = await Git.cloneInTempFolder(gitUrl);
   console.log(`Cloned to ${dir}`);
 
-  console.log(`Checking out ${Hardcoded.mainBranch}`);
-  await git.checkout(Hardcoded.mainBranch);
+  const mainBranch = Hardcoded.mainBranch;
+  console.log(`Checking out ${mainBranch}`);
+  await git.checkout(mainBranch);
 
   console.log(`Parsing package.json file in dir: ${dir}`);
   const pj = await PackageJson.parsePackageJsonFileInFolder(dir);
@@ -70,7 +89,9 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
 
   await createReleaseBranch(releaseBranchName, git, dir, fc);
 
-  console.log(`Checking out ${Hardcoded.mainBranch}`);
-  await git.checkout(Hardcoded.mainBranch);
+  console.log(`Checking out ${mainBranch}`);
+  await git.checkout(mainBranch);
+
+  // TODO: change main branch version in package.json
 
 };
