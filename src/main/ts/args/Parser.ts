@@ -69,8 +69,6 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
       .strict()
       .parse(args);
 
-    console.log(a);
-
     const dryRun = a['dry-run'];
 
     if (a._[0] === 'prepare') {

@@ -35,8 +35,11 @@ export const parseJsonRecordFile = async (path: string): Promise<JsonRecord> => 
   return parseJsonRecord(s);
 };
 
+export const prettyPrint = (j: Json): string =>
+  JSON.stringify(j, null, 2);
+
 export const writeJsonFile = async (path: string, j: Json): Promise<void> =>
-  Files.writeFile(path, JSON.stringify(j));
+  Files.writeFile(path, prettyPrint(j));
 
 export const optionalField = async (o: JsonRecord, k: string): Promise<Option<Json>> =>
   PromiseUtils.succeed(ObjUtils.lookup(o, k));

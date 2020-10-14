@@ -47,12 +47,14 @@ export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => 
   preRelease: 'rc'
 });
 
-const dryRunMessage = (dir: string): string =>
-  `dry-run - not pushing. To complete, run "git push" from ${dir}`;
+const dryRunMessage = async (dir: string, git: SimpleGit): Promise<string> => {
+  const curBranch = await Git.currentBranch(git);
+  return `dry-run - not pushing. To complete, push "${curBranch}" branch from ${dir}`;
+};
 
 const pushNewBranchUnlessDryRun = async (fc: PrepareArgs, dir: string, git: SimpleGit): Promise<void> => {
   if (fc.dryRun) {
-    console.log(dryRunMessage(dir));
+    console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
     await Git.pushNewBranch(git);
@@ -61,7 +63,7 @@ const pushNewBranchUnlessDryRun = async (fc: PrepareArgs, dir: string, git: Simp
 
 const pushUnlessDryRun = async (fc: PrepareArgs, dir: string, git: SimpleGit) => {
   if (fc.dryRun) {
-    console.log(dryRunMessage(dir));
+    console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
     await Git.push(git);
@@ -71,7 +73,7 @@ const pushUnlessDryRun = async (fc: PrepareArgs, dir: string, git: SimpleGit) =>
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {
   const branchVersion = releaseBranchVersion(version);
   PackageJson.setVersion(pj, O.some(branchVersion));
-  await PackageJson.writePackageJsonFileInFolder(pjFile, pj);
+  await PackageJson.writePackageJsonFile(pjFile, pj);
 };
 
 const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise<void> => {
@@ -83,7 +85,7 @@ const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise
 const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<Version> => {
   const newMainVersion = newMainBranchVersion(version);
   PackageJson.setVersion(pj, O.some(newMainVersion));
-  await PackageJson.writePackageJsonFileInFolder(pjFile, pj);
+  await PackageJson.writePackageJsonFile(pjFile, pj);
   return newMainVersion;
 };
 export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {

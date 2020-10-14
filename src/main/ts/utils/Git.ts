@@ -1,6 +1,7 @@
 import * as gitP from 'simple-git/promise';
 import { PushResult } from 'simple-git';
 import * as Files from './Files';
+import * as ObjUtils from './ObjUtils';
 
 type SimpleGit = gitP.SimpleGit;
 
@@ -45,5 +46,5 @@ export const push = async (git: SimpleGit): Promise<PushResult> =>
 
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
-  return Object.prototype.hasOwnProperty.call(b.branches, 'remotes/origin/' + branchName);
+  return ObjUtils.hasKey(b.branches, 'remotes/origin/' + branchName);
 };

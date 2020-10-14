@@ -34,7 +34,6 @@ const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
 export const parsePackageJsonFile = (file: string): Promise<PackageJson> =>
   JsonUtils.parseJsonRecordFile(file).then(fromJson);
 
-
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
   parsePackageJsonFile(pjInFolder(folder));
 
