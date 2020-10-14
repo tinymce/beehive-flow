@@ -1,5 +1,5 @@
 import { Either, left, right } from 'fp-ts/Either';
-import { impossible } from './Impossible';
+import { impossible } from '../utils/Impossible';
 
 export interface ReleaseVersion {
   readonly kind: 'ReleaseVersion';

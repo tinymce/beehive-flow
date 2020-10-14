@@ -1,5 +1,5 @@
 import * as yargs from 'yargs';
-import { impossible } from './Impossible';
+import { impossible } from '../utils/Impossible';
 
 interface BaseArgs {
   readonly dryRun: boolean;

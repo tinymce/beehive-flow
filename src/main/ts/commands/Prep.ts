@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as PropertiesReader from 'properties-reader';
-import * as Git from './Git';
-import * as Hardcoded from './Hardcoded';
-import * as PackageJson from './PackageJson';
-import * as Version from './Version';
-import * as Files from './Files';
-import { optionToPromise } from './PromiseUtils';
-import { FreezeArgs } from './Args';
+import * as Git from '../utils/Git';
+import * as Hardcoded from '../args/Hardcoded';
+import * as PackageJson from '../data/PackageJson';
+import * as Version from '../data/Version';
+import * as Files from '../utils/Files';
+import { optionToPromise } from '../utils/PromiseUtils';
+import { FreezeArgs } from '../args/Args';
 
 // TODO: Pass in git repo / git url? Use current checkout?
 

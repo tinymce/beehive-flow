@@ -1,5 +1,5 @@
 import * as Version from './Version';
-import * as JsonUtils from './JsonUtils';
+import * as JsonUtils from '../utils/JsonUtils';
 
 import * as O from 'fp-ts/Option';
 import * as E from 'fp-ts/Either';
