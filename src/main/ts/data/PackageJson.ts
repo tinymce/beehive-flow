@@ -9,7 +9,7 @@ type Option<A> = O.Option<A>;
 type Version = Version.Version;
 type JsonRecord = E.JsonRecord;
 
-interface PackageJson {
+export interface PackageJson {
   readonly version: Option<Version>;
   readonly other: Omit<JsonRecord, 'version'>
 }
@@ -17,7 +17,8 @@ interface PackageJson {
 const parsePackageJsonVersion = (pj: JsonRecord): Promise<Option<Version>> =>
   JsonUtils.optionalStringFieldSuchThat(pj, 'version', Version.parseVersion);
 
-const pjInFolder = (folder: string) => path.join(folder, 'package.json');
+export const pjInFolder = (folder: string) =>
+  path.join(folder, 'package.json');
 
 const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
   const parsedVersion = await parsePackageJsonVersion(j);
@@ -30,13 +31,25 @@ const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
   };
 };
 
+export const parsePackageJsonFile = (file: string): Promise<PackageJson> =>
+  JsonUtils.parseJsonRecordFile(file).then(fromJson);
+
+
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
-  JsonUtils.parseJsonRecordFile(pjInFolder(folder)).then(fromJson);
+  parsePackageJsonFile(pjInFolder(folder));
 
 export const toJson = (pj: PackageJson): JsonRecord => ({
   ...pj.other,
   ...JsonUtils.optionalToJsonRecord('version', pj.version, Version.versionToString)
 });
 
+export const writePackageJsonFile = (file: string, pj: PackageJson): Promise<void> =>
+  JsonUtils.writeJsonFile(file, toJson(pj));
+
 export const writePackageJsonFileInFolder = (folder: string, pj: PackageJson): Promise<void> =>
-  JsonUtils.writeJsonFile(pjInFolder(folder), toJson(pj));
+  writePackageJsonFile(pjInFolder(folder), pj);
+
+export const setVersion = (pj: PackageJson, version: Option<Version>): PackageJson => ({
+  ...pj,
+  version
+});

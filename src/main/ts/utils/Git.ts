@@ -40,6 +40,9 @@ export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
   return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
 };
 
+export const push = async (git: SimpleGit): Promise<PushResult> =>
+  git.push(ASSUMED_REMOTE);
+
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
   return Object.prototype.hasOwnProperty.call(b.branches, 'remotes/origin/' + branchName);
