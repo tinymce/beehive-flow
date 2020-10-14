@@ -14,7 +14,8 @@ export const prepare = (fc: PrepareArgs): Promise<void> =>
   runPrepare(fc, Hardcoded.testGitUrl);
 
 export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {
-  console.log('Freeze' + (fc.dryRun ? ' (dry-run)' : ''));
+  const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
+  console.log(`Freeze${dryRunMessage}`);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl);
