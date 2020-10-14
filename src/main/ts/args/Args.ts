@@ -5,38 +5,37 @@ interface BaseArgs {
   readonly dryRun: boolean;
 }
 
-export interface FreezeArgs extends BaseArgs {
-  readonly kind: 'freeze';
+export interface PrepArgs extends BaseArgs {
+  readonly kind: 'prep';
 }
 
-export const freezeCommand = (dryRun: boolean): FreezeArgs => ({
-  kind: 'freeze',
+export const prepCommand = (dryRun: boolean): PrepArgs => ({
+  kind: 'prep',
   dryRun
 });
 
-export type BeehiveArgs = FreezeArgs;
+export type BeehiveArgs = PrepArgs;
 
-export const fold = <T> (bh: BeehiveArgs, ifFreeze: (dryRun: boolean) => T): T => {
+export const fold = <T> (bh: BeehiveArgs, ifPrep: (dryRun: boolean) => T): T => {
   switch (bh.kind) {
-    case 'freeze':
-      return ifFreeze(bh.dryRun);
+    case 'prep':
+      return ifPrep(bh.dryRun);
     default:
       return impossible(bh.kind);
   }
 };
 
-export const fold_ = <T> (bh: BeehiveArgs, ifFreeze: (f: FreezeArgs) => T): T => {
+export const fold_ = <T> (bh: BeehiveArgs, ifPrep: (f: PrepArgs) => T): T => {
   switch (bh.kind) {
-    case 'freeze':
-      return ifFreeze(bh);
+    case 'prep':
+      return ifPrep(bh);
     default:
       return impossible(bh.kind);
   }
 };
 
-const freezeDescription =
-  '\'freezes\' the current master branch, in preparation for merging develop to master. ' +
-  'Master will be branched as releases/x.y, some settings tweaked and pushed.';
+const prepDescription =
+  'Branches main as releases/x.y and tweaks versions. Run this command when you are preparing to stabilize "main" as a new release.';
 
 const argParser =
   yargs
@@ -47,8 +46,8 @@ const argParser =
       description: 'Don\'t push changes to remote systems and only make local changes.'
     })
     .command(
-      'freeze',
-      freezeDescription
+      'prep',
+      prepDescription
     );
 
 /**
@@ -62,8 +61,8 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
     .strict()
     .parse(args);
 
-  if (a._[0] === 'freeze') {
-    resolve(freezeCommand(a['dry-run']));
+  if (a._[0] === 'prep') {
+    resolve(prepCommand(a['dry-run']));
   } else {
     reject();
   }

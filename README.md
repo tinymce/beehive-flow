@@ -16,7 +16,7 @@ In the below description, an NPM/Yarn package.json project is assumed, and the t
 Branches
 --------
 
-A single mainline branch called "master" or "main" is used. All new features and fixes are merged first to the main branch, then cherry-picked to other branches as necessary.
+A single mainline branch called "main" is used. All new features and fixes are merged first to the main branch, then cherry-picked to other branches as necessary.
 
 ```
   main
