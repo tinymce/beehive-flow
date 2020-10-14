@@ -15,7 +15,7 @@ export const voidify = <A> (p: Promise<A>): Promise<void> =>
   p.then(() => {});
 
 export const optionToPromise = <R, A> (o: Option<A>, e?: any): Promise<A> => new Promise((resolve, reject) => {
-  O.fold(() => reject(e), resolve)(e);
+  O.fold(() => reject(e), resolve)(o);
 });
 
 export const succeed = <A> (a: A): Promise<A> => new Promise((resolve, reject) => {

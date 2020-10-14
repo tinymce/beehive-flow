@@ -104,7 +104,8 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
   const pj = await PackageJson.parsePackageJsonFile(pjFile);
 
   const version = await optionToPromise(pj.version, "Version missing in package.json file");
-  console.log(`package.json has version: ${pj.version}`);
+  console.log(version);
+  console.log(`package.json has version: ${Version.versionToString(version)})`);
   const releaseBranchName = BranchRules.releaseBranchName(version);
 
   await BranchRules.checkMainBranchVersion(version, 'package.json');

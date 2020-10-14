@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/Either';
 import { eitherToPromiseVoid, eitherToPromise } from '../utils/PromiseUtils';
-import * as StringUtils from '../utils/StringUtils';
+import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Version from '../data/Version';
 import { Either } from 'fp-ts/Either';
 
@@ -15,11 +15,11 @@ export const checkMainBranchVersionE = (v: Version, source: string): Either<stri
   // must be a.b.0-main
   const loc = `main branch: ${source} version`;
   if (v.patch !== 0) {
-    return E.left(`${loc}: patch part should be 0, but is ${v.patch}`);
+    return E.left(`${loc}: patch part should be 0, but is "${v.patch}"`);
   } else if (v.preRelease !== 'main') {
-    return E.left(`${loc}: prerelease part should be "main", but is "${v.preRelease}"`);
+    return E.left(`${loc}: prerelease part should be "main", but is ${showStringOrUndefined(v.preRelease)}`);
   } else if (v.buildMetaData !== undefined) {
-    return E.left(`${loc}: buildMetaData part should not be set, but it is "${v.buildMetaData}"`);
+    return E.left(`${loc}: buildMetaData part should not be set, but it is ${showStringOrUndefined(v.buildMetaData)}`);
   } else {
     return E.right(null);
   }
@@ -45,12 +45,12 @@ export const checkReleaseBranchPreReleaseVersionE = (v: Version, branchVersion: 
   const loc = `${branchName} branch: ${source} version`;
 
   if (v.preRelease !== "rc") {
-    const sPre = StringUtils.showStringOrUndefined(v.preRelease);
-    return E.left(`${loc}: prerelease version part should be "rc", but it is ${sPre}`);
+    const sPre = showStringOrUndefined(v.preRelease);
+    return E.left(`${loc}: prerelease version part should be "rc", but it is "${sPre}"`);
   } else if (v.buildMetaData !== undefined) {
-    return E.left(`${loc}: buildMetaData version part should not be set, but it is "${v.buildMetaData}"`);
+    return E.left(`${loc}: buildMetaData version part should not be set, but it is ${showStringOrUndefined(v.buildMetaData)}`);
   } else if (v.major != branchVersion.major || v.minor !== branchVersion.minor) {
-    return E.left(`${loc}: major.minor of branch name (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
+    return E.left(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
   } else {
     return E.right(null);
   }
