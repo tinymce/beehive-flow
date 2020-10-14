@@ -1,4 +1,4 @@
 
 
 // TODO: not hardcode this.
-export const tinymceGitUrl = 'git@github.com:tinymce/tinymce.git';
+export const testGitUrl = 'git@github.com:tinydylan/hubris.git';

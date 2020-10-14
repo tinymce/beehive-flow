@@ -11,7 +11,7 @@ import { FreezeArgs } from './Args';
 // TODO: Pass in git repo / git url? Use current checkout?
 
 export const freeze = (fc: FreezeArgs): Promise<void> =>
-  runFreeze(fc, Hardcoded.tinymceGitUrl);
+  runFreeze(fc, Hardcoded.testGitUrl);
 
 export const runFreeze = async (fc: FreezeArgs, gitUrl: string): Promise<void> => {
   console.log('Freeze' + (fc.dryRun ? ' (dry-run)' : ''));
@@ -23,11 +23,8 @@ export const runFreeze = async (fc: FreezeArgs, gitUrl: string): Promise<void> =
   console.log('Checking out master');
   await git.checkout('master');
 
-  // TODO: where do we get the "primary" version from?
-  const pjDir = path.resolve(dir, 'modules', 'tinymce');
-
-  console.log(`Parsing package.json file in dir: ${pjDir}`);
-  const pj = await PackageJson.parsePackageJsonFileInFolder(pjDir);
+  console.log(`Parsing package.json file in dir: ${dir}`);
+  const pj = await PackageJson.parsePackageJsonFileInFolder(dir);
 
   const version = await optionToPromise(pj.version, "Version missing in package.json file");
   console.log(`package.json has version: ${pj.version}`);
