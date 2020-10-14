@@ -30,7 +30,7 @@ A single mainline branch called "master" or "main" is used. All new features and
 
 ```
 
-Release branches are named "release/x.y" where x.y is the major.minor version. These are branched off the main branch at the beginning of *release stabilization*.
+Release branches are named "release/x.y" where x.y is the major.minor version. These are branched off the main branch at the beginning of *release preparation*.
 The release branch code is stabilised and then released.
 
 Support fixes are made first to the main branch, then cherry-picked to a release/x.y branch and released.
@@ -54,7 +54,7 @@ All point releases for a major.minor release happen in the the branch for the re
 Operations
 ----------
 
-### freeze
+### prep
 
 This signifies that the mainline is ready for stabilization.
 main is branched as release/a.b, where a.b come from package.json
@@ -70,7 +70,7 @@ This signifies that branch release/a.b is ready for release.
 Version changes:
 - release/a.b: a.b.c-rc -> a.b.c
 
-### bump a.b
+### complete a.b
 
 This signifies that branch release/a.b has been released and is ready to accept changes for the next patch release.
 
@@ -94,7 +94,7 @@ This command should be run at the start of a build. This command does the follow
 
 This command should be run when the build completes. This command does the following:
 
- 1. If the branch is a release branch in release state, runs the "bump" command to promote to new prerelease version.
+ 1. If the branch is a release branch in release state, runs the "complete" command to promote to new prerelease version.
 
 TODO: Should beehive-cli push tags?
 
