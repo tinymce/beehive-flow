@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as PropertiesReader from 'properties-reader';
 import * as Git from '../utils/Git';
-import * as Hardcoded from '../args/Hardcoded';
+import * as HardCoded from '../args/HardCoded';
 import * as PackageJson from '../data/PackageJson';
 import * as BranchLogic from '../logic/BranchLogic';
 import * as Files from '../utils/Files';
@@ -22,7 +22,7 @@ type Version = Version.Version;
 // TODO: Pass in git repo / git url? Use current checkout?
 
 export const prepare = (fc: PrepareArgs): Promise<void> =>
-  runPrepare(fc, Hardcoded.testGitUrl);
+  runPrepare(fc, HardCoded.testGitUrl);
 
 const writeBuildPropertiesFile = async (dir: string, releaseBranchName: string): Promise<string> => {
   const buildPropertiesFile = path.resolve(dir, 'build.properties');
@@ -42,14 +42,14 @@ export const newMainBranchVersion = (oldMainBranchVersion: Version): Version => 
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor + 1,
   patch: 0,
-  preRelease: 'main'
+  preRelease: HardCoded.mainBranchPreReleaseVersion
 });
 
 export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => ({
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor,
   patch: 0,
-  preRelease: 'rc'
+  preRelease: HardCoded.releaseBranchPreReleaseVersion
 });
 
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {

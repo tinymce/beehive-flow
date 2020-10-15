@@ -4,7 +4,7 @@ import { SimpleGit } from 'simple-git';
 import * as PackageJson from '../data/PackageJson';
 import * as Version from '../data/Version';
 import { optionToPromise } from '../utils/PromiseUtils';
-import * as Hardcoded from '../args/Hardcoded';
+import * as HardCoded from '../args/HardCoded';
 
 // This module contains high-level operations used by the commands. Unlike those in utils, these are allowed to log console messages.
 
@@ -51,7 +51,7 @@ export const branchShouldNotExist = async (git: SimpleGit, branchName: string): 
 };
 
 export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
-  gitCheckout(git, Hardcoded.mainBranch);
+  gitCheckout(git, HardCoded.mainBranch);
 
 
 export const gitCheckout = async (git: SimpleGit, branchName: string): Promise<string> => {

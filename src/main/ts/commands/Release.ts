@@ -1,7 +1,7 @@
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../data/Version';
 import * as Git from '../utils/Git';
-import * as Hardcoded from '../args/Hardcoded';
+import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../logic/BranchLogic';
 import * as PackageJson from '../data/PackageJson';
 import * as O from 'fp-ts/Option';
@@ -11,7 +11,7 @@ type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
 
 export const release = async (fc: ReleaseArgs): Promise<void> =>
-  runRelease(fc, Hardcoded.testGitUrl);
+  runRelease(fc, HardCoded.testGitUrl);
 
 const updateVersion = (version: Version) => ({
   major: version.major,
