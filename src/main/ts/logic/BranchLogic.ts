@@ -44,7 +44,7 @@ export const checkReleaseBranchPreReleaseVersionE = (v: Version, branchVersion: 
 
   const loc = `${branchName} branch: ${source} version`;
 
-  if (v.preRelease !== "rc") {
+  if (v.preRelease !== 'rc') {
     const sPre = showStringOrUndefined(v.preRelease);
     return E.left(`${loc}: prerelease version part should be "rc", but it is "${sPre}"`);
   } else if (v.buildMetaData !== undefined) {
@@ -67,7 +67,7 @@ export const checkReleaseBranchPreReleaseVersion = (v: Version, branchVersion: M
   eitherToPromiseVoid(checkReleaseBranchPreReleaseVersionE(v, branchVersion, branchName, source));
 
 // TODO: Test
-export const releaseBranchName = (v: Version): string =>
+export const releaseBranchName = (v: MajorMinorVersion): string =>
   `release/${v.major}.${v.minor}`;
 
 export const versionFromReleaseBranchE = (branchName: string): Either<string, MajorMinorVersion> => {

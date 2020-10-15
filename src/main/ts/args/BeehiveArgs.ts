@@ -1,6 +1,6 @@
 import { MajorMinorVersion } from '../data/Version';
 
-interface BaseArgs {
+export interface BaseArgs {
   readonly dryRun: boolean;
 }
 
@@ -47,7 +47,7 @@ export const stampArgs = (dryRun: boolean): StampArgs => ({
 
 export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | StampArgs;
 
-export const fold = <T> (
+export const fold = <T>(
   bh: BeehiveArgs,
   ifPrepare: (a: PrepareArgs) => T,
   ifRelease: (a: ReleaseArgs) => T,

@@ -65,30 +65,30 @@ export const getRealArgs = (): string[] =>
   process.argv.slice(2);
 
 export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((resolve, reject) => {
-    const a = argParser
-      .strict()
-      .parse(args);
+  const a = argParser
+    .strict()
+    .parse(args);
 
-    const dryRun = a['dry-run'];
+  const dryRun = a['dry-run'];
 
-    if (a._[0] === 'prepare') {
-      resolve(BeehiveArgs.prepareArgs(dryRun));
+  if (a._[0] === 'prepare') {
+    resolve(BeehiveArgs.prepareArgs(dryRun));
 
-    } else if (a._[0] === 'release') {
-      const mm = a['majorMinorVersion'] as MajorMinorVersion;
-      resolve(BeehiveArgs.releaseArgs(dryRun, mm));
+  } else if (a._[0] === 'release') {
+    const mm = a['majorMinorVersion'] as MajorMinorVersion;
+    resolve(BeehiveArgs.releaseArgs(dryRun, mm));
 
-    } else if (a._[0] === 'advance') {
-      const mm = a['majorMinorVersion'] as MajorMinorVersion;
-      resolve(BeehiveArgs.advanceArgs(dryRun, mm));
+  } else if (a._[0] === 'advance') {
+    const mm = a['majorMinorVersion'] as MajorMinorVersion;
+    resolve(BeehiveArgs.advanceArgs(dryRun, mm));
 
-    } else if (a._[0] === 'stamp') {
-      resolve(BeehiveArgs.stampArgs(dryRun));
+  } else if (a._[0] === 'stamp') {
+    resolve(BeehiveArgs.stampArgs(dryRun));
 
-    } else {
-      reject();
-    }
-  });
+  } else {
+    reject();
+  }
+});
 
 export const parseProcessArgs = (): Promise<BeehiveArgs> =>
   parseArgs(getRealArgs());

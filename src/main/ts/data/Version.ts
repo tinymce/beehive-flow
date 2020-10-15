@@ -80,5 +80,5 @@ export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
 export const versionToString = (v: Version): string => {
   const preBit = v.preRelease === undefined ? '' : '-' + v.preRelease;
   const metaBit = v.buildMetaData === undefined ? '' : '+' + v.buildMetaData;
-  return [v.major, v.minor, v.patch].join('.') + preBit + metaBit;
+  return [ v.major, v.minor, v.patch ].join('.') + preBit + metaBit;
 };

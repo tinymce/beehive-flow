@@ -61,7 +61,7 @@ export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f
     Type.isString(j) ? f(j) : E.left(`field ${k} was not a string`)
   );
 
-export const optionalToJsonRecord = <A> (k: string, oa: Option<A>, f: (a: A) => Json): JsonRecord =>
+export const optionalToJsonRecord = <A>(k: string, oa: Option<A>, f: (a: A) => Json): JsonRecord =>
   O.fold<A, JsonRecord>(
     () => ({}),
     (a) => ({ [k]: f(a) })

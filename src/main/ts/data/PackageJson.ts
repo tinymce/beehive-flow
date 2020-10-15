@@ -23,7 +23,7 @@ export const pjInFolder = (folder: string) =>
 const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
   const parsedVersion = await parsePackageJsonVersion(j);
 
-  const {version, ...other} = j;
+  const { version, ...other } = j;
 
   return {
     version: parsedVersion,
