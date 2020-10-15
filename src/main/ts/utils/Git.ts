@@ -41,8 +41,11 @@ export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
   return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
 };
 
-export const currentRevision = (git: SimpleGit): Promise<string> =>
+export const currentRevisionSha = (git: SimpleGit): Promise<string> =>
   git.revparse({ HEAD: null });
+
+export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
+  git.revparse({ HEAD: null, '--short': null });
 
 export const push = async (git: SimpleGit): Promise<PushResult> =>
   git.push(ASSUMED_REMOTE);

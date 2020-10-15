@@ -45,9 +45,7 @@ export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Pr
   const git = gitP(dir);
 
   const currentBranch = await Git.currentBranch(git);
-
-  // TODO: get short SHA
-  const gitSha = await Git.currentRevision(git);
+  const gitSha = await Git.currentRevisionShortSha(git);
 
   const { version, pj, pjFile } = await readPackageJsonFileInDirAndRequireVersion(dir);
   const newVersion = await validateBranchAndChooseNewVersion(currentBranch, version, gitSha, clock);
