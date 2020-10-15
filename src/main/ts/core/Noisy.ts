@@ -2,10 +2,10 @@ import { SimpleGit } from 'simple-git';
 import * as O from 'fp-ts/Option';
 import { BeehiveArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
-import * as PackageJson from './PackageJson';
-import * as Version from './Version';
 import { optionToPromise } from '../utils/PromiseUtils';
 import * as HardCoded from '../args/HardCoded';
+import * as PackageJson from './PackageJson';
+import * as Version from './Version';
 
 // This module contains high-level operations used by the commands. Unlike those in utils, these are allowed to log console messages.
 
