@@ -1,3 +1,5 @@
+// These were copied from Katamari. Trying to avoid dependencies on Tiny libraries in this tool.
+
 /**
  * Show the parameter as a JS literal
  * @param s
