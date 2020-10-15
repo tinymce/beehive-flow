@@ -1,14 +1,13 @@
+import * as fs from 'fs';
 import { describe, it } from 'mocha';
-import { assert } from 'chai';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
 
 import * as tmp from 'tmp';
-import * as fs from 'fs';
-import * as E from 'fp-ts/Either';
 import fc from 'fast-check';
-import * as PromiseUtils from '../../../main/ts/utils/PromiseUtils';
 import * as Files from '../../../main/ts/utils/Files';
 
-type Either<R, A> = E.Either<R, A>;
+const assert = chai.use(chaiAsPromised).assert;
 
 describe('Files.fileMustExist', () => {
   it('Passes when file exists', async () => {
@@ -19,15 +18,13 @@ describe('Files.fileMustExist', () => {
   it('Fails when file does not exist', async () => {
     const { name } = tmp.fileSync();
     fs.unlinkSync(name);
-    const actual = await PromiseUtils.tryPromise(Files.fileMustExist(name)) as Either<Error, void>;
-    const message = E.mapLeft((e: Error) => e.message)(actual);
-    assert.deepEqual(message, E.left(`file not found: ${name}`));
+    await assert.isRejected(Files.fileMustExist(name), `file not found: ${name}`);
   });
 });
 
 describe('Files.writeFile/Files.readFile', () => {
-  it('reads the written content', () => {
-    fc.assert(fc.asyncProperty(fc.string(), async (contents) => {
+  it('reads the written content', async () => {
+    await fc.assert(fc.asyncProperty(fc.string(), async (contents) => {
       const { name } = tmp.fileSync();
       fs.unlinkSync(name);
       await Files.writeFile(name, contents);
