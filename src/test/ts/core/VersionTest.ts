@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import fc from 'fast-check';
 import * as E from 'fp-ts/Either';
 import * as Version from '../../../main/ts/core/Version';
+import * as EitherUtils from '../../../main/ts/utils/EitherUtils';
 
 describe('Version', () => {
   describe('parseVersion', () => {
@@ -75,6 +76,28 @@ describe('Version', () => {
         (major, minor, patch, preRelease, buildMetaData) => {
           assert.isFalse(Version.isReleaseVersion({ major, minor, patch, preRelease, buildMetaData }));
         }));
+    });
+  });
+
+  describe('versionToString', () => {
+    it('round-trips for 3-point version', () => {
+      fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), fc.integer(0, 100), (major, minor, patch) => {
+        const sVersion = `${major}.${minor}.${patch}`;
+        const version = EitherUtils.getOrThrow(Version.parseVersion(sVersion));
+        const actual = Version.versionToString(version);
+        assert.deepEqual(actual, sVersion);
+      }));
+    });
+
+    it('round-trips for version with buildmeta', () => {
+      fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), fc.integer(0, 100), fc.integer(0, 100).map(String),
+        (major, minor, patch, preRelease) => {
+          const input = `${major}.${minor}.${patch}-${preRelease}`;
+          const version = EitherUtils.getOrThrow(Version.parseVersion(input));
+          const actual = Version.versionToString(version);
+          assert.deepEqual(actual, input);
+        }
+      ));
     });
   });
 });
