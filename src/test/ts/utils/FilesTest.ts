@@ -9,30 +9,32 @@ import * as Files from '../../../main/ts/utils/Files';
 
 const assert = chai.use(chaiAsPromised).assert;
 
-describe('Files.fileMustExist', () => {
-  it('Passes when file exists', async () => {
-    const { name } = tmp.fileSync();
-    await Files.fileMustExist(name);
-  });
+describe('Files', () => {
+  describe('fileMustExist', () => {
+    it('Passes when file exists', async () => {
+      const { name } = tmp.fileSync();
+      await Files.fileMustExist(name);
+    });
 
-  it('Fails when file does not exist', async () => {
-    const { name } = tmp.fileSync();
-    fs.unlinkSync(name);
-    await assert.isRejected(Files.fileMustExist(name), `file not found: ${name}`);
-  });
-});
-
-describe('Files.writeFile/Files.readFile', () => {
-  it('reads the written content', async () => {
-    await fc.assert(fc.asyncProperty(fc.string(), async (contents) => {
+    it('Fails when file does not exist', async () => {
       const { name } = tmp.fileSync();
       fs.unlinkSync(name);
-      await Files.writeFile(name, contents);
-      const actual = await Files.readFileAsString(name);
-      assert.deepEqual(actual, contents);
+      await assert.isRejected(Files.fileMustExist(name), `file not found: ${name}`);
+    });
+  });
 
-      const actualBuffer = await Files.readFile(name);
-      assert.deepEqual(actualBuffer.toString(), contents);
-    }), { numRuns: 3 });
+  describe('writeFile/readFile', () => {
+    it('reads the written content', async () => {
+      await fc.assert(fc.asyncProperty(fc.string(), async (contents) => {
+        const { name } = tmp.fileSync();
+        fs.unlinkSync(name);
+        await Files.writeFile(name, contents);
+        const actual = await Files.readFileAsString(name);
+        assert.deepEqual(actual, contents);
+
+        const actualBuffer = await Files.readFile(name);
+        assert.deepEqual(actualBuffer.toString(), contents);
+      }), { numRuns: 3 });
+    });
   });
 });
