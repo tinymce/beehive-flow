@@ -35,6 +35,13 @@ The release branch code is stabilised and then released.
 
 Support fixes are made first to the main branch, then cherry-picked to a release/x.y branch and released.
 
+The only acceptible branch names are as follows:
+- main
+- release/x.y
+- feature/FEATURE_CODE
+
+The stamp command will validate branch names.
+
 Versions
 --------
 

@@ -5,6 +5,7 @@ import * as PackageJson from '../data/PackageJson';
 import * as Version from '../data/Version';
 import { optionToPromise } from '../utils/PromiseUtils';
 import * as HardCoded from '../args/HardCoded';
+import * as O from 'fp-ts/Option';
 
 // This module contains high-level operations used by the commands. Unlike those in utils, these are allowed to log console messages.
 
@@ -58,4 +59,11 @@ export const gitCheckout = async (git: SimpleGit, branchName: string): Promise<s
   console.log(`Checking out branch: ${branchName}`);
   await git.checkout(branchName);
   return branchName;
+};
+
+export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVersion: Version, pjFile: string): Promise<PackageJson> => {
+  console.log(`Setting version in ${pjFile} to: ${Version.versionToString(newVersion)}`)
+  const newPj = PackageJson.setVersion(pj, O.some(newVersion));
+  await PackageJson.writePackageJsonFile(pjFile, newPj);
+  return newPj;
 };

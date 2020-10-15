@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/Either';
 import { eitherToPromiseVoid, eitherToPromise } from '../utils/PromiseUtils';
-import { showStringOrUndefined } from '../utils/StringUtils';
+import { showStringOrUndefined, startsWith } from '../utils/StringUtils';
 import * as Version from '../data/Version';
 import { Either } from 'fp-ts/Either';
 import * as HardCoded from '../args/HardCoded';
@@ -124,3 +124,6 @@ export const versionFromReleaseBranchE = (branchName: string): Either<string, Ma
 
 export const versionFromReleaseBranch = (branchName: string): Promise<MajorMinorVersion> =>
   eitherToPromise(versionFromReleaseBranchE(branchName));
+
+export const isFeatureBranch = (branchName: string): boolean =>
+  startsWith(branchName, 'feature/');

@@ -1,6 +1,60 @@
 import { StampArgs } from '../args/BeehiveArgs';
+import * as Files from '../utils/Files';
+import { gitP } from 'simple-git';
+import * as Git from '../utils/Git';
+import * as HardCoded from '../args/HardCoded';
+import * as BranchLogic from '../logic/BranchLogic';
+import * as Version from '../data/Version';
+import * as E from 'fp-ts/Either';
+import * as PromiseUtils from '../utils/PromiseUtils';
+import * as Clock from '../data/Clock';
+import { readPackageJsonFileInDirAndRequireVersion, writePackageJsonFileWithNewVersion } from '../noisy/Noisy';
 
-export const stamp = async (fc: StampArgs): Promise<void> => {
+type Version = Version.Version;
+type Clock = Clock.Clock;
+
+const validateBranchAndChooseNewVersion = async (currentBranch: string, version: Version, gitSha: string, clock: Clock): Promise<Version> => {
+  const buildMetaData = `${gitSha}.${clock.getTimeMillis()}`;
+  const newVersion = {
+    ...version,
+    buildMetaData
+  };
+  if (currentBranch === HardCoded.mainBranch) {
+    await BranchLogic.checkMainBranchVersion(version, 'package.json');
+    return newVersion;
+  } else {
+    const branchVersionE = BranchLogic.versionFromReleaseBranchE(currentBranch);
+    if (E.isRight(branchVersionE)) {
+      const bv = branchVersionE.right;
+      if (Version.isReleaseVersion(version)) {
+        return PromiseUtils.fail('Current branch is a release version, so we should not be stamping the version.');
+      } else {
+        await BranchLogic.checkReleaseBranchPreReleaseVersion(version, bv, currentBranch, 'package.json');
+        return newVersion;
+      }
+    } else if (BranchLogic.isFeatureBranch(currentBranch)) {
+      return newVersion;
+    } else {
+      return PromiseUtils.fail(`Current branch "${currentBranch}" is not a valid branch type for beehive flow. Branches may only be "main", "release/x.y" or "feature/*"`);
+    }
+  }
+}
+
+
+export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Promise<void> => {
   console.log('Stamp');
 
-}
+  const dir = Files.cwd();
+
+  const git = gitP(dir);
+
+  const currentBranch = await Git.currentBranch(git);
+  const gitSha = await Git.currentRevision(git);
+
+  const { version, pj, pjFile } = await readPackageJsonFileInDirAndRequireVersion(dir);
+  const newVersion = await validateBranchAndChooseNewVersion(currentBranch, version, gitSha, clock);
+
+  await writePackageJsonFileWithNewVersion(pj, newVersion, pjFile);
+
+  console.log('Note: this command does not commit changes to package.json.');
+};

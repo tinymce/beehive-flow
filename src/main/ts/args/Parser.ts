@@ -92,3 +92,5 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
 
 export const parseProcessArgs = (): Promise<BeehiveArgs> =>
   parseArgs(getRealArgs());
+
+// TODO: add a parameter that tells beehive to keep temp checkouts.

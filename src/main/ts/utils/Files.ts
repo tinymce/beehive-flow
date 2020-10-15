@@ -24,3 +24,6 @@ export const exists: (filename: string) => Promise<boolean> =
 
 export const tempFolder: () => Promise<string> =
   util.promisify(tmp.dir);
+
+export const cwd = (): string =>
+  process.cwd();

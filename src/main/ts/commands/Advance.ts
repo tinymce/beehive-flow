@@ -3,9 +3,12 @@ import * as Version from '../data/Version';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../logic/BranchLogic';
-import * as PackageJson from '../data/PackageJson';
-import * as O from 'fp-ts/Option';
-import { gitCheckout, gitPushUnlessDryRun, readPackageJsonFileInDirAndRequireVersion } from '../noisy/Noisy';
+import {
+  gitCheckout,
+  gitPushUnlessDryRun,
+  readPackageJsonFileInDirAndRequireVersion,
+  writePackageJsonFileWithNewVersion
+} from '../noisy/Noisy';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
@@ -38,9 +41,7 @@ export const runAdvance = async (fc: AdvanceArgs, gitUrl: string): Promise<void>
 
   const newVersion = updateVersion(version);
   console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`)
-
-  const newPj = PackageJson.setVersion(pj, O.some(newVersion));
-  await PackageJson.writePackageJsonFile(pjFile, newPj);
+  await writePackageJsonFileWithNewVersion(pj, newVersion, pjFile);
 
   await git.add(pjFile);
   await git.commit('Advancing to release candidate version for next patch release');
