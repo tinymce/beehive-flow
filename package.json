@@ -16,7 +16,7 @@
   },
   "scripts": {
     "beehive": "./src/main/ts/Main.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "testOnly": "nyc mocha -r esm --require ts-node/register --require source-map-support/register --recursive --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters-config.json src/test/ts/**/*Test.ts",
     "buildTestOnly": "yarn build && yarn testOnly",
