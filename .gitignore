@@ -7,3 +7,5 @@ yarn-error.log
 /lib
 test-results.xml
 /scratch
+/coverage
+/.nyc_output
