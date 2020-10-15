@@ -1,10 +1,10 @@
+import * as O from 'fp-ts/Option';
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../data/Version';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../logic/BranchLogic';
 import * as PackageJson from '../data/PackageJson';
-import * as O from 'fp-ts/Option';
 import { gitCheckout, gitPushUnlessDryRun, readPackageJsonFileInDirAndRequireVersion } from '../noisy/Noisy';
 
 type Version = Version.Version;
@@ -36,7 +36,7 @@ export const runRelease = async (fc: ReleaseArgs, gitUrl: string): Promise<void>
   await BranchLogic.checkReleaseBranchPreReleaseVersion(version, fc.majorMinorVersion, rbn, 'package.json');
 
   const newVersion = updateVersion(version);
-  console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`)
+  console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`);
 
   const newPj = PackageJson.setVersion(pj, O.some(newVersion));
   await PackageJson.writePackageJsonFile(pjFile, newPj);

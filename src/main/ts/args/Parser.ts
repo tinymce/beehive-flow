@@ -1,6 +1,6 @@
 import * as yargs from 'yargs';
-import * as BeehiveArgs from './BeehiveArgs';
 import * as Version from '../data/Version';
+import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 type MajorMinorVersion = Version.MajorMinorVersion;
@@ -12,10 +12,10 @@ const releaseDescription =
   'Changes version in release/x.y branch to a release version. Run this when you are ready to release.';
 
 const advanceDescription =
-  'Changes version in release/x.y branch to the next prerelease version. Run this once you have completed a release.'
+  'Changes version in release/x.y branch to the next prerelease version. Run this once you have completed a release.';
 
 const stampDescription =
-  'Changes version in current branch to add the git sha to the prerelease version. Run this at the start of a build. Don\'t commit the changes.'
+  'Changes version in current branch to add the git sha to the prerelease version. Run this at the start of a build. Don\'t commit the changes.';
 
 const argParser =
   yargs
@@ -75,11 +75,11 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
     resolve(BeehiveArgs.prepareArgs(dryRun));
 
   } else if (a._[0] === 'release') {
-    const mm = a['majorMinorVersion'] as MajorMinorVersion;
+    const mm = a.majorMinorVersion as MajorMinorVersion;
     resolve(BeehiveArgs.releaseArgs(dryRun, mm));
 
   } else if (a._[0] === 'advance') {
-    const mm = a['majorMinorVersion'] as MajorMinorVersion;
+    const mm = a.majorMinorVersion as MajorMinorVersion;
     resolve(BeehiveArgs.advanceArgs(dryRun, mm));
 
   } else if (a._[0] === 'stamp') {

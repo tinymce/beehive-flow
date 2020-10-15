@@ -42,7 +42,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
     const minor = parseInt(g.minor, 10);
     const patch = parseInt(g.patch, 10);
     const preRelease = r.groups.prerelease;
-    const buildMetaData = r.groups.buildMetaData
+    const buildMetaData = r.groups.buildMetaData;
 
     return E.right({
       major,
@@ -54,7 +54,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
   }
 };
 
-export const parseMajorMinorVersion = (input: string) => {
+export const parseMajorMinorVersion = (input: string): Either<string, MajorMinorVersion> => {
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
   const r = regexp.exec(input);
   if (r === null || r.groups === undefined) {
@@ -74,7 +74,7 @@ export const isReleaseVersion = (v: Version): boolean =>
   v.preRelease === undefined && v.buildMetaData === undefined;
 
 export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
-  `${v.major}.${v.minor}`
+  `${v.major}.${v.minor}`;
 
 // TODO: Test
 export const versionToString = (v: Version): string => {

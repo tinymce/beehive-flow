@@ -1,9 +1,9 @@
-import * as Version from './Version';
-import * as JsonUtils from '../utils/JsonUtils';
-
+import * as path from 'path';
 import * as O from 'fp-ts/Option';
 import * as E from 'fp-ts/Either';
-import * as path from 'path';
+import * as JsonUtils from '../utils/JsonUtils';
+import * as Version from './Version';
+
 
 type Option<A> = O.Option<A>;
 type Version = Version.Version;
@@ -11,13 +11,13 @@ type JsonRecord = E.JsonRecord;
 
 export interface PackageJson {
   readonly version: Option<Version>;
-  readonly other: Omit<JsonRecord, 'version'>
+  readonly other: Omit<JsonRecord, 'version'>;
 }
 
 const parsePackageJsonVersion = (pj: JsonRecord): Promise<Option<Version>> =>
   JsonUtils.optionalStringFieldSuchThat(pj, 'version', Version.parseVersion);
 
-export const pjInFolder = (folder: string) =>
+export const pjInFolder = (folder: string): string =>
   path.join(folder, 'package.json');
 
 const fromJson = async (j: JsonRecord): Promise<PackageJson> => {

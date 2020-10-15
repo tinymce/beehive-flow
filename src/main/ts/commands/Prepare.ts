@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as PropertiesReader from 'properties-reader';
+import * as O from 'fp-ts/Option';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
 import * as PackageJson from '../data/PackageJson';
@@ -7,7 +8,6 @@ import * as BranchLogic from '../logic/BranchLogic';
 import * as Files from '../utils/Files';
 import { PrepareArgs } from '../args/BeehiveArgs';
 import * as Version from '../data/Version';
-import * as O from 'fp-ts/Option';
 import {
   branchShouldNotExist,
   checkoutMainBranch,

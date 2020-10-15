@@ -1,16 +1,14 @@
+import kind_of = require('kind-of');
+import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 import * as PromiseUtils from './PromiseUtils';
 import * as Files from './Files';
-import kind_of = require('kind-of');
-
-import * as E from 'fp-ts/Either';
-import { Either } from 'fp-ts/Either';
 import * as ObjUtils from './ObjUtils';
 import * as Type from './Type';
-import * as O from 'fp-ts/Option';
 
 type Json = E.Json;
 type JsonRecord = E.JsonRecord;
-type Option<A> = O.Option<A>;
+type Either<R, A> = E.Either<R, A>;
 
 export const parse = (s: string): Promise<Json> => {
   const result = E.parseJSON(s, String);
@@ -41,27 +39,27 @@ export const prettyPrint = (j: Json): string =>
 export const writeJsonFile = async (path: string, j: Json): Promise<void> =>
   Files.writeFile(path, prettyPrint(j) + '\n');
 
-export const optionalField = async (o: JsonRecord, k: string): Promise<Option<Json>> =>
+export const optionalField = async (o: JsonRecord, k: string): Promise<O.Option<Json>> =>
   PromiseUtils.succeed(ObjUtils.lookup(o, k));
 
-export const optionalStringField = async (o: JsonRecord, k: string): Promise<Option<string>> =>
+export const optionalStringField = async (o: JsonRecord, k: string): Promise<O.Option<string>> =>
   optionalFieldSuchThat(o, k, (j) => Type.isString(j) ? E.right(j) : E.left(`Expected key: ${k} to be a string`));
 
-export const optionalFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: Json) => Either<string, A>): Promise<Option<A>> => {
+export const optionalFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: Json) => Either<string, A>): Promise<O.Option<A>> => {
   const oa = await optionalField(o, k);
 
   return O.fold(
     () => PromiseUtils.succeed(O.none),
-    (j: Json) => PromiseUtils.eitherToPromise(E.map<A, Option<A>>(O.some)(f(j)))
+    (j: Json) => PromiseUtils.eitherToPromise(E.map<A, O.Option<A>>(O.some)(f(j)))
   )(oa);
 };
 
-export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Either<string, A>): Promise<Option<A>> =>
+export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Either<string, A>): Promise<O.Option<A>> =>
   optionalFieldSuchThat(o, k, (j) =>
     Type.isString(j) ? f(j) : E.left(`field ${k} was not a string`)
   );
 
-export const optionalToJsonRecord = <A>(k: string, oa: Option<A>, f: (a: A) => Json): JsonRecord =>
+export const optionalToJsonRecord = <A>(k: string, oa: O.Option<A>, f: (a: A) => Json): JsonRecord =>
   O.fold<A, JsonRecord>(
     () => ({}),
     (a) => ({ [k]: f(a) })

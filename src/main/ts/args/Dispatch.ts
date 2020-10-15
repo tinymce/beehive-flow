@@ -1,8 +1,8 @@
-import * as BeehiveArgs from './BeehiveArgs';
 import * as Prepare from '../commands/Prepare';
 import * as Release from '../commands/Release';
 import * as Advance from '../commands/Advance';
 import * as Stamp from '../commands/Stamp';
+import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 

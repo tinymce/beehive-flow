@@ -2,11 +2,11 @@ import * as E from 'fp-ts/Either';
 import { eitherToPromiseVoid, eitherToPromise } from '../utils/PromiseUtils';
 import { showStringOrUndefined, startsWith } from '../utils/StringUtils';
 import * as Version from '../data/Version';
-import { Either } from 'fp-ts/Either';
 import * as HardCoded from '../args/HardCoded';
 
 type Version = Version.Version;
 type MajorMinorVersion = Version.MajorMinorVersion;
+type Either<R, A> = E.Either<R, A>;
 
 /**
  * @param v Version to check.
@@ -39,7 +39,12 @@ export const checkMainBranchVersion = (v: Version, source: string): Promise<void
  * @param branchName Name of the branch. Should be consistent with branchVersion. Only used for error messages.
  * @param source File that the version came from, e.g. package.json. Only used for error messages.
  */
-export const checkReleaseBranchPreReleaseVersionE = (v: Version, branchVersion: MajorMinorVersion, branchName: string, source: string): Either<string, null> => {
+export const checkReleaseBranchPreReleaseVersionE = (
+  v: Version,
+  branchVersion: MajorMinorVersion,
+  branchName: string,
+  source: string
+): Either<string, null> => {
   const sPackageVersion = Version.versionToString(v);
   const sBranchVersion = Version.majorMinorVersionToString(branchVersion);
 
@@ -50,7 +55,7 @@ export const checkReleaseBranchPreReleaseVersionE = (v: Version, branchVersion: 
     return E.left(`${loc}: prerelease version part should be "${HardCoded.releaseBranchPreReleaseVersion}", but it is "${sPre}"`);
   } else if (v.buildMetaData !== undefined) {
     return E.left(`${loc}: buildMetaData version part should not be set, but it is ${showStringOrUndefined(v.buildMetaData)}`);
-  } else if (v.major != branchVersion.major || v.minor !== branchVersion.minor) {
+  } else if (v.major !== branchVersion.major || v.minor !== branchVersion.minor) {
     return E.left(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
   } else {
     return E.right(null);
@@ -87,7 +92,7 @@ export const checkReleaseBranchReleaseVersionE = (v: Version, branchVersion: Maj
     return E.left(`${loc}: prerelease version part should not be set, but it is "${sPre}"`);
   } else if (v.buildMetaData !== undefined) {
     return E.left(`${loc}: buildMetaData version part should not be set, but it is ${showStringOrUndefined(v.buildMetaData)}`);
-  } else if (v.major != branchVersion.major || v.minor !== branchVersion.minor) {
+  } else if (v.major !== branchVersion.major || v.minor !== branchVersion.minor) {
     return E.left(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
   } else {
     return E.right(null);
@@ -127,3 +132,6 @@ export const versionFromReleaseBranch = (branchName: string): Promise<MajorMinor
 
 export const isFeatureBranch = (branchName: string): boolean =>
   startsWith(branchName, 'feature/');
+
+export const isReleaseBranch = (branchName: string): boolean =>
+  E.isRight(versionFromReleaseBranchE(branchName));

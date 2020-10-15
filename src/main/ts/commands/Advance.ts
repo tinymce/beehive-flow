@@ -40,7 +40,7 @@ export const runAdvance = async (fc: AdvanceArgs, gitUrl: string): Promise<void>
   await BranchLogic.checkReleaseBranchReleaseVersion(version, fc.majorMinorVersion, rbn, 'package.json');
 
   const newVersion = updateVersion(version);
-  console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`)
+  console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`);
   await writePackageJsonFileWithNewVersion(pj, newVersion, pjFile);
 
   await git.add(pjFile);

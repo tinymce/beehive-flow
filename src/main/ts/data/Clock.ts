@@ -3,11 +3,11 @@ export interface Clock {
   readonly getTimeMillis: () => number;
 }
 
-export const realClock = () => ({
+export const realClock = (): Clock => ({
   getTimeMillis: () => Date.now()
 });
 
 /** useful for testing */
-export const stoppedClock = (time: number) => ({
+export const stoppedClock = (time: number): Clock => ({
   getTimeMillis: () => time
 });

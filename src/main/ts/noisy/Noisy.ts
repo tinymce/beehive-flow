@@ -1,11 +1,11 @@
+import { SimpleGit } from 'simple-git';
+import * as O from 'fp-ts/Option';
 import { BeehiveArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
-import { SimpleGit } from 'simple-git';
 import * as PackageJson from '../data/PackageJson';
 import * as Version from '../data/Version';
 import { optionToPromise } from '../utils/PromiseUtils';
 import * as HardCoded from '../args/HardCoded';
-import * as O from 'fp-ts/Option';
 
 // This module contains high-level operations used by the commands. Unlike those in utils, these are allowed to log console messages.
 
@@ -26,7 +26,7 @@ export const gitPushNewBranchUnlessDryRun = async (fc: BeehiveArgs, dir: string,
   }
 };
 
-export const gitPushUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit) => {
+export const gitPushUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
   if (args.dryRun) {
     console.log(await dryRunMessage(dir, git));
   } else {
@@ -62,7 +62,7 @@ export const gitCheckout = async (git: SimpleGit, branchName: string): Promise<s
 };
 
 export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVersion: Version, pjFile: string): Promise<PackageJson> => {
-  console.log(`Setting version in ${pjFile} to: ${Version.versionToString(newVersion)}`)
+  console.log(`Setting version in ${pjFile} to: ${Version.versionToString(newVersion)}`);
   const newPj = PackageJson.setVersion(pj, O.some(newVersion));
   await PackageJson.writePackageJsonFile(pjFile, newPj);
   return newPj;
