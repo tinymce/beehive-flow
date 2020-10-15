@@ -2,11 +2,11 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as tmp from 'tmp';
 
-export const fileMustExist = (filename: string): Promise<string> => new Promise<string>((resolve, reject) => {
+export const fileMustExist = (filename: string): Promise<void> => new Promise<void>((resolve, reject) => {
   if (!fs.existsSync(filename)) {
     reject(new Error('file not found: ' + filename));
   } else {
-    resolve(filename);
+    resolve();
   }
 });
 
@@ -24,6 +24,3 @@ export const exists: (filename: string) => Promise<boolean> =
 
 export const tempFolder: () => Promise<string> =
   util.promisify(tmp.dir);
-
-export const cwd = (): string =>
-  process.cwd();

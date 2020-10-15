@@ -1,6 +1,5 @@
 import { gitP } from 'simple-git';
 import { StampArgs } from '../args/BeehiveArgs';
-import * as Files from '../utils/Files';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../logic/BranchLogic';
@@ -40,7 +39,7 @@ const validateBranchAndChooseNewVersion = async (currentBranch: string, version:
 export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Promise<void> => {
   console.log('Stamp');
 
-  const dir = Files.cwd();
+  const dir = process.cwd();
 
   const git = gitP(dir);
 
