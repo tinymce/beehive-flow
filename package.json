@@ -59,7 +59,8 @@
       ".tsx"
     ],
     "exclude": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "coverage"
     ],
     "reporter": [
       "html",
