@@ -1,5 +1,5 @@
 import * as yargs from 'yargs';
-import * as Version from '../data/Version';
+import * as Version from '../core/Version';
 import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;

@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either';
 import { eitherToPromiseVoid, eitherToPromise } from '../utils/PromiseUtils';
 import { showStringOrUndefined, startsWith } from '../utils/StringUtils';
-import * as Version from '../data/Version';
+import * as Version from './Version';
 import * as HardCoded from '../args/HardCoded';
 
 type Version = Version.Version;

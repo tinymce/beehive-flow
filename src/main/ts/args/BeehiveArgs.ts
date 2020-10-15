@@ -1,4 +1,4 @@
-import { MajorMinorVersion } from '../data/Version';
+import { MajorMinorVersion } from '../core/Version';
 
 export interface BaseArgs {
   readonly dryRun: boolean;

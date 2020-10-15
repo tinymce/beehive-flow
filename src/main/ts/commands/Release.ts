@@ -1,11 +1,11 @@
 import * as O from 'fp-ts/Option';
 import { ReleaseArgs } from '../args/BeehiveArgs';
-import * as Version from '../data/Version';
+import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
-import * as BranchLogic from '../logic/BranchLogic';
-import * as PackageJson from '../data/PackageJson';
-import { gitCheckout, gitPushUnlessDryRun, readPackageJsonFileInDirAndRequireVersion } from '../noisy/Noisy';
+import * as BranchLogic from '../core/BranchLogic';
+import * as PackageJson from '../core/PackageJson';
+import { gitCheckout, gitPushUnlessDryRun, readPackageJsonFileInDirAndRequireVersion } from '../core/Noisy';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;

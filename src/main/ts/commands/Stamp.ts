@@ -2,11 +2,11 @@ import { gitP } from 'simple-git';
 import { StampArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
-import * as BranchLogic from '../logic/BranchLogic';
-import * as Version from '../data/Version';
+import * as BranchLogic from '../core/BranchLogic';
+import * as Version from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import * as Clock from '../data/Clock';
-import { readPackageJsonFileInDirAndRequireVersion, writePackageJsonFileWithNewVersion } from '../noisy/Noisy';
+import * as Clock from '../core/Clock';
+import { readPackageJsonFileInDirAndRequireVersion, writePackageJsonFileWithNewVersion } from '../core/Noisy';
 
 type Version = Version.Version;
 type Clock = Clock.Clock;

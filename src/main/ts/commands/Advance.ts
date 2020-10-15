@@ -1,14 +1,14 @@
 import { AdvanceArgs } from '../args/BeehiveArgs';
-import * as Version from '../data/Version';
+import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
-import * as BranchLogic from '../logic/BranchLogic';
+import * as BranchLogic from '../core/BranchLogic';
 import {
   gitCheckout,
   gitPushUnlessDryRun,
   readPackageJsonFileInDirAndRequireVersion,
   writePackageJsonFileWithNewVersion
-} from '../noisy/Noisy';
+} from '../core/Noisy';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
