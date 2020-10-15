@@ -16,15 +16,6 @@ export interface MajorMinorVersion {
   readonly minor: number;
 }
 
-export const releaseVersion = (major: number, minor: number, patch: number): Version => ({
-  major, minor, patch
-});
-
-export const preReleaseVersion = (major: number, minor: number, patch: number, preRelease: string): Version => ({
-  major, minor, patch, preRelease
-});
-
-// TODO: capture the "build metadata" in the semver spec
 // TODO: maybe use the "semver" package instead
 export const parseVersion = (input: string): Either<string, Version> => {
   // based on https://semver.org/
@@ -42,7 +33,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
     const minor = parseInt(g.minor, 10);
     const patch = parseInt(g.patch, 10);
     const preRelease = r.groups.prerelease;
-    const buildMetaData = r.groups.buildMetaData;
+    const buildMetaData = r.groups.buildmetadata;
 
     return E.right({
       major,
