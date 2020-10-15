@@ -28,3 +28,13 @@ export const fail = <A>(error?: unknown): Promise<A> =>
   new Promise(((resolve, reject) => {
     reject(error);
   }));
+
+/**
+ * Catch the success or error cases of a Promise as an Either. Always succeeds (but could still be non-terminating).
+ * @param promise
+ */
+export const tryPromise = <A> (promise: Promise<A>): Promise<Either<unknown, A>> =>
+  promise.then(
+    (a) => succeed(E.right(a)),
+    (e) => succeed(E.left(e))
+  );
