@@ -5,6 +5,8 @@ import * as E from 'fp-ts/Either';
 import * as Version from '../../../main/ts/core/Version';
 import * as EitherUtils from '../../../main/ts/utils/EitherUtils';
 
+const mmThrowMessage = 'Could not parse major.minor version string';
+
 describe('Version', () => {
   describe('parseVersion', () => {
     it('parses a correct 3-point version', () => {
@@ -76,6 +78,52 @@ describe('Version', () => {
         (major, minor, patch, preRelease, buildMetaData) => {
           assert.isFalse(Version.isReleaseVersion({ major, minor, patch, preRelease, buildMetaData }));
         }));
+      });
+  });
+
+  const invalid2Points = [
+    '1.2.3',
+    'cat.3',
+    '',
+    'dog',
+    'dog.frog',
+    '-1.0'
+  ]
+
+  describe('parseMajorMinorVersion', () => {
+    it('parses 2-point version', () => {
+      fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), (major, minor) => {
+        assert.deepEqual(Version.parseMajorMinorVersion(`${major}.${minor}`), E.right({ major, minor }));
+      }));
+    });
+
+    it('fails for invalid input (manual cases)', () => {
+      for (const x of invalid2Points) {
+        assert.deepEqual(Version.parseMajorMinorVersion(x), E.left(mmThrowMessage))
+      }
+    });
+  });
+
+  describe('parseMajorMinorVersionOrThrow', () => {
+    it('parses 2-point version', () => {
+      fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), (major, minor) => {
+        assert.deepEqual(Version.parseMajorMinorVersionOrThrow(`${major}.${minor}`), { major, minor });
+      }));
+    });
+
+    it('fails for invalid input (manual cases)', () => {
+      for (const x of invalid2Points) {
+        assert.throws(() => Version.parseMajorMinorVersionOrThrow(x), mmThrowMessage)
+      }
+    });
+  });
+
+  describe('majorMinorVersionToString', () => {
+    it('round-trips', () => {
+      fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), (major, minor) => {
+        const s = `${major}.${minor}`;
+        assert.deepEqual(Version.majorMinorVersionToString(Version.parseMajorMinorVersionOrThrow(s)), s);
+      }));
     });
   });
 
@@ -89,10 +137,21 @@ describe('Version', () => {
       }));
     });
 
-    it('round-trips for version with buildmeta', () => {
+    it('round-trips for version with prerelease', () => {
       fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), fc.integer(0, 100), fc.integer(0, 100).map(String),
         (major, minor, patch, preRelease) => {
           const input = `${major}.${minor}.${patch}-${preRelease}`;
+          const version = EitherUtils.getOrThrow(Version.parseVersion(input));
+          const actual = Version.versionToString(version);
+          assert.deepEqual(actual, input);
+        }
+      ));
+    });
+
+    it('round-trips for version with buildmeta', () => {
+      fc.assert(fc.property(fc.integer(0, 200), fc.integer(0, 200), fc.integer(0, 100), fc.integer(0, 100).map(String),
+        (major, minor, patch, buildMetaData) => {
+          const input = `${major}.${minor}.${patch}+${buildMetaData}`;
           const version = EitherUtils.getOrThrow(Version.parseVersion(input));
           const actual = Version.versionToString(version);
           assert.deepEqual(actual, input);

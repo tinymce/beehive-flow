@@ -67,7 +67,6 @@ export const isReleaseVersion = (v: Version): boolean =>
 export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
   `${v.major}.${v.minor}`;
 
-// TODO: Test
 export const versionToString = (v: Version): string => {
   const preBit = v.preRelease === undefined ? '' : '-' + v.preRelease;
   const metaBit = v.buildMetaData === undefined ? '' : '+' + v.buildMetaData;
