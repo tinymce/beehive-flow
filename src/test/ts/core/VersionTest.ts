@@ -78,7 +78,7 @@ describe('Version', () => {
         (major, minor, patch, preRelease, buildMetaData) => {
           assert.isFalse(Version.isReleaseVersion({ major, minor, patch, preRelease, buildMetaData }));
         }));
-      });
+    });
   });
 
   const invalid2Points = [
@@ -88,7 +88,7 @@ describe('Version', () => {
     'dog',
     'dog.frog',
     '-1.0'
-  ]
+  ];
 
   describe('parseMajorMinorVersion', () => {
     it('parses 2-point version', () => {
@@ -99,7 +99,7 @@ describe('Version', () => {
 
     it('fails for invalid input (manual cases)', () => {
       for (const x of invalid2Points) {
-        assert.deepEqual(Version.parseMajorMinorVersion(x), E.left(mmThrowMessage))
+        assert.deepEqual(Version.parseMajorMinorVersion(x), E.left(mmThrowMessage));
       }
     });
   });
@@ -113,7 +113,7 @@ describe('Version', () => {
 
     it('fails for invalid input (manual cases)', () => {
       for (const x of invalid2Points) {
-        assert.throws(() => Version.parseMajorMinorVersionOrThrow(x), mmThrowMessage)
+        assert.throws(() => Version.parseMajorMinorVersionOrThrow(x), mmThrowMessage);
       }
     });
   });
