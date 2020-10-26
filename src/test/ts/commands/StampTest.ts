@@ -2,6 +2,7 @@ import { describe, it } from 'mocha';
 import { DateTime } from 'luxon';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import fc from 'fast-check';
 import * as Stamp from '../../../main/ts/commands/Stamp';
 import * as Version from '../../../main/ts/core/Version';
 
@@ -63,9 +64,12 @@ describe('Stamp', () => {
         await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('release/1.2', Version.parseVersionOrThrow('1.2.9-main'), 'blah', 123));
       });
       it('passes if version is valid, but does not change the version', async () => {
-        const actual = await Stamp.validateBranchAndChooseNewVersion('release/1.2', Version.parseVersionOrThrow('1.2.6'), 'b0d52ad', 1603695425074);
-        const sactual = Version.versionToString(actual);
-        assert.equal(sactual, '1.2.6');
+        await fc.assert(fc.asyncProperty(fc.nat(), fc.nat(), fc.nat(), async (major, minor, patch) => {
+          const v = `${major}.${minor}.${patch}`;
+          const actual = await Stamp.validateBranchAndChooseNewVersion(`release/${major}.${minor}`, Version.parseVersionOrThrow(v), 'b0d52ad', 1603695425074);
+          const sactual = Version.versionToString(actual);
+          assert.equal(sactual, v);
+        }));
       });
     });
   });
