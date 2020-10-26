@@ -42,9 +42,13 @@ describe('Stamp', () => {
 
     describe('behaviour on feature branch', () => {
       it('passes if version is valid', async () => {
-        const actual = await Stamp.validateBranchAndChooseNewVersion('feature/TINY-1234', Version.parseVersionOrThrow('1.2.0-main'), 'b0d52ad', 1603695425074);
-        const sactual = Version.versionToString(actual);
-        assert.equal(sactual, '1.2.0-alpha.feature.20201026065705074+b0d52ad');
+        await fc.assert(fc.asyncProperty(fc.nat(), fc.nat(), async (major, minor) => {
+          const patch = 0;
+          const v = `${major}.${minor}.${patch}-main`;
+          const actual = await Stamp.validateBranchAndChooseNewVersion('feature/TINY-1234', Version.parseVersionOrThrow(v), 'b0d52ad', 1603695425074);
+          const sactual = Version.versionToString(actual);
+          assert.equal(sactual, `${major}.${minor}.${patch}-alpha.feature.20201026065705074+b0d52ad`);
+        }));
       });
     });
 
