@@ -1,4 +1,5 @@
 import { gitP } from 'simple-git';
+import { DateTime } from 'luxon';
 import { StampArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
@@ -11,25 +12,36 @@ import { readPackageJsonFileInDirAndRequireVersion, writePackageJsonFileWithNewV
 type Version = Version.Version;
 type Clock = Clock.Clock;
 
-const validateBranchAndChooseNewVersion = async (currentBranch: string, version: Version, gitSha: string, clock: Clock): Promise<Version> => {
-  const buildMetaData = `${gitSha}.${clock.getTimeMillis()}`;
-  const newVersion = {
-    ...version,
-    buildMetaData
+export const timeFormat = 'yyyyMMddHHmmssSSS';
+
+export const formatDate = (timeMillis: number): string =>
+  DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat, { timeZone: 'utc' });
+
+export const validateBranchAndChooseNewVersion = async (currentBranch: string, version: Version, gitSha: string, timeMillis: number): Promise<Version> => {
+
+  const newVersion = () => {
+    const dt = formatDate(timeMillis);
+    const buildMetaData = `${dt}.${gitSha}`;
+
+    return {
+      ...version,
+      buildMetaData
+    };
   };
+
   if (currentBranch === HardCoded.mainBranch) {
     await BranchLogic.checkMainBranchVersion(version, 'package.json');
-    return newVersion;
+    return newVersion();
   } else if (BranchLogic.isReleaseBranch(currentBranch)) {
     const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
     if (Version.isReleaseVersion(version)) {
       return PromiseUtils.fail('Current branch is a release version, so we should not be stamping the version.');
     } else {
       await BranchLogic.checkReleaseBranchPreReleaseVersion(version, bv, currentBranch, 'package.json');
-      return newVersion;
+      return newVersion();
     }
   } else if (BranchLogic.isFeatureBranch(currentBranch)) {
-    return newVersion;
+    return newVersion();
   } else {
     return PromiseUtils.fail(
       `Current branch "${currentBranch}" is not a valid branch type for beehive flow. Branches may only be "main", "release/x.y" or "feature/*"`);
@@ -47,7 +59,7 @@ export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Pr
   const gitSha = await Git.currentRevisionShortSha(git);
 
   const { version, pj, pjFile } = await readPackageJsonFileInDirAndRequireVersion(dir);
-  const newVersion = await validateBranchAndChooseNewVersion(currentBranch, version, gitSha, clock);
+  const newVersion = await validateBranchAndChooseNewVersion(currentBranch, version, gitSha, clock.getTimeMillis());
 
   await writePackageJsonFileWithNewVersion(pj, newVersion, pjFile);
 

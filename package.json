@@ -5,8 +5,10 @@
   "repository": "git@github.com:tinymce/beehive-cli.git",
   "license": "MIT",
   "dependencies": {
+    "@types/luxon": "^1.25.0",
     "fp-ts": "^2.8.4",
     "kind-of": "^6.0.3",
+    "luxon": "^1.25.0",
     "properties-reader": "^2.1.1",
     "read-pkg": "^5.2.0",
     "simple-git": "^2.21.0",
