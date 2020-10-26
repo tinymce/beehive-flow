@@ -7,14 +7,12 @@ import {
   gitCheckout,
   gitPushUnlessDryRun,
   readPackageJsonFileInDirAndRequireVersion,
-  writePackageJsonFileWithNewVersion
+  writePackageJsonFileWithNewVersion,
+  resolveGitUrl
 } from '../core/Noisy';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
-
-export const advance = async (fc: AdvanceArgs): Promise<void> =>
-  runAdvance(fc, HardCoded.testGitUrl);
 
 export const updateVersion = (version: Version): Version => ({
   major: version.major,
@@ -23,11 +21,13 @@ export const updateVersion = (version: Version): Version => ({
   preRelease: HardCoded.releaseBranchPreReleaseVersion
 });
 
-export const runAdvance = async (fc: AdvanceArgs, gitUrl: string): Promise<void> => {
+export const advance = async (fc: AdvanceArgs): Promise<void> => {
   const sMajorMinor = majorMinorVersionToString(fc.majorMinorVersion);
 
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Release${dryRunMessage} ${sMajorMinor}`);
+
+  const gitUrl = await resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);

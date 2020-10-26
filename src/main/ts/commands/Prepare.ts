@@ -13,16 +13,11 @@ import {
   checkoutMainBranch,
   gitPushNewBranchUnlessDryRun,
   gitPushUnlessDryRun,
-  readPackageJsonFileInDirAndRequireVersion
+  readPackageJsonFileInDirAndRequireVersion, resolveGitUrl
 } from '../core/Noisy';
 
 type PackageJson = PackageJson.PackageJson;
 type Version = Version.Version;
-
-// TODO: Pass in git repo / git url? Use current checkout?
-
-export const prepare = (fc: PrepareArgs): Promise<void> =>
-  runPrepare(fc, HardCoded.testGitUrl);
 
 const writeBuildPropertiesFile = async (dir: string, releaseBranchName: string): Promise<string> => {
   const buildPropertiesFile = path.resolve(dir, 'build.properties');
@@ -65,9 +60,11 @@ const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJ
   return newMainVersion;
 };
 
-export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void> => {
+export const prepare = async (fc: PrepareArgs): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Prepare${dryRunMessage}`);
+
+  const gitUrl = await resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);

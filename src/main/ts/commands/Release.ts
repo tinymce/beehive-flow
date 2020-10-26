@@ -2,16 +2,17 @@ import * as O from 'fp-ts/Option';
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
-import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../core/BranchLogic';
 import * as PackageJson from '../core/PackageJson';
-import { gitCheckout, gitPushUnlessDryRun, readPackageJsonFileInDirAndRequireVersion } from '../core/Noisy';
+import {
+  gitCheckout,
+  gitPushUnlessDryRun,
+  readPackageJsonFileInDirAndRequireVersion,
+  resolveGitUrl
+} from '../core/Noisy';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
-
-export const release = async (fc: ReleaseArgs): Promise<void> =>
-  runRelease(fc, HardCoded.testGitUrl);
 
 export const updateVersion = (version: Version): Version => ({
   major: version.major,
@@ -19,11 +20,13 @@ export const updateVersion = (version: Version): Version => ({
   patch: version.patch
 });
 
-export const runRelease = async (fc: ReleaseArgs, gitUrl: string): Promise<void> => {
+export const release = async (fc: ReleaseArgs): Promise<void> => {
   const sMajorMinor = majorMinorVersionToString(fc.majorMinorVersion);
 
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Release${dryRunMessage} ${sMajorMinor}`);
+
+  const gitUrl = await resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
