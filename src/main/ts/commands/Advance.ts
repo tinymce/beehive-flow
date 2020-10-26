@@ -25,7 +25,7 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
   const sMajorMinor = majorMinorVersionToString(fc.majorMinorVersion);
 
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
-  console.log(`Release${dryRunMessage} ${sMajorMinor}`);
+  console.log(`Advance${dryRunMessage} ${sMajorMinor}`);
 
   const gitUrl = await resolveGitUrl(fc.gitUrl);
 
