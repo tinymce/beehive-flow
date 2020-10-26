@@ -4,7 +4,6 @@ import * as E from 'fp-ts/Either';
 import * as JsonUtils from '../utils/JsonUtils';
 import * as Version from './Version';
 
-
 type Option<A> = O.Option<A>;
 type Version = Version.Version;
 type JsonRecord = E.JsonRecord;
