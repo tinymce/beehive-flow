@@ -45,6 +45,9 @@ export const parseVersion = (input: string): Either<string, Version> => {
   }
 };
 
+export const parseVersionOrThrow = (s: string): Version =>
+  EitherUtils.getOrThrow(parseVersion(s));
+
 export const parseMajorMinorVersion = (input: string): Either<string, MajorMinorVersion> => {
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
   const r = regexp.exec(input);

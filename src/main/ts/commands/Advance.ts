@@ -16,7 +16,7 @@ const { versionToString, majorMinorVersionToString } = Version;
 export const advance = async (fc: AdvanceArgs): Promise<void> =>
   runAdvance(fc, HardCoded.testGitUrl);
 
-const updateVersion = (version: Version) => ({
+export const updateVersion = (version: Version): Version => ({
   major: version.major,
   minor: version.minor,
   patch: version.patch + 1,
