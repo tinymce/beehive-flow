@@ -1,9 +1,11 @@
 import * as gitP from 'simple-git/promise';
 import { PushResult } from 'simple-git';
+import * as O from 'fp-ts/Option';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
 
 type SimpleGit = gitP.SimpleGit;
+type Option<A> = O.Option<A>;
 
 const ASSUMED_REMOTE = 'origin'; // This module assumes a single remote called 'origin'
 
@@ -17,16 +19,10 @@ export interface TempGit {
 
 // TODO: are we removing these folders on exit?
 
-export const initInTempFolder = (bare: boolean = false): Promise<TempGit> =>
-  withTempGit((dir, git) => git.init(bare));
-
-export const cloneInTempFolder = (repoPath: string): Promise<TempGit> =>
-  withTempGit((dir, git) => git.clone(repoPath, dir));
-
-const withTempGit = async <T>(f: (dir: string, git: SimpleGit) => Promise<T>): Promise<TempGit> => {
-  const dir = await Files.tempFolder();
+export const cloneInTempFolder = async (repoPath: string, temp: Option<string>): Promise<TempGit> => {
+  const dir = temp._tag === 'Some' ? temp.value : (await Files.tempFolder());
   const git = gitP(dir);
-  await f(dir, git);
+  await git.clone(repoPath, dir);
   return { dir, git };
 };
 

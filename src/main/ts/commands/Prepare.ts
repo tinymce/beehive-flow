@@ -70,7 +70,7 @@ export const runPrepare = async (fc: PrepareArgs, gitUrl: string): Promise<void>
   console.log(`Prepare${dryRunMessage}`);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
-  const { dir, git } = await Git.cloneInTempFolder(gitUrl);
+  const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
   console.log(`Cloned to ${dir}`);
   const mainBranch = await checkoutMainBranch(git);
 

@@ -1,7 +1,9 @@
+import { Option } from 'fp-ts/Option';
 import { MajorMinorVersion } from '../core/Version';
 
 export interface BaseArgs {
   readonly dryRun: boolean;
+  readonly temp: Option<string>;
 }
 
 export interface PrepareArgs extends BaseArgs {
@@ -22,25 +24,29 @@ export interface StampArgs extends BaseArgs {
   readonly kind: 'StampArgs';
 }
 
-export const prepareArgs = (dryRun: boolean): PrepareArgs => ({
+export const prepareArgs = (dryRun: boolean, temp: Option<string>): PrepareArgs => ({
   kind: 'PrepareArgs',
-  dryRun
+  dryRun,
+  temp
 });
 
-export const releaseArgs = (dryRun: boolean, majorMinorVersion: MajorMinorVersion): ReleaseArgs => ({
+export const releaseArgs = (dryRun: boolean, temp: Option<string>, majorMinorVersion: MajorMinorVersion): ReleaseArgs => ({
   kind: 'ReleaseArgs',
   dryRun,
+  temp,
   majorMinorVersion
 });
 
-export const advanceArgs = (dryRun: boolean, majorMinorVersion: MajorMinorVersion): AdvanceArgs => ({
+export const advanceArgs = (dryRun: boolean, temp: Option<string>, majorMinorVersion: MajorMinorVersion): AdvanceArgs => ({
   kind: 'AdvanceArgs',
   dryRun,
+  temp,
   majorMinorVersion
 });
 
-export const stampArgs = (dryRun: boolean): StampArgs => ({
+export const stampArgs = (dryRun: boolean, temp: Option<string>): StampArgs => ({
   kind: 'StampArgs',
+  temp,
   dryRun
 });
 

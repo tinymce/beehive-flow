@@ -1,4 +1,5 @@
 import * as yargs from 'yargs';
+import * as O from 'fp-ts/Option';
 import * as Version from '../core/Version';
 import * as BeehiveArgs from './BeehiveArgs';
 
@@ -30,6 +31,11 @@ const argParser =
       'prepare',
       prepDescription
     )
+    .option('temp', {
+      type: 'string',
+      default: null,
+      description: 'Temp folder for git checkout. Useful for keeping within a workspace in a CI server. If not specified, a system temp folder is used.'
+    })
     .command(
       'release <majorDotMinor>',
       releaseDescription, (yargs) => {
@@ -75,20 +81,21 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
     .parse(args);
 
   const dryRun = a['dry-run'];
+  const temp = O.fromNullable(a.temp);
 
   if (a._[0] === 'prepare') {
-    resolve(BeehiveArgs.prepareArgs(dryRun));
+    resolve(BeehiveArgs.prepareArgs(dryRun, temp));
 
   } else if (a._[0] === 'release') {
     const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.releaseArgs(dryRun, mm));
+    resolve(BeehiveArgs.releaseArgs(dryRun, temp, mm));
 
   } else if (a._[0] === 'advance') {
     const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.advanceArgs(dryRun, mm));
+    resolve(BeehiveArgs.advanceArgs(dryRun, temp, mm));
 
   } else if (a._[0] === 'stamp') {
-    resolve(BeehiveArgs.stampArgs(dryRun));
+    resolve(BeehiveArgs.stampArgs(dryRun, temp));
 
   } else {
     reject();

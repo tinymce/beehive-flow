@@ -26,7 +26,7 @@ export const runRelease = async (fc: ReleaseArgs, gitUrl: string): Promise<void>
   console.log(`Release${dryRunMessage} ${sMajorMinor}`);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
-  const { dir, git } = await Git.cloneInTempFolder(gitUrl);
+  const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
   console.log(`Cloned to ${dir}`);
 
   const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
