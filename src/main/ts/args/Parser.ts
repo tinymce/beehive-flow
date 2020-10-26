@@ -15,7 +15,8 @@ const advanceDescription =
   'Changes version in release/x.y branch to the next prerelease version. Run this once you have completed a release.';
 
 const stampDescription =
-  'Changes version in current branch to add the git sha to the prerelease version. Run this at the start of a build. Don\'t commit the changes.';
+  'Changes version in current branch to add the git sha to the prerelease version, if applicable. ' +
+  'Also validates versions. Run this at the start of a build. Don\'t commit the changes.';
 
 const argParser =
   yargs

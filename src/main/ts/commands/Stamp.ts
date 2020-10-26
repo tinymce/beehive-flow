@@ -33,7 +33,9 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
   } else if (BranchLogic.isReleaseBranch(currentBranch)) {
     const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
     if (Version.isReleaseVersion(version)) {
-      return PromiseUtils.fail('Current branch is a release version, so we should not be stamping the version.');
+      // Don't change anything for a release version
+      await BranchLogic.checkReleaseBranchReleaseVersion(version, bv, currentBranch, 'package.json');
+      return version;
     } else {
       await BranchLogic.checkReleaseBranchPreReleaseVersion(version, bv, currentBranch, 'package.json');
       return {
@@ -59,7 +61,7 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
 
   } else {
     return PromiseUtils.fail(
-      `Current branch "${currentBranch}" is not a valid branch type for beehive flow. Branches may only be "main", "release/x.y" or "feature/*"`);
+      `Current branch "${currentBranch}" is not a valid branch type for beehive flow. Branches may only be "main", "release/x.y", "hotfix/*" or "feature/*"`);
   }
 };
 

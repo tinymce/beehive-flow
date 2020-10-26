@@ -115,7 +115,7 @@ export const releaseBranchName = (v: MajorMinorVersion): string =>
   `release/${v.major}.${v.minor}`;
 
 export const versionFromReleaseBranchE = (branchName: string): Either<string, MajorMinorVersion> => {
-  const regexp = /^\/release\/(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
+  const regexp = /^release\/(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
   const r = regexp.exec(branchName);
   if (r === null || r.groups === undefined) {
     return E.left('Could not parse major.minor version from branch name');

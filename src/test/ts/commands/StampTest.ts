@@ -54,5 +54,19 @@ describe('Stamp', () => {
         assert.equal(sactual, '1.2.0-hotfix.20201026065705074+b0d52ad');
       });
     });
+
+    describe('behaviour on release branch', () => {
+      it('fails on version mismatch', async () => {
+        await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('release/1.2', Version.parseVersionOrThrow('1.3.9'), 'blah', 123));
+      });
+      it('fails on wrong prerelease', async () => {
+        await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('release/1.2', Version.parseVersionOrThrow('1.2.9-main'), 'blah', 123));
+      });
+      it('passes if version is valid, but does not change the version', async () => {
+        const actual = await Stamp.validateBranchAndChooseNewVersion('release/1.2', Version.parseVersionOrThrow('1.2.6'), 'b0d52ad', 1603695425074);
+        const sactual = Version.versionToString(actual);
+        assert.equal(sactual, '1.2.6');
+      });
+    });
   });
 });
