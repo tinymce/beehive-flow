@@ -133,5 +133,8 @@ export const versionFromReleaseBranch = (branchName: string): Promise<MajorMinor
 export const isFeatureBranch = (branchName: string): boolean =>
   startsWith(branchName, 'feature/');
 
+export const isHotfixBranch = (branchName: string): boolean =>
+  startsWith(branchName, 'hotfix/');
+
 export const isReleaseBranch = (branchName: string): boolean =>
   E.isRight(versionFromReleaseBranchE(branchName));

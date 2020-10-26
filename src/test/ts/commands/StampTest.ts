@@ -1,8 +1,11 @@
 import { describe, it } from 'mocha';
-import { assert } from 'chai';
 import { DateTime } from 'luxon';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
 import * as Stamp from '../../../main/ts/commands/Stamp';
 import * as Version from '../../../main/ts/core/Version';
+
+const assert = chai.use(chaiAsPromised).assert;
 
 describe('Stamp', () => {
   describe('formatDate', () => {
@@ -28,6 +31,11 @@ describe('Stamp', () => {
       });
       it('fails if version has wrong minor and wrong prerelease', async () => {
         await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.8-frog'), 'blah', 123));
+      });
+      it('passes if version is valid', async () => {
+        const actual = await Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.0-main'), 'b0d52ad', 1603695425074);
+        const sactual = Version.versionToString(actual);
+        assert.equal(sactual, '1.2.0-alpha.main.20201026065705074+b0d52ad');
       });
     });
   });

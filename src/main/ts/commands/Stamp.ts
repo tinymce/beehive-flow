@@ -19,29 +19,44 @@ export const formatDate = (timeMillis: number): string =>
 
 export const validateBranchAndChooseNewVersion = async (currentBranch: string, version: Version, gitSha: string, timeMillis: number): Promise<Version> => {
 
-  const newVersion = () => {
-    const dt = formatDate(timeMillis);
-    const buildMetaData = `${dt}.${gitSha}`;
-
-    return {
-      ...version,
-      buildMetaData
-    };
-  };
+  const dt = formatDate(timeMillis);
+  const buildMetaData = `${gitSha}`;
 
   if (currentBranch === HardCoded.mainBranch) {
     await BranchLogic.checkMainBranchVersion(version, 'package.json');
-    return newVersion();
+    return {
+      ...version,
+      preRelease: `alpha.main.${dt}`,
+      buildMetaData
+    };
+
   } else if (BranchLogic.isReleaseBranch(currentBranch)) {
     const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
     if (Version.isReleaseVersion(version)) {
       return PromiseUtils.fail('Current branch is a release version, so we should not be stamping the version.');
     } else {
       await BranchLogic.checkReleaseBranchPreReleaseVersion(version, bv, currentBranch, 'package.json');
-      return newVersion();
+      return {
+        ...version,
+        preRelease: `rc.${dt}`,
+        buildMetaData
+      };
     }
+
   } else if (BranchLogic.isFeatureBranch(currentBranch)) {
-    return newVersion();
+    return {
+      ...version,
+      preRelease: `alpha.feature.${dt}`,
+      buildMetaData
+    };
+
+  } else if (BranchLogic.isHotfixBranch(currentBranch)) {
+    return {
+      ...version,
+      preRelease: `rc.hotfix.${dt}`,
+      buildMetaData
+    };
+
   } else {
     return PromiseUtils.fail(
       `Current branch "${currentBranch}" is not a valid branch type for beehive flow. Branches may only be "main", "release/x.y" or "feature/*"`);
