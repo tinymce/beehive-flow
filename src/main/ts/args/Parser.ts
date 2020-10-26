@@ -67,6 +67,10 @@ export const getRealArgs = (): string[] =>
 export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((resolve, reject) => {
   const a = argParser
     .strict()
+    .exitProcess(false)
+    .parserConfiguration({
+      'parse-numbers': false
+    })
     .parse(args);
 
   const dryRun = a['dry-run'];
@@ -75,11 +79,11 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
     resolve(BeehiveArgs.prepareArgs(dryRun));
 
   } else if (a._[0] === 'release') {
-    const mm = a.majorMinorVersion as MajorMinorVersion;
+    const mm = a.majorDotMinor as MajorMinorVersion;
     resolve(BeehiveArgs.releaseArgs(dryRun, mm));
 
   } else if (a._[0] === 'advance') {
-    const mm = a.majorMinorVersion as MajorMinorVersion;
+    const mm = a.majorDotMinor as MajorMinorVersion;
     resolve(BeehiveArgs.advanceArgs(dryRun, mm));
 
   } else if (a._[0] === 'stamp') {
