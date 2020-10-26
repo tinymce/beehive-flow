@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import * as Release from '../../../main/ts/commands/Release';
 import * as Version from '../../../main/ts/core/Version';
 
-describe('Advance', () => {
+describe('Release', () => {
   describe('updateVersion', () => {
     it('Updates versions', () => {
       const check = (input: string, expected: string): void => {
