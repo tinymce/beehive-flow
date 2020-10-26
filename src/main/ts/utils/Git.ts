@@ -53,6 +53,9 @@ export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
 export const push = async (git: SimpleGit): Promise<PushResult> =>
   git.push(ASSUMED_REMOTE);
 
+export const pushFfOnly = async (git: SimpleGit): Promise<PushResult> =>
+  git.push(ASSUMED_REMOTE, undefined, { '--ff-only': null });
+
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
   return ObjUtils.hasKey(b.branches, 'remotes/origin/' + branchName);
