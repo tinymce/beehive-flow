@@ -53,7 +53,7 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
   } else if (BranchLogic.isHotfixBranch(currentBranch)) {
     return {
       ...version,
-      preRelease: `rc.hotfix.${dt}`,
+      preRelease: `hotfix.${dt}`,
       buildMetaData
     };
 
