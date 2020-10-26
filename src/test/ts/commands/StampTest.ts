@@ -28,15 +28,15 @@ describe('Stamp', () => {
         await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.0-rc'), 'blah', 123));
       });
       it('fails if version has wrong minor', async () => {
-        await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.8-main'), 'blah', 123));
+        await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.8-alpha'), 'blah', 123));
       });
       it('fails if version has wrong minor and wrong prerelease', async () => {
         await assert.isRejected(Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.8-frog'), 'blah', 123));
       });
       it('passes if version is valid', async () => {
-        const actual = await Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.0-main'), 'b0d52ad', 1603695425074);
+        const actual = await Stamp.validateBranchAndChooseNewVersion('main', Version.parseVersionOrThrow('1.2.0-alpha'), 'b0d52ad', 1603695425074);
         const sactual = Version.versionToString(actual);
-        assert.equal(sactual, '1.2.0-alpha.main.20201026065705074+b0d52ad');
+        assert.equal(sactual, '1.2.0-alpha.20201026065705074+b0d52ad');
       });
     });
 
@@ -47,7 +47,7 @@ describe('Stamp', () => {
           const v = `${major}.${minor}.${patch}-main`;
           const actual = await Stamp.validateBranchAndChooseNewVersion('feature/TINY-1234', Version.parseVersionOrThrow(v), 'b0d52ad', 1603695425074);
           const sactual = Version.versionToString(actual);
-          assert.equal(sactual, `${major}.${minor}.${patch}-alpha.feature.20201026065705074+b0d52ad`);
+          assert.equal(sactual, `${major}.${minor}.${patch}-feature.20201026065705074+b0d52ad`);
         }));
       });
     });

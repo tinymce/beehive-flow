@@ -17,6 +17,13 @@ export interface TempGit {
   readonly dir: string;
 }
 
+export const initInTempFolder = async (bare: boolean = false): Promise<TempGit> => {
+  const dir = await Files.tempFolder();
+  const git = gitP(dir);
+  await git.init(bare);
+  return { dir, git };
+};
+
 // TODO: are we removing these folders on exit?
 
 export const cloneInTempFolder = async (repoPath: string, temp: Option<string>): Promise<TempGit> => {

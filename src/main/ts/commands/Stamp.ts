@@ -26,7 +26,7 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
     await BranchLogic.checkMainBranchVersion(version, 'package.json');
     return {
       ...version,
-      preRelease: `alpha.main.${dt}`,
+      preRelease: `${HardCoded.mainBranchPreReleaseVersion}.${dt}`,
       buildMetaData
     };
 
@@ -40,7 +40,7 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
       await BranchLogic.checkReleaseBranchPreReleaseVersion(version, bv, currentBranch, 'package.json');
       return {
         ...version,
-        preRelease: `rc.${dt}`,
+        preRelease: `${HardCoded.releaseBranchPreReleaseVersion}.${dt}`,
         buildMetaData
       };
     }
@@ -48,14 +48,14 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
   } else if (BranchLogic.isFeatureBranch(currentBranch)) {
     return {
       ...version,
-      preRelease: `alpha.feature.${dt}`,
+      preRelease: `${HardCoded.featureBranchPreReleaseVersion}.${dt}`,
       buildMetaData
     };
 
   } else if (BranchLogic.isHotfixBranch(currentBranch)) {
     return {
       ...version,
-      preRelease: `hotfix.${dt}`,
+      preRelease: `${HardCoded.hotfixBranchPrereleaseVersion}.${dt}`,
       buildMetaData
     };
 
