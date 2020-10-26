@@ -3,50 +3,57 @@ import { MajorMinorVersion } from '../core/Version';
 
 export interface BaseArgs {
   readonly dryRun: boolean;
-  readonly temp: Option<string>;
 }
 
 export interface PrepareArgs extends BaseArgs {
   readonly kind: 'PrepareArgs';
+  readonly temp: Option<string>;
+  readonly gitUrl: Option<string>;
 }
 
 export interface ReleaseArgs extends BaseArgs {
   readonly kind: 'ReleaseArgs';
+  readonly temp: Option<string>;
   readonly majorMinorVersion: MajorMinorVersion;
+  readonly gitUrl: Option<string>;
 }
 
 export interface AdvanceArgs extends BaseArgs {
   readonly kind: 'AdvanceArgs';
+  readonly temp: Option<string>;
   readonly majorMinorVersion: MajorMinorVersion;
+  readonly gitUrl: Option<string>;
 }
 
 export interface StampArgs extends BaseArgs {
   readonly kind: 'StampArgs';
 }
 
-export const prepareArgs = (dryRun: boolean, temp: Option<string>): PrepareArgs => ({
+export const prepareArgs = (dryRun: boolean, temp: Option<string>, gitUrl: Option<string>): PrepareArgs => ({
   kind: 'PrepareArgs',
   dryRun,
-  temp
+  temp,
+  gitUrl
 });
 
-export const releaseArgs = (dryRun: boolean, temp: Option<string>, majorMinorVersion: MajorMinorVersion): ReleaseArgs => ({
+export const releaseArgs = (dryRun: boolean, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion): ReleaseArgs => ({
   kind: 'ReleaseArgs',
   dryRun,
   temp,
+  gitUrl,
   majorMinorVersion
 });
 
-export const advanceArgs = (dryRun: boolean, temp: Option<string>, majorMinorVersion: MajorMinorVersion): AdvanceArgs => ({
+export const advanceArgs = (dryRun: boolean, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion): AdvanceArgs => ({
   kind: 'AdvanceArgs',
   dryRun,
   temp,
+  gitUrl,
   majorMinorVersion
 });
 
-export const stampArgs = (dryRun: boolean, temp: Option<string>): StampArgs => ({
+export const stampArgs = (dryRun: boolean): StampArgs => ({
   kind: 'StampArgs',
-  temp,
   dryRun
 });
 

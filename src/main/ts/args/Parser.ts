@@ -27,15 +27,24 @@ const argParser =
       default: false,
       description: 'Don\'t push changes to remote systems and only make local changes.'
     })
+    .option('temp', {
+      type: 'string',
+      default: null,
+      description:
+        'Temp folder for git checkout. Useful for keeping within a workspace in a CI server. ' +
+        'If not specified, a system temp folder is used.'
+    })
+    .option('git-url', {
+      type: 'string',
+      default: null,
+      description:
+        'URL of git repo to operate on. Defaults to the git repo in the current directory. ' +
+        'Ignored by stamp command, which always works in current directory.'
+    })
     .command(
       'prepare',
       prepDescription
     )
-    .option('temp', {
-      type: 'string',
-      default: null,
-      description: 'Temp folder for git checkout. Useful for keeping within a workspace in a CI server. If not specified, a system temp folder is used.'
-    })
     .command(
       'release <majorDotMinor>',
       releaseDescription, (yargs) => {
@@ -82,20 +91,21 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
 
   const dryRun = a['dry-run'];
   const temp = O.fromNullable(a.temp);
+  const gitUrl = O.fromNullable(a['git-url']);
 
   if (a._[0] === 'prepare') {
-    resolve(BeehiveArgs.prepareArgs(dryRun, temp));
+    resolve(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
 
   } else if (a._[0] === 'release') {
     const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.releaseArgs(dryRun, temp, mm));
+    resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
 
   } else if (a._[0] === 'advance') {
     const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.advanceArgs(dryRun, temp, mm));
+    resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
 
   } else if (a._[0] === 'stamp') {
-    resolve(BeehiveArgs.stampArgs(dryRun, temp));
+    resolve(BeehiveArgs.stampArgs(dryRun));
 
   } else {
     reject();
