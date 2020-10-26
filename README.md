@@ -20,6 +20,7 @@ A single mainline branch called "main" is used. All new features and fixes are m
 
 ```
   main
+ (x.y.0-alpha)
   +---------+----------------------------------+------------------+
             |                                  |
             |                                  |
@@ -27,20 +28,29 @@ A single mainline branch called "main" is used. All new features and fixes are m
             +-----------------+                +------------------+
 
              release/1.2                         release/1.3
-
+             (1.2.x-rc / 1.2.x)                  (1.3.x-rc / 1.3.x)
 ```
 
 Release branches are named "release/x.y" where x.y is the major.minor version. These are branched off the main branch at the beginning of *release preparation*.
 The release branch code is stabilised and then released.
 
-Support fixes are made first to the main branch, then cherry-picked to a release/x.y branch and released.
+Support fixes are made first to the main branch (via a feature branch), then cherry-picked to a release/x.y branch (via a hotfix branch) and released.
 
-The only acceptible branch names are as follows:
+The *only* acceptable branch names are as follows:
 - main
 - release/x.y
 - feature/FEATURE_CODE
+- hotfix/FEATURE_CODE
 
-The stamp command will validate branch names.
+Feature branches are branched off main. All new work is done here. It doesn't matter if it's a feature, improvement, task, refactor, spike, bugfix or any other type of change. 
+These are all considered feature branches. 
+
+Hotfix branches are branched off a release branch. These are used to add changes during release preparation. Similar to feature branches, it doesn't matter what type of change
+is being made, the key part is that these are branched from a release branch.
+
+Unlike git-flow, there is no "develop" branch. There is also no "master" branch. The branch "main" was chosen instead, as this has become GitHub's default. 
+
+Note that the stamp command validates that branch names meet the spec.
 
 Versions
 --------
@@ -56,12 +66,16 @@ As you can see, a release branch exists in one of two states:
 - "a.b.c-rc" - prerelease state
 - "a.b.c" - releasable state
 
-All point releases for a major.minor release happen in the the branch for the release/major.minor branch.
+All patch releases for a major.minor release happen in the branch for the release/major.minor branch.
+
+Feature branches have a version "a.b.0-main", just like the main branch. However, the stamp command will change "main" to "feature". See below.
+
+Hotfix branches have a version "a.b.c-rc", just like a release branch. However, the stamp command will change "rc" to "hotfix". See below.
 
 Operations
 ----------
 
-Note: the "timestamp" command operates on a checkout in the current working directory, whereas the other commands make their own checkout.
+Note: the "stamp" command operates on a checkout in the current working directory, whereas the other commands make their own checkout.
 
 ### prepare
 
@@ -91,7 +105,19 @@ Version changes:
 This command should be run at the start of a build. This command does the following:
 
  1. Checks that the package.json file has a valid version for the branch.
- 2. If the branch is a main branch, or a release branch in "prerelease" state, the version is changed to add the short git SHA as a suffix. 
+ 2. Changes the version to a "timestamped" version, so that each build can be published.
+ 
+The timestamping changes the package.json file. The idea is to build and publish, but not to commit the changes.
+
+Versions are changed thus:
+
+ - On the main branch, `a.b.0-alpha` becomes `a.b.0-alpha.TIMESTAMP+GITSHA`
+ - On a feature branch, `a.b.0-alpha` becomes `a.b.0-feature.TIMESTAMP+GITSHA`
+ - On a hotfix branch, `a.b.c-rc` becomes `a.b.c-hotfix.TIMESTAMP+GITSHA`
+ - On a release branch in prerelease state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP+GITSHA`
+ - On a release branch in release state, no changes are made.
+ 
+Timestamp format is `yyyyMMddHHmmssSSS` in UTC. The short git sha format is used.
 
 Note: this is the only command that operates on the checkout in the current working directory.
 
@@ -100,4 +126,4 @@ CI Instructions
 
 CI needs to check out a real branch, not just a detached head.
 
-At the start of the build, run "timestamp". If the build is successful, run "advance".
+At the start of the build, run "stamp". If the build is successful, run "advance".
