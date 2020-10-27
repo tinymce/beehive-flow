@@ -11,7 +11,7 @@ import * as Version from '../core/Version';
 import * as Inspect from '../core/Inspect';
 import * as RepoState from '../core/RepoState';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { mainBranch, releaseCandidate } from '../core/PreRelease';
+import * as Prerelease from '../core/PreRelease';
 
 type PackageJson = PackageJson.PackageJson;
 type Version = Version.Version;
@@ -35,14 +35,14 @@ export const newMainBranchVersion = (oldMainBranchVersion: Version): Version => 
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor + 1,
   patch: 0,
-  preRelease: mainBranch
+  preRelease: Prerelease.mainBranch
 });
 
 export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => ({
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor,
   patch: 0,
-  preRelease: releaseCandidate
+  preRelease: Prerelease.releaseCandidate
 });
 
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {

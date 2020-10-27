@@ -6,7 +6,7 @@ import * as Version from '../core/Version';
 import * as Clock from '../core/Clock';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as RepoState from '../core/RepoState';
-import { featureBranch, hotfixBranch, mainBranch, releaseCandidate } from '../core/PreRelease';
+import * as PreRelease from '../core/PreRelease';
 import { detectRepoState } from '../core/BranchLogic';
 
 type Version = Version.Version;
@@ -18,30 +18,31 @@ export const timeFormat = 'yyyyMMddHHmmssSSS';
 export const formatDate = (timeMillis: number): string =>
   DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat, { timeZone: 'utc' });
 
-export const chooseNewVersion = (r: RepoState, gitSha: string, timeMillis: number): Version => {
-  if (r.kind === 'Release') {
-    return r.version;
+export const chooseNewVersion = ({ kind, version }: RepoState, gitSha: string, timeMillis: number): Version => {
+  if (kind === 'Release') {
+    return version;
   } else {
-    const dt = formatDate(timeMillis);
-    const buildMetaData = gitSha;
 
     const prePre = (() => {
-      switch (r.kind) {
+      switch (kind) {
         case 'Main':
-          return mainBranch;
+          return PreRelease.mainBranch;
         case 'ReleaseCandidate':
-          return releaseCandidate;
+          return PreRelease.releaseCandidate;
         case 'Feature':
-          return featureBranch;
+          return PreRelease.featureBranch;
         case 'Hotfix':
-          return hotfixBranch;
+          return PreRelease.hotfixBranch;
       }
     })();
 
+    const dt = formatDate(timeMillis);
     const preRelease = `${prePre}.${dt}`;
 
+    const buildMetaData = gitSha;
+
     return {
-      ...r.version,
+      ...version,
       preRelease,
       buildMetaData
     };
