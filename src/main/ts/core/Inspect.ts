@@ -1,13 +1,6 @@
 import * as gitP from 'simple-git/promise';
 import { Option } from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git';
-import * as Version from '../core/Version';
-import * as Git from '../utils/Git';
-import * as BranchLogic from '../core/BranchLogic';
-import * as Files from '../utils/Files';
-import * as Noisy from './Noisy';
-
-type MajorMinorVersion = Version.MajorMinorVersion;
 
 // TODO: Does this belong here?
 export const detectGitUrl = async (g: SimpleGit): Promise<string> => {
@@ -38,43 +31,5 @@ export const detectGitUrlCwd = async (): Promise<string> => {
 
 export const resolveGitUrl = async (gitUrlArg: Option<string>): Promise<string> =>
   gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlCwd();
-
-
-export const resolveTempDir = async (dirFromSetting: Option<string>): Promise<string> => {
-  if (dirFromSetting._tag === 'Some') {
-    return dirFromSetting.value;
-  } else {
-    // TODO: rename to tempDir
-    return Files.tempFolder();
-  }
-};
-
-// TODO: use or lose
-export const detectReleaseBranchReleaseVersion = async (): Promise<MajorMinorVersion> => {
-  const dir = process.cwd();
-  const g = gitP(dir);
-  const currentBranch = await Git.currentBranch(g);
-
-  const pj = await Noisy.readPackageJsonFileInDirAndRequireVersion(dir);
-
-  const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
-
-  BranchLogic.checkReleaseBranchReleaseVersionE(pj.version, bv, currentBranch, 'package.json');
-  return bv;
-};
-
-// TODO: use or lose
-export const detectReleaseBranchPreReleaseVersion = async (): Promise<MajorMinorVersion> => {
-  const dir = process.cwd();
-  const g = gitP(dir);
-  const currentBranch = await Git.currentBranch(g);
-
-  const pj = await Noisy.readPackageJsonFileInDirAndRequireVersion(dir);
-
-  const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
-
-  BranchLogic.checkReleaseBranchPreReleaseVersionE(pj.version, bv, currentBranch, 'package.json');
-  return bv;
-};
 
 
