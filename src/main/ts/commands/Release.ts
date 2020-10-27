@@ -7,9 +7,9 @@ import * as PackageJson from '../core/PackageJson';
 import {
   gitCheckout,
   gitPushUnlessDryRun,
-  readPackageJsonFileInDirAndRequireVersion,
-  resolveGitUrl
+  readPackageJsonFileInDirAndRequireVersion
 } from '../core/Noisy';
+import * as Inspect from '../core/Inspect';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
@@ -26,7 +26,7 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Release${dryRunMessage} ${sMajorMinor}`);
 
-  const gitUrl = await resolveGitUrl(fc.gitUrl);
+  const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);

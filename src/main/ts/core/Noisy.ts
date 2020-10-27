@@ -1,6 +1,5 @@
 import { SimpleGit } from 'simple-git';
 import * as O from 'fp-ts/Option';
-import * as gitP from 'simple-git/promise';
 import { BeehiveArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
 import { optionToPromise } from '../utils/PromiseUtils';
@@ -12,7 +11,6 @@ import * as Version from './Version';
 
 type Version = Version.Version;
 type PackageJson = PackageJson.PackageJson;
-type Option<A> = O.Option<A>;
 
 const dryRunMessage = async (dir: string, git: SimpleGit): Promise<string> => {
   const curBranch = await Git.currentBranch(git);
@@ -68,25 +66,4 @@ export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVer
   const newPj = PackageJson.setVersion(pj, O.some(newVersion));
   await PackageJson.writePackageJsonFile(pjFile, newPj);
   return newPj;
-};
-
-export const resolveGitUrl = async (configGitUrl: Option<string>): Promise<string> => {
-  if (configGitUrl._tag === 'Some') {
-    return configGitUrl.value;
-  } else {
-    const g = gitP(process.cwd());
-    const remotes = await g.getRemotes(true);
-    if (remotes.length === 1) {
-      return remotes[0].refs.fetch;
-    } else if (remotes.length === 0) {
-      throw new Error('Could not detect git url - the repo has no remotes.');
-    } else {
-      const res = remotes.find((r) => r.name === 'origin');
-      if (res !== undefined) {
-        return res.refs.fetch;
-      } else {
-        throw new Error('Could not detect git url - there were multiple remotes and none were called "origin"');
-      }
-    }
-  }
 };

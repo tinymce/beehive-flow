@@ -8,12 +8,13 @@ import * as BranchLogic from '../core/BranchLogic';
 import * as Files from '../utils/Files';
 import { PrepareArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
+import * as Inspect from '../core/Inspect';
 import {
   branchShouldNotExist,
   checkoutMainBranch,
   gitPushNewBranchUnlessDryRun,
   gitPushUnlessDryRun,
-  readPackageJsonFileInDirAndRequireVersion, resolveGitUrl
+  readPackageJsonFileInDirAndRequireVersion
 } from '../core/Noisy';
 
 type PackageJson = PackageJson.PackageJson;
@@ -64,7 +65,7 @@ export const prepare = async (fc: PrepareArgs): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Prepare${dryRunMessage}`);
 
-  const gitUrl = await resolveGitUrl(fc.gitUrl);
+  const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);

@@ -3,12 +3,12 @@ import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../core/BranchLogic';
+import * as Inspect from '../core/Inspect';
 import {
   gitCheckout,
   gitPushUnlessDryRun,
   readPackageJsonFileInDirAndRequireVersion,
-  writePackageJsonFileWithNewVersion,
-  resolveGitUrl
+  writePackageJsonFileWithNewVersion
 } from '../core/Noisy';
 
 type Version = Version.Version;
@@ -27,7 +27,7 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
   const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
   console.log(`Advance${dryRunMessage} ${sMajorMinor}`);
 
-  const gitUrl = await resolveGitUrl(fc.gitUrl);
+  const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
