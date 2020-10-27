@@ -21,7 +21,7 @@ const stampDescription =
 
 const argParser =
   yargs
-    .scriptName('beehive')
+    .scriptName('beehive-flow')
     .option('dry-run', {
       type: 'boolean',
       default: false,
