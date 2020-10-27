@@ -20,7 +20,7 @@ export const updateVersion = (version: Version): Version => ({
   preRelease: releaseCandidate
 });
 
-const go = async function (version: Version, pj: PackageJson, pjFile: string, git: SimpleGit, fc: BeehiveArgs, dir: string): Promise<void> {
+const go = async (version: Version, pj: PackageJson, pjFile: string, git: SimpleGit, fc: BeehiveArgs, dir: string): Promise<void> => {
   const newVersion = updateVersion(version);
   console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`);
   await writePackageJsonFileWithNewVersion(pj, newVersion, pjFile);
