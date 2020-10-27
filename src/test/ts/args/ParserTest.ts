@@ -20,14 +20,14 @@ describe('Parser', () => {
     });
     it('succeeds for release command', async () => {
       await fc.assert(fc.asyncProperty(fc.nat(100), fc.nat(100), async (major, minor) => {
-        await assert.becomes(parseArgs([ 'release', '--ver', `${major}.${minor}` ]), BeehiveArgs.releaseArgs(false, O.none, O.none, { major, minor }));
-        await assert.becomes(parseArgs([ 'release', '--ver', `${major}.${minor}`, '--dry-run' ]), BeehiveArgs.releaseArgs(true, O.none, O.none, { major, minor }));
+        await assert.becomes(parseArgs([ 'release', `${major}.${minor}` ]), BeehiveArgs.releaseArgs(false, O.none, O.none, { major, minor }));
+        await assert.becomes(parseArgs([ 'release', `${major}.${minor}`, '--dry-run' ]), BeehiveArgs.releaseArgs(true, O.none, O.none, { major, minor }));
       }));
     });
     it('succeeds for advance command', async () => {
       await fc.assert(fc.asyncProperty(fc.nat(100), fc.nat(100), async (major, minor) => {
-        await assert.becomes(parseArgs([ 'advance', '--ver', `${major}.${minor}` ]), BeehiveArgs.advanceArgs(false, O.none, O.none, { major, minor }));
-        await assert.becomes(parseArgs([ 'advance', '--ver', `${major}.${minor}`, '--dry-run' ]), BeehiveArgs.advanceArgs(true, O.none, O.none, { major, minor }));
+        await assert.becomes(parseArgs([ 'advance', `${major}.${minor}` ]), BeehiveArgs.advanceArgs(false, O.none, O.none, { major, minor }));
+        await assert.becomes(parseArgs([ 'advance', `${major}.${minor}`, '--dry-run' ]), BeehiveArgs.advanceArgs(true, O.none, O.none, { major, minor }));
       }));
     });
     it('succeeds for advance command', async () => {

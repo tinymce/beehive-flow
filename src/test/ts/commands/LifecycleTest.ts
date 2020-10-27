@@ -45,19 +45,19 @@ describe('Lifecycle', () => {
     await git.checkout('release/0.1');
     await assertPjVersion('0.1.0-rc');
 
-    await beehiveFlow([ 'release', '--ver', '0.1', '--git-url', hub.dir ]);
+    await beehiveFlow([ 'release', '0.1', '--git-url', hub.dir ]);
     await git.pull();
     await assertPjVersion('0.1.0');
 
-    await beehiveFlow([ 'advance', '--ver', '0.1', '--git-url', hub.dir ]);
+    await beehiveFlow([ 'advance', '0.1', '--git-url', hub.dir ]);
     await git.pull();
     await assertPjVersion('0.1.1-rc');
 
-    await beehiveFlow([ 'release', '--ver', '0.1', '--git-url', hub.dir ]);
+    await beehiveFlow([ 'release', '0.1', '--git-url', hub.dir ]);
     await git.pull();
     await assertPjVersion('0.1.1');
 
-    await beehiveFlow([ 'advance', '--ver', '0.1', '--git-url', hub.dir ]);
+    await beehiveFlow([ 'advance', '0.1', '--git-url', hub.dir ]);
     await git.pull();
     await assertPjVersion('0.1.2-rc');
   });

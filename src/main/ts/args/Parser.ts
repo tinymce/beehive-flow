@@ -46,26 +46,24 @@ const argParser =
       prepDescription
     )
     .command(
-      'release [--ver x.y]',
+      'release <majorDotMinor>',
       releaseDescription, (yargs) => {
         yargs
-          .option('ver', {
+          .positional('majorDotMinor', {
             describe: 'major.minor version',
             type: 'string',
-            coerce: Version.parseMajorMinorVersionOrThrow,
-            default: null
+            coerce: Version.parseMajorMinorVersionOrThrow
           });
       }
     )
     .command(
-      'advance [--ver x.y]',
+      'advance <majorDotMinor>',
       advanceDescription, (yargs) => {
         yargs
-          .option('ver', {
+          .positional('majorDotMinor', {
             describe: 'major.minor version',
             type: 'string',
-            coerce: Version.parseMajorMinorVersionOrThrow,
-            default: null
+            coerce: Version.parseMajorMinorVersionOrThrow
           });
       }
     )
@@ -94,31 +92,17 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
   const dryRun = a['dry-run'];
   const temp = O.fromNullable(a.temp);
   const gitUrl = O.fromNullable(a['git-url']);
-  const ver = O.fromNullable(a.ver as MajorMinorVersion | undefined);
 
   if (a._[0] === 'prepare') {
     resolve(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
 
   } else if (a._[0] === 'release') {
-    // TODO: refactor
-    if (ver._tag === 'None') {
-      console.log('command requires --ver X.Y argument');
-      argParser.showHelp();
-      reject();
-    } else {
-      const mm = ver.value;
-      resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
-    }
+    const mm = a.majorDotMinor as MajorMinorVersion;
+    resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
 
   } else if (a._[0] === 'advance') {
-    if (ver._tag === 'None') {
-      console.log('command requires --ver X.Y argument');
-      argParser.showHelp();
-      reject();
-    } else {
-      const mm = ver.value;
-      resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
-    }
+    const mm = a.majorDotMinor as MajorMinorVersion;
+    resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
 
   } else if (a._[0] === 'stamp') {
     resolve(BeehiveArgs.stampArgs(dryRun));
