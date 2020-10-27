@@ -31,7 +31,7 @@ const stampDescription =
   `Changes version in current branch to add the git sha to the prerelease version, if applicable.
   Run this at the start of a CI build. 
   Operates on current directory.
-  Don't commit the changes.`;
+  You should not commit the changes this command makes.`;
 
 const argParser =
   yargs
@@ -39,21 +39,21 @@ const argParser =
     .option('dry-run', {
       type: 'boolean',
       default: false,
-      description: 'Don\'t push changes to remote systems and only make local changes.'
+      description: 'Don\'t push changes to remote systems.'
     })
     .option('temp', {
       type: 'string',
       default: null,
       description:
-        'Temp folder for git checkout. Useful for keeping within a workspace in a CI server. ' +
-        'If not specified, a system temp folder is used.'
+        `Temp folder for git checkout.
+        If not specified, a system temp folder is used.`
     })
     .option('git-url', {
       type: 'string',
       default: null,
       description:
-        'URL of git repo to operate on. Defaults to the git repo in the current directory. ' +
-        'Ignored by stamp command, which always works in current directory.'
+        `URL of git repo to operate on. Defaults to the git repo in the current directory.
+        Ignored by stamp and advance-ci commands, which always work in current directory.`
     })
     .command(
       'prepare',
