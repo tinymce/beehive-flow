@@ -42,10 +42,9 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
 
   const r = await RepoState.detectRepoState(dir);
   if (r.kind !== 'Release') {
-    return PromiseUtils.fail('Branch is not in Release state - can\t advance.');
-  } else {
-    await go(r.version, r.packageJson, r.packageJsonFile, git, fc, dir);
+    return PromiseUtils.fail('Branch is not in Release state - can\'t advance.');
   }
+  await go(r.version, r.packageJson, r.packageJsonFile, git, fc, dir);
 };
 
 export const advanceCi = async (fc: AdvanceCiArgs): Promise<void> => {

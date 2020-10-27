@@ -1,13 +1,11 @@
-import * as O from 'fp-ts/Option';
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
 import * as PackageJson from '../core/PackageJson';
-import {
-  readPackageJsonFileInDirAndRequireVersion
-} from '../core/Noisy';
 import * as Inspect from '../core/Inspect';
+import * as RepoState from '../core/RepoState';
+import * as PromiseUtils from '../utils/PromiseUtils';
 
 type Version = Version.Version;
 const { versionToString, majorMinorVersionToString } = Version;
@@ -28,17 +26,18 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
 
   const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
   await Git.checkout(git, rbn);
-  const { pjFile, pj, version } = await readPackageJsonFileInDirAndRequireVersion(dir);
 
-  await BranchLogic.checkReleaseBranchPreReleaseVersion(version, fc.majorMinorVersion, rbn, 'package.json');
+  const r = await RepoState.detectRepoState(dir);
+  if (r.kind !== 'ReleaseCandidate') {
+    return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
+  }
 
-  const newVersion = updateVersion(version);
-  console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`);
+  const newVersion = updateVersion(r.version);
+  console.log(`Updating version from ${versionToString(r.version)} to ${versionToString(newVersion)}`);
 
-  const newPj = PackageJson.setVersion(pj, O.some(newVersion));
-  await PackageJson.writePackageJsonFile(pjFile, newPj);
+  await PackageJson.writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
 
-  await git.add(pjFile);
+  await git.add(r.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');
 
   await Git.pushUnlessDryRun(fc, dir, git);
