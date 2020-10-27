@@ -2,11 +2,16 @@ import { gitP } from 'simple-git';
 import { DateTime } from 'luxon';
 import { StampArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
-import * as HardCoded from '../args/HardCoded';
 import * as Version from '../core/Version';
 import * as Clock from '../core/Clock';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as RepoState from '../core/RepoState';
+import {
+  featureBranch,
+  hotfixBranch,
+  mainBranch,
+  releaseCandidate
+} from '../core/PreRelease';
 
 type Version = Version.Version;
 type Clock = Clock.Clock;
@@ -27,13 +32,13 @@ export const chooseNewVersion = (r: RepoState, gitSha: string, timeMillis: numbe
     const prePre = (() => {
       switch (r.kind) {
         case 'Main':
-          return HardCoded.mainBranchPreReleaseVersion;
+          return mainBranch;
         case 'ReleaseCandidate':
-          return HardCoded.releaseBranchReleaseCandidatePrereleaseVersion;
+          return releaseCandidate;
         case 'Feature':
-          return HardCoded.featureBranchPreReleaseVersion;
+          return featureBranch;
         case 'Hotfix':
-          return HardCoded.hotfixBranchPrereleaseVersion;
+          return hotfixBranch;
       }
     })();
 

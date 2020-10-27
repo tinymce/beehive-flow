@@ -3,12 +3,12 @@ import { SimpleGit } from 'simple-git';
 import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
-import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../core/BranchLogic';
 import * as Inspect from '../core/Inspect';
 import * as RepoState from '../core/RepoState';
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
+import { releaseCandidate } from '../core/PreRelease';
 
 type Version = Version.Version;
 const { versionToString } = Version;
@@ -17,7 +17,7 @@ export const updateVersion = (version: Version): Version => ({
   major: version.major,
   minor: version.minor,
   patch: version.patch + 1,
-  preRelease: HardCoded.releaseBranchReleaseCandidatePrereleaseVersion
+  preRelease: releaseCandidate
 });
 
 const go = async function (version: Version, pj: PackageJson, pjFile: string, git: SimpleGit, fc: BeehiveArgs, dir: string): Promise<void> {

@@ -3,7 +3,6 @@ import * as PropertiesReader from 'properties-reader';
 import * as O from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git';
 import * as Git from '../utils/Git';
-import * as HardCoded from '../args/HardCoded';
 import * as PackageJson from '../core/PackageJson';
 import * as BranchLogic from '../core/BranchLogic';
 import * as Files from '../utils/Files';
@@ -12,6 +11,7 @@ import * as Version from '../core/Version';
 import * as Inspect from '../core/Inspect';
 import * as RepoState from '../core/RepoState';
 import * as PromiseUtils from '../utils/PromiseUtils';
+import { mainBranch, releaseCandidate } from '../core/PreRelease';
 
 type PackageJson = PackageJson.PackageJson;
 type Version = Version.Version;
@@ -35,14 +35,14 @@ export const newMainBranchVersion = (oldMainBranchVersion: Version): Version => 
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor + 1,
   patch: 0,
-  preRelease: HardCoded.mainBranchPreReleaseVersion
+  preRelease: mainBranch
 });
 
 export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => ({
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor,
   patch: 0,
-  preRelease: HardCoded.releaseBranchReleaseCandidatePrereleaseVersion
+  preRelease: releaseCandidate
 });
 
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {

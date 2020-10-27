@@ -4,10 +4,10 @@ import * as BranchLogic from '../core/BranchLogic';
 import * as Git from '../utils/Git';
 import * as Version from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import * as HardCoded from '../args/HardCoded';
-import { showStringOrUndefined, removeLeading } from '../utils/StringUtils';
+import { removeLeading, showStringOrUndefined } from '../utils/StringUtils';
 import * as PackageJson from './PackageJson';
 import * as Inspect from './Inspect';
+import { mainBranch, releaseCandidate } from './PreRelease';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
 type Version = Version.Version;
@@ -81,8 +81,8 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
     if (BranchLogic.isMainBranch(currentBranch)) {
       if (version.patch !== 0) {
         return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
-      } else if (version.preRelease !== HardCoded.mainBranchPreReleaseVersion) {
-        return fail(`${loc}: prerelease part should be "${HardCoded.mainBranchPreReleaseVersion}", but is ${showStringOrUndefined(version.preRelease)}`);
+      } else if (version.preRelease !== mainBranch) {
+        return fail(`${loc}: prerelease part should be "${mainBranch}", but is ${showStringOrUndefined(version.preRelease)}`);
       } else {
         return {
           kind: 'Main',
@@ -101,22 +101,22 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
           kind: 'Release',
           ...baseRepoState
         };
-      } else if (version.preRelease === HardCoded.releaseBranchReleaseCandidatePrereleaseVersion) {
+      } else if (version.preRelease === releaseCandidate) {
         return {
           kind: 'ReleaseCandidate',
           ...baseRepoState
         };
       } else {
         const sPre = showStringOrUndefined(version.preRelease);
-        return fail(`${loc}: prerelease version part should be either "${HardCoded.releaseBranchReleaseCandidatePrereleaseVersion}" or not set, but it is "${sPre}"`);
+        return fail(`${loc}: prerelease version part should be either "${releaseCandidate}" or not set, but it is "${sPre}"`);
       }
     } else if (BranchLogic.isFeatureBranch(currentBranch)) {
       const code = removeLeading(currentBranch, 'feature/');
 
       if (version.patch !== 0) {
         return fail(`${loc}: patch part should be 0, but is "${version.patch}".`);
-      } else if (version.preRelease !== HardCoded.mainBranchPreReleaseVersion) {
-        return fail(`${loc}: prerelease part should be "${HardCoded.mainBranchPreReleaseVersion}", but is ${showStringOrUndefined(version.preRelease)}`);
+      } else if (version.preRelease !== mainBranch) {
+        return fail(`${loc}: prerelease part should be "${mainBranch}", but is ${showStringOrUndefined(version.preRelease)}`);
       } else {
         return {
           kind: 'Feature',
@@ -126,8 +126,8 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
       }
     } else if (BranchLogic.isHotfixBranch(currentBranch)) {
       const code = removeLeading(currentBranch, 'hotfix/');
-      if (version.preRelease !== HardCoded.releaseBranchReleaseCandidatePrereleaseVersion) {
-        return fail(`${loc}: prerelease part should be "${HardCoded.releaseBranchReleaseCandidatePrereleaseVersion}"`);
+      if (version.preRelease !== releaseCandidate) {
+        return fail(`${loc}: prerelease part should be "${releaseCandidate}"`);
       } else {
         return {
           kind: 'Hotfix',

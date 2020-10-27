@@ -1,7 +1,6 @@
 import * as E from 'fp-ts/Either';
 import { eitherToPromise } from '../utils/PromiseUtils';
 import { startsWith } from '../utils/StringUtils';
-import * as HardCoded from '../args/HardCoded';
 import * as Version from './Version';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
@@ -36,5 +35,7 @@ export const isHotfixBranch = (branchName: string): boolean =>
 export const isReleaseBranch = (branchName: string): boolean =>
   E.isRight(versionFromReleaseBranchE(branchName));
 
+export const mainBranch = 'main';
+
 export const isMainBranch = (branchName: string): boolean =>
-  branchName === HardCoded.mainBranch;
+  branchName === mainBranch;

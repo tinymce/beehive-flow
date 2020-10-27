@@ -2,7 +2,7 @@ import * as gitP from 'simple-git/promise';
 import { PushResult } from 'simple-git';
 import * as O from 'fp-ts/Option';
 import { BeehiveArgs } from '../args/BeehiveArgs';
-import * as HardCoded from '../args/HardCoded';
+import { mainBranch } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
 
@@ -95,7 +95,7 @@ export const branchShouldNotExist = async (git: SimpleGit, branchName: string): 
   }
 };
 export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
-  checkout(git, HardCoded.mainBranch);
+  checkout(git, mainBranch);
 
 export const checkout = async (git: SimpleGit, branchName: string): Promise<string> => {
   console.log(`Checking out branch: ${branchName}`);
