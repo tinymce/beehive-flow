@@ -17,7 +17,7 @@
     "yargs": "^16.0.3"
   },
   "scripts": {
-    "beehive": "./src/main/ts/Main.ts",
+    "beehive-flow": "./src/main/ts/Main.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "testOnly": "nyc mocha -r esm --require ts-node/register --require source-map-support/register --recursive --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters-config.json src/test/ts/**/*Test.ts",
