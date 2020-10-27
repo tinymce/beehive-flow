@@ -51,3 +51,10 @@ export const setVersion = (pj: PackageJson, version: Option<Version>): PackageJs
   ...pj,
   version
 });
+
+export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVersion: Version, pjFile: string): Promise<PackageJson> => {
+  console.log(`Setting version in ${pjFile} to: ${Version.versionToString(newVersion)}`);
+  const newPj = setVersion(pj, O.some(newVersion));
+  await writePackageJsonFile(pjFile, newPj);
+  return newPj;
+};

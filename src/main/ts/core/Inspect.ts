@@ -4,6 +4,7 @@ import { SimpleGit } from 'simple-git';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
+import * as Files from '../utils/Files';
 import * as Noisy from './Noisy';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
@@ -38,6 +39,15 @@ export const detectGitUrlCwd = async (): Promise<string> => {
 export const resolveGitUrl = async (gitUrlArg: Option<string>): Promise<string> =>
   gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlCwd();
 
+
+export const resolveTempDir = async (dirFromSetting: Option<string>): Promise<string> => {
+  if (dirFromSetting._tag === 'Some') {
+    return dirFromSetting.value;
+  } else {
+    // TODO: rename to tempDir
+    return Files.tempFolder();
+  }
+};
 
 // TODO: use or lose
 export const detectReleaseBranchReleaseVersion = async (): Promise<MajorMinorVersion> => {

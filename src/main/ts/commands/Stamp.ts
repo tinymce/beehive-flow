@@ -7,7 +7,8 @@ import * as BranchLogic from '../core/BranchLogic';
 import * as Version from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Clock from '../core/Clock';
-import { readPackageJsonFileInDirAndRequireVersion, writePackageJsonFileWithNewVersion } from '../core/Noisy';
+import { readPackageJsonFileInDirAndRequireVersion } from '../core/Noisy';
+import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 
 type Version = Version.Version;
 type Clock = Clock.Clock;

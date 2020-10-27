@@ -7,13 +7,10 @@ import * as HardCoded from '../args/HardCoded';
 import * as BranchLogic from '../core/BranchLogic';
 import * as Inspect from '../core/Inspect';
 import {
-  gitCheckout,
-  gitPushUnlessDryRun,
-  readPackageJsonFileInDirAndRequireVersion,
-  writePackageJsonFileWithNewVersion
+  readPackageJsonFileInDirAndRequireVersion
 } from '../core/Noisy';
 import * as RepoState from '../core/RepoState';
-import { PackageJson } from '../core/PackageJson';
+import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 
 type Version = Version.Version;
 const { versionToString } = Version;
@@ -34,18 +31,16 @@ const go = async function (version: Version, pj: PackageJson, pjFile: string, gi
   await git.commit('Advancing to release candidate version for next patch release');
 
   // TODO: ff-only?
-  await gitPushUnlessDryRun(fc, dir, git);
+  await Git.pushUnlessDryRun(fc, dir, git);
 };
 
 export const advance = async (fc: AdvanceArgs): Promise<void> => {
   const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
-  console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
-  console.log(`Cloned to ${dir}`);
 
   const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
-  await gitCheckout(git, rbn);
+  await Git.checkout(git, rbn);
   const { pjFile, pj, version } = await readPackageJsonFileInDirAndRequireVersion(dir);
 
   await BranchLogic.checkReleaseBranchReleaseVersion(version, fc.majorMinorVersion, rbn, 'package.json');

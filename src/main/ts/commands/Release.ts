@@ -5,8 +5,6 @@ import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
 import * as PackageJson from '../core/PackageJson';
 import {
-  gitCheckout,
-  gitPushUnlessDryRun,
   readPackageJsonFileInDirAndRequireVersion
 } from '../core/Noisy';
 import * as Inspect from '../core/Inspect';
@@ -26,12 +24,10 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
 
   const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
-  console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
-  console.log(`Cloned to ${dir}`);
 
   const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
-  await gitCheckout(git, rbn);
+  await Git.checkout(git, rbn);
   const { pjFile, pj, version } = await readPackageJsonFileInDirAndRequireVersion(dir);
 
   await BranchLogic.checkReleaseBranchPreReleaseVersion(version, fc.majorMinorVersion, rbn, 'package.json');
@@ -45,5 +41,5 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
   await git.add(pjFile);
   await git.commit('Branch is ready for release - setting release version');
 
-  await gitPushUnlessDryRun(fc, dir, git);
+  await Git.pushUnlessDryRun(fc, dir, git);
 };

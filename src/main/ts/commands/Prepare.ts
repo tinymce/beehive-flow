@@ -10,10 +10,6 @@ import { PrepareArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Inspect from '../core/Inspect';
 import {
-  branchShouldNotExist,
-  checkoutMainBranch,
-  gitPushNewBranchUnlessDryRun,
-  gitPushUnlessDryRun,
   readPackageJsonFileInDirAndRequireVersion
 } from '../core/Noisy';
 
@@ -64,10 +60,9 @@ const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJ
 export const prepare = async (fc: PrepareArgs): Promise<void> => {
   const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
-  console.log(`Cloning ${gitUrl} to temp folder`);
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
-  console.log(`Cloned to ${dir}`);
-  const mainBranch = await checkoutMainBranch(git);
+
+  const mainBranch = await Git.checkoutMainBranch(git);
 
   console.log(`Parsing package.json file in dir: ${dir}`);
 
@@ -75,7 +70,7 @@ export const prepare = async (fc: PrepareArgs): Promise<void> => {
   const releaseBranchName = BranchLogic.releaseBranchName(version);
 
   await BranchLogic.checkMainBranchVersion(version, 'package.json');
-  await branchShouldNotExist(git, releaseBranchName);
+  await Git.branchShouldNotExist(git, releaseBranchName);
 
   console.log(`Creating ${releaseBranchName} branch`);
   await Git.checkoutNewBranch(git, releaseBranchName);
@@ -84,12 +79,12 @@ export const prepare = async (fc: PrepareArgs): Promise<void> => {
   await git.add(buildPropertiesFile);
   await git.add(pjFile);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
-  await gitPushNewBranchUnlessDryRun(fc, dir, git);
+  await Git.pushNewBranchUnlessDryRun(fc, dir, git);
 
   console.log(`Updating ${mainBranch} branch`);
   await git.checkout(mainBranch);
   await updatePackageJsonFileForMainBranch(version, pj, pjFile);
   await git.add(pjFile);
   await git.commit(`Updating version`);
-  await gitPushUnlessDryRun(fc, dir, git);
+  await Git.pushUnlessDryRun(fc, dir, git);
 };
