@@ -46,24 +46,26 @@ const argParser =
       prepDescription
     )
     .command(
-      'release <majorDotMinor>',
+      'release [--ver x.y]',
       releaseDescription, (yargs) => {
         yargs
-          .positional('majorDotMinor', {
+          .option('ver', {
             describe: 'major.minor version',
             type: 'string',
-            coerce: Version.parseMajorMinorVersionOrThrow
+            coerce: Version.parseMajorMinorVersionOrThrow,
+            default: null
           });
       }
     )
     .command(
-      'advance <majorDotMinor>',
+      'advance [--ver x.y]',
       advanceDescription, (yargs) => {
         yargs
-          .positional('majorDotMinor', {
+          .option('ver', {
             describe: 'major.minor version',
             type: 'string',
-            coerce: Version.parseMajorMinorVersionOrThrow
+            coerce: Version.parseMajorMinorVersionOrThrow,
+            default: null
           });
       }
     )
@@ -92,17 +94,31 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
   const dryRun = a['dry-run'];
   const temp = O.fromNullable(a.temp);
   const gitUrl = O.fromNullable(a['git-url']);
+  const ver = O.fromNullable(a.ver as MajorMinorVersion | undefined);
 
   if (a._[0] === 'prepare') {
     resolve(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
 
   } else if (a._[0] === 'release') {
-    const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
+    // TODO: refactor
+    if (ver._tag === 'None') {
+      console.log('command requires --ver X.Y argument');
+      argParser.showHelp();
+      reject();
+    } else {
+      const mm = ver.value;
+      resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
+    }
 
   } else if (a._[0] === 'advance') {
-    const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
+    if (ver._tag === 'None') {
+      console.log('command requires --ver X.Y argument');
+      argParser.showHelp();
+      reject();
+    } else {
+      const mm = ver.value;
+      resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
+    }
 
   } else if (a._[0] === 'stamp') {
     resolve(BeehiveArgs.stampArgs(dryRun));
