@@ -7,17 +7,31 @@ type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 type MajorMinorVersion = Version.MajorMinorVersion;
 
 const prepDescription =
-  'Branches main as releases/x.y and tweaks versions. Run this command when you are preparing to stabilize "main" as a new release.';
+  `Branches main as releases/x.y and tweaks versions. 
+  Run this command when you are preparing to stabilize "main" as a new release.
+  Operates on a fresh clone.`;
 
 const releaseDescription =
-  'Changes version in release/x.y branch to a release version. Run this when you are ready to release.';
+  `Changes version in release/x.y branch to a release version. 
+  Run this when you are ready to release.
+  Operates on a fresh clone.`;
 
 const advanceDescription =
-  'Changes version in release/x.y branch to the next prerelease version. Run this once you have completed a release.';
+  `Changes version in release/x.y branch to the next prerelease version. 
+  Run this once you have completed a release.
+  Operates on a fresh clone.`;
+
+const advanceCiDescription =
+  `Changes version in release/x.y branch to the next prerelease version, 
+  but only if on a release branch in release state.
+  Operates on current directory.
+  Suitable for running at the end of a CI build.`;
 
 const stampDescription =
-  'Changes version in current branch to add the git sha to the prerelease version, if applicable. ' +
-  'Also validates versions. Run this at the start of a build. Don\'t commit the changes.';
+  `Changes version in current branch to add the git sha to the prerelease version, if applicable.
+  Run this at the start of a CI build. 
+  Operates on current directory.
+  Don't commit the changes.`;
 
 const argParser =
   yargs
@@ -68,6 +82,10 @@ const argParser =
       }
     )
     .command(
+      'advance-ci',
+      advanceCiDescription
+    )
+    .command(
       'stamp',
       stampDescription
     )
@@ -89,20 +107,24 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
     })
     .parse(args);
 
+  const cmd = a._[0];
   const dryRun = a['dry-run'];
   const temp = O.fromNullable(a.temp);
   const gitUrl = O.fromNullable(a['git-url']);
 
-  if (a._[0] === 'prepare') {
+  if (cmd === 'prepare') {
     resolve(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
 
-  } else if (a._[0] === 'release') {
+  } else if (cmd === 'release') {
     const mm = a.majorDotMinor as MajorMinorVersion;
     resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
 
-  } else if (a._[0] === 'advance') {
+  } else if (cmd === 'advance') {
     const mm = a.majorDotMinor as MajorMinorVersion;
     resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
+
+  } else if (cmd === 'advance-ci') {
+    resolve(BeehiveArgs.advanceCiArgs(dryRun));
 
   } else if (a._[0] === 'stamp') {
     resolve(BeehiveArgs.stampArgs(dryRun));

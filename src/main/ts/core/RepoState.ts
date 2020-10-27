@@ -19,6 +19,7 @@ export interface BaseRepoState {
   readonly version: Version;
   readonly majorMinorVersion: MajorMinorVersion;
   readonly packageJson: PackageJson;
+  readonly packageJsonFile: string;
 }
 
 export interface Main extends BaseRepoState {
@@ -56,7 +57,8 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
 
   const gitUrl = await Inspect.detectGitUrl(git);
 
-  const packageJson = await PackageJson.parsePackageJsonFileInFolder(dir);
+  const packageJsonFile = PackageJson.pjInFolder(dir);
+  const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
 
   const version = await PromiseUtils.optionToPromise(packageJson.version, 'Version missing in package.json file');
   const majorMinorVersion = Version.toMajorMinor(version);
@@ -66,7 +68,8 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
     currentBranch,
     version,
     majorMinorVersion,
-    packageJson
+    packageJson,
+    packageJsonFile
   });
 
   const loc = `${currentBranch} branch: package.json version`;
@@ -135,5 +138,11 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
     } else {
       return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, release/x.y');
     }
+  }
+};
+
+export const expect = async (repoState: RepoState, kind: typeof repoState.kind): Promise<void> => {
+  if (repoState.kind !== kind) {
+    return PromiseUtils.fail(`Expected branch to be in ${kind} state, but was in ${repoState.kind} state`);
   }
 };

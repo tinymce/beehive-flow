@@ -25,6 +25,9 @@ export interface AdvanceArgs extends BaseArgs {
   readonly gitUrl: Option<string>;
 }
 
+export interface AdvanceCiArgs extends BaseArgs {
+  readonly kind: 'AdvanceCiArgs';
+}
 export interface StampArgs extends BaseArgs {
   readonly kind: 'StampArgs';
 }
@@ -58,13 +61,19 @@ export const stampArgs = (dryRun: boolean): StampArgs => ({
 });
 
 
-export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | StampArgs;
+export const advanceCiArgs = (dryRun: boolean): AdvanceCiArgs => ({
+  kind: 'AdvanceCiArgs',
+  dryRun
+});
+
+export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | AdvanceCiArgs | StampArgs;
 
 export const fold = <T>(
   bh: BeehiveArgs,
   ifPrepare: (a: PrepareArgs) => T,
   ifRelease: (a: ReleaseArgs) => T,
   ifAdvance: (a: AdvanceArgs) => T,
+  ifAdvanceCi: (a: AdvanceCiArgs) => T,
   ifStamp: (a: StampArgs) => T
 ): T => {
   switch (bh.kind) {
@@ -74,7 +83,12 @@ export const fold = <T>(
       return ifRelease(bh);
     case 'AdvanceArgs':
       return ifAdvance(bh);
+    case 'AdvanceCiArgs':
+      return ifAdvanceCi(bh);
     case 'StampArgs':
       return ifStamp(bh);
   }
 };
+
+export const commandName = (bh: BeehiveArgs): string =>
+  fold(bh, () => 'prepare', () => 'release', () => 'advance', () => 'advance-si', () => 'stamp');

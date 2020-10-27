@@ -66,10 +66,7 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
 };
 
 export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Promise<void> => {
-  console.log('Stamp');
-
   const dir = process.cwd();
-
   const git = gitP(dir);
 
   const currentBranch = await Git.currentBranch(git);

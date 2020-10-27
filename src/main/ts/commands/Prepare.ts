@@ -62,9 +62,6 @@ const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJ
 };
 
 export const prepare = async (fc: PrepareArgs): Promise<void> => {
-  const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
-  console.log(`Prepare${dryRunMessage}`);
-
   const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 
   console.log(`Cloning ${gitUrl} to temp folder`);

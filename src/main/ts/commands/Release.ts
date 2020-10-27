@@ -22,9 +22,7 @@ export const updateVersion = (version: Version): Version => ({
 
 export const release = async (fc: ReleaseArgs): Promise<void> => {
   const sMajorMinor = majorMinorVersionToString(fc.majorMinorVersion);
-
-  const dryRunMessage = fc.dryRun ? ' (dry-run)' : '';
-  console.log(`Release${dryRunMessage} ${sMajorMinor}`);
+  console.log(`${sMajorMinor}`);
 
   const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
 

@@ -6,11 +6,21 @@ import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 
-export const dispatch = (args: BeehiveArgs): Promise<void> =>
-  BeehiveArgs.fold<Promise<void>>(
+const headerMessage = (args: BeehiveArgs): string => {
+  const cmd = BeehiveArgs.commandName(args);
+  const dryRunMessage = args.dryRun ? ' (dry-run)' : '';
+  return `Running: ${cmd} ${dryRunMessage}`;
+};
+
+export const dispatch = (args: BeehiveArgs): Promise<void> => {
+  console.log(headerMessage(args));
+
+  return BeehiveArgs.fold<Promise<void>>(
     args,
     Prepare.prepare,
     Release.release,
     Advance.advance,
+    Advance.advanceCi,
     Stamp.stamp
   );
+};
