@@ -140,9 +140,3 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
     }
   }
 };
-
-export const expect = async (repoState: RepoState, kind: typeof repoState.kind): Promise<void> => {
-  if (repoState.kind !== kind) {
-    return PromiseUtils.fail(`Expected branch to be in ${kind} state, but was in ${repoState.kind} state`);
-  }
-};
