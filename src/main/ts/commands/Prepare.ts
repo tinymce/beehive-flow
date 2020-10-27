@@ -45,7 +45,7 @@ export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => 
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor,
   patch: 0,
-  preRelease: HardCoded.releaseBranchPreReleaseVersion
+  preRelease: HardCoded.releaseBranchReleaseCandidatePrereleaseVersion
 });
 
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {

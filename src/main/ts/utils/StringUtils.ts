@@ -18,3 +18,9 @@ const checkRange = (str: string, substr: string, start: number): boolean =>
  */
 export const startsWith = (str: string, prefix: string): boolean =>
   checkRange(str, prefix, 0);
+
+export const removeLeading = (str: string, prefix: string): string =>
+  startsWith(str, prefix) ? removeFromStart(str, prefix.length) : str;
+
+const removeFromStart = (str: string, numChars: number): string =>
+  str.substring(numChars);

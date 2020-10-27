@@ -9,6 +9,8 @@ import * as Version from './Version';
 
 // This module contains high-level operations used by the commands. Unlike those in utils, these are allowed to log console messages.
 
+// TODO: This module's existence is dubious...
+
 type Version = Version.Version;
 type PackageJson = PackageJson.PackageJson;
 

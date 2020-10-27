@@ -1,6 +1,6 @@
 export const mainBranch = 'main';
 
-export const releaseBranchPreReleaseVersion = 'rc';
+export const releaseBranchReleaseCandidatePrereleaseVersion = 'rc';
 export const mainBranchPreReleaseVersion = 'alpha';
 
 export const featureBranchPreReleaseVersion = 'feature';

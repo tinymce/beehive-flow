@@ -1,8 +1,15 @@
 import * as gitP from 'simple-git/promise';
 import { Option } from 'fp-ts/Option';
+import { SimpleGit } from 'simple-git';
+import * as Version from '../core/Version';
+import * as Git from '../utils/Git';
+import * as BranchLogic from '../core/BranchLogic';
+import * as Noisy from './Noisy';
 
-export const detectGitUrl = async (): Promise<string> => {
-  const g = gitP(process.cwd());
+type MajorMinorVersion = Version.MajorMinorVersion;
+
+// TODO: Does this belong here?
+export const detectGitUrl = async (g: SimpleGit): Promise<string> => {
   const remotes = await g.getRemotes(true);
   if (remotes.length === 1) {
     return remotes[0].refs.fetch;
@@ -18,5 +25,46 @@ export const detectGitUrl = async (): Promise<string> => {
   }
 };
 
+const detectGitUrlFromDir = async (dir: string): Promise<string> => {
+  const g = gitP(dir);
+  return await detectGitUrl(g);
+};
+
+export const detectGitUrlCwd = async (): Promise<string> => {
+  const s = process.cwd();
+  return await detectGitUrlFromDir(s);
+};
+
 export const resolveGitUrl = async (gitUrlArg: Option<string>): Promise<string> =>
-  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrl();
+  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlCwd();
+
+
+// TODO: use or lose
+export const detectReleaseBranchReleaseVersion = async (): Promise<MajorMinorVersion> => {
+  const dir = process.cwd();
+  const g = gitP(dir);
+  const currentBranch = await Git.currentBranch(g);
+
+  const pj = await Noisy.readPackageJsonFileInDirAndRequireVersion(dir);
+
+  const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
+
+  BranchLogic.checkReleaseBranchReleaseVersionE(pj.version, bv, currentBranch, 'package.json');
+  return bv;
+};
+
+// TODO: use or lose
+export const detectReleaseBranchPreReleaseVersion = async (): Promise<MajorMinorVersion> => {
+  const dir = process.cwd();
+  const g = gitP(dir);
+  const currentBranch = await Git.currentBranch(g);
+
+  const pj = await Noisy.readPackageJsonFileInDirAndRequireVersion(dir);
+
+  const bv = await BranchLogic.versionFromReleaseBranch(currentBranch);
+
+  BranchLogic.checkReleaseBranchPreReleaseVersionE(pj.version, bv, currentBranch, 'package.json');
+  return bv;
+};
+
+

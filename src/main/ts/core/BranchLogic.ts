@@ -50,9 +50,9 @@ export const checkReleaseBranchPreReleaseVersionE = (
 
   const loc = `${branchName} branch: ${source} version`;
 
-  if (v.preRelease !== HardCoded.releaseBranchPreReleaseVersion) {
+  if (v.preRelease !== HardCoded.releaseBranchReleaseCandidatePrereleaseVersion) {
     const sPre = showStringOrUndefined(v.preRelease);
-    return E.left(`${loc}: prerelease version part should be "${HardCoded.releaseBranchPreReleaseVersion}", but it is "${sPre}"`);
+    return E.left(`${loc}: prerelease version part should be "${HardCoded.releaseBranchReleaseCandidatePrereleaseVersion}", but it is "${sPre}"`);
   } else if (v.buildMetaData !== undefined) {
     return E.left(`${loc}: buildMetaData version part should not be set, but it is ${showStringOrUndefined(v.buildMetaData)}`);
   } else if (v.major !== branchVersion.major || v.minor !== branchVersion.minor) {
@@ -138,3 +138,6 @@ export const isHotfixBranch = (branchName: string): boolean =>
 
 export const isReleaseBranch = (branchName: string): boolean =>
   E.isRight(versionFromReleaseBranchE(branchName));
+
+export const isMainBranch = (branchName: string): boolean =>
+  branchName === HardCoded.mainBranch;

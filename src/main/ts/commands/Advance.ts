@@ -18,7 +18,7 @@ export const updateVersion = (version: Version): Version => ({
   major: version.major,
   minor: version.minor,
   patch: version.patch + 1,
-  preRelease: HardCoded.releaseBranchPreReleaseVersion
+  preRelease: HardCoded.releaseBranchReleaseCandidatePrereleaseVersion
 });
 
 export const advance = async (fc: AdvanceArgs): Promise<void> => {

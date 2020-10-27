@@ -40,7 +40,7 @@ export const validateBranchAndChooseNewVersion = async (currentBranch: string, v
       await BranchLogic.checkReleaseBranchPreReleaseVersion(version, bv, currentBranch, 'package.json');
       return {
         ...version,
-        preRelease: `${HardCoded.releaseBranchPreReleaseVersion}.${dt}`,
+        preRelease: `${HardCoded.releaseBranchReleaseCandidatePrereleaseVersion}.${dt}`,
         buildMetaData
       };
     }
