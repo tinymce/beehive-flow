@@ -85,7 +85,7 @@ export const prepare = async (fc: PrepareArgs): Promise<void> => {
 
   const mainBranch = await Git.checkoutMainBranch(git);
 
-  const r = await RepoState.detectRepoState(dir);
+  const r = await BranchLogic.detectRepoState(dir);
   if (r.kind !== 'Main') {
     return PromiseUtils.fail('main branch not in correct state.');
   }

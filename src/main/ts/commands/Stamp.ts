@@ -6,12 +6,8 @@ import * as Version from '../core/Version';
 import * as Clock from '../core/Clock';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as RepoState from '../core/RepoState';
-import {
-  featureBranch,
-  hotfixBranch,
-  mainBranch,
-  releaseCandidate
-} from '../core/PreRelease';
+import { featureBranch, hotfixBranch, mainBranch, releaseCandidate } from '../core/PreRelease';
+import { detectRepoState } from '../core/BranchLogic';
 
 type Version = Version.Version;
 type Clock = Clock.Clock;
@@ -57,7 +53,7 @@ export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Pr
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);
 
-  const r = await RepoState.detectRepoState(dir);
+  const r = await detectRepoState(dir);
   const newVersion = chooseNewVersion(r, gitSha, clock.getTimeMillis());
   await writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
 

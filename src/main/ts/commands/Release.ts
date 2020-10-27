@@ -4,7 +4,6 @@ import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
 import * as PackageJson from '../core/PackageJson';
 import * as Inspect from '../core/Inspect';
-import * as RepoState from '../core/RepoState';
 import * as PromiseUtils from '../utils/PromiseUtils';
 
 type Version = Version.Version;
@@ -27,7 +26,7 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
   const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await RepoState.detectRepoState(dir);
+  const r = await BranchLogic.detectRepoState(dir);
   if (r.kind !== 'ReleaseCandidate') {
     return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
   }

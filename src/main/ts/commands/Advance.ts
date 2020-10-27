@@ -5,7 +5,6 @@ import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
 import * as Inspect from '../core/Inspect';
-import * as RepoState from '../core/RepoState';
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { releaseCandidate } from '../core/PreRelease';
@@ -40,7 +39,7 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
   const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await RepoState.detectRepoState(dir);
+  const r = await BranchLogic.detectRepoState(dir);
   if (r.kind !== 'Release') {
     return PromiseUtils.fail('Branch is not in Release state - can\'t advance.');
   }
@@ -50,7 +49,7 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
 export const advanceCi = async (fc: AdvanceCiArgs): Promise<void> => {
   const dir = process.cwd();
 
-  const r = await RepoState.detectRepoState(dir);
+  const r = await BranchLogic.detectRepoState(dir);
   if (r.kind !== 'Release') {
     console.log('Not in Release state - not advancing version.');
   } else {
