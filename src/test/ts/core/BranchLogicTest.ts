@@ -6,7 +6,6 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
 import * as BranchLogic from '../../../main/ts/core/BranchLogic';
 import * as Git from '../../../main/ts/utils/Git';
-import * as Files from '../../../main/ts/utils/Files';
 import * as RepoState from '../../../main/ts/core/RepoState';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
@@ -57,10 +56,8 @@ describe('BranchLogic', () => {
       };
 
       await PackageJson.writePackageJsonFile(packageJsonFile, packageJson);
-
-      await Files.writeFile(packageJsonFile, `{ "version": "0.6.0-alpha" }`);
       await git.add(packageJsonFile);
-      await git.commit('initial');
+      await git.commit('commit');
 
       const expected: RepoState = {
         kind: 'Main',
