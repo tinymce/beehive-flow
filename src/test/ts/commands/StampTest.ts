@@ -6,8 +6,6 @@ import fc from 'fast-check';
 import * as Stamp from '../../../main/ts/commands/Stamp';
 import * as Version from '../../../main/ts/core/Version';
 
-type Version = Version.Version;
-
 const assert = chai.use(chaiAsPromised).assert;
 
 describe('Stamp', () => {
