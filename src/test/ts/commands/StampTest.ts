@@ -52,8 +52,7 @@ describe('Stamp', () => {
       fc.assert(fc.property(fc.nat(), fc.nat(), fc.nat(), (major, minor, patch) => {
         const v = `${major}.${minor}.${patch}`;
         const actual = Stamp.chooseNewVersion({ kind: 'Release', version: Version.parseVersionOrThrow(v) }, 'aorseitnoarsetn', 1603695425074);
-        const sactual = Version.versionToString(actual);
-        assert.equal(sactual, v);
+        assert.equal(Version.versionToString(actual), v);
       }));
     });
   });
