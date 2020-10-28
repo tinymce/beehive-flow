@@ -33,6 +33,8 @@ export const chooseNewVersion = ({ kind, version }: Pick<RepoState, 'kind' | 've
           return PreRelease.featureBranch;
         case 'Hotfix':
           return PreRelease.hotfixBranch;
+        case 'Spike':
+          return PreRelease.spikeBranch;
       }
     })();
 

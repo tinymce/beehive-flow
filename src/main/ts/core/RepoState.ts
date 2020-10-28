@@ -36,4 +36,9 @@ export interface Hotfix extends BaseRepoState {
   readonly code: string;
 }
 
-export type RepoState = Main | ReleaseCandidate | Release | Feature | Hotfix;
+export interface Spike extends BaseRepoState {
+  readonly kind: 'Spike';
+  readonly code: string;
+}
+
+export type RepoState = Main | ReleaseCandidate | Release | Feature | Hotfix | Spike;

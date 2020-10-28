@@ -37,6 +37,9 @@ export const isFeatureBranch = (branchName: string): boolean =>
 export const isHotfixBranch = (branchName: string): boolean =>
   startsWith(branchName, 'hotfix/');
 
+export const isSpikeBranch = (branchName: string): boolean =>
+  startsWith(branchName, 'spike/');
+
 export const isReleaseBranch = (branchName: string): boolean =>
   E.isRight(versionFromReleaseBranchE(branchName));
 
@@ -120,6 +123,14 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
       const code = removeLeading(currentBranch, 'hotfix/');
       return {
         kind: 'Hotfix',
+        code,
+        ...baseRepoState
+      };
+
+    } else if (isSpikeBranch(currentBranch)) {
+      const code = removeLeading(currentBranch, 'hotfix/');
+      return {
+        kind: 'Spike',
         code,
         ...baseRepoState
       };
