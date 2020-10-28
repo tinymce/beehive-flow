@@ -3,7 +3,7 @@ import { SimpleGit } from 'simple-git';
 import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
-import * as BranchLogic from '../core/BranchLogic';
+import { BranchState, getReleaseBranchName, inspectRepo } from '../core/BranchLogic';
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { releaseCandidate } from '../core/PreRelease';
@@ -34,12 +34,12 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
 
-  const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
+  const rbn = getReleaseBranchName(fc.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await BranchLogic.detectRepoState(dir);
-  if (r.kind !== 'Release') {
-    return PromiseUtils.fail('Branch is not in Release state - can\'t advance.');
+  const r = await inspectRepo(dir);
+  if (r.branchState !== BranchState.ReleaseReady) {
+    return PromiseUtils.fail('Branch is not in release ready state - can\'t advance. Check that the version is x.y.z with no suffix.');
   }
   await go(r.version, r.packageJson, r.packageJsonFile, git, fc, dir);
 };
@@ -47,9 +47,9 @@ export const advance = async (fc: AdvanceArgs): Promise<void> => {
 export const advanceCi = async (fc: AdvanceCiArgs): Promise<void> => {
   const dir = process.cwd();
 
-  const r = await BranchLogic.detectRepoState(dir);
-  if (r.kind !== 'Release') {
-    console.log('Not in Release state - not advancing version.');
+  const r = await inspectRepo(dir);
+  if (r.branchState !== BranchState.ReleaseReady) {
+    console.log('Not in release ready state - not advancing version.');
   } else {
     const git = gitP(dir);
     await go(r.version, r.packageJson, r.packageJsonFile, git, fc, dir);

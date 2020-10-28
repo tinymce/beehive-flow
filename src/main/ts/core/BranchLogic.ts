@@ -1,18 +1,21 @@
 import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
 import { CheckRepoActions } from 'simple-git';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { removeLeading, showStringOrUndefined, startsWith } from '../utils/StringUtils';
+import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
 import * as Version from './Version';
 import * as PreRelease from './PreRelease';
-import { BaseRepoState, RepoState } from './RepoState';
 import * as PackageJson from './PackageJson';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
+type Version = Version.Version;
 type Either<R, A> = E.Either<R, A>;
+type Option<A> = O.Option<A>;
+type PackageJson = PackageJson.PackageJson;
 
-export const releaseBranchName = ({ major, minor }: MajorMinorVersion): string =>
+export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): string =>
   `release/${major}.${minor}`;
 
 export const versionFromReleaseBranchE = (branchName: string): Either<string, MajorMinorVersion> => {
@@ -28,27 +31,55 @@ export const versionFromReleaseBranchE = (branchName: string): Either<string, Ma
   }
 };
 
+export enum BranchType {
+  Main, Feature, Hotfix, Spike, Release
+}
+
+export enum BranchState {
+  Main, Feature, Hotfix, Spike, ReleaseReady, ReleaseCandidate
+}
+
+export interface BranchDetails {
+  readonly gitUrl: string;
+  readonly currentBranch: string;
+  readonly version: Version;
+  readonly majorMinorVersion: MajorMinorVersion;
+  readonly packageJson: PackageJson;
+  readonly packageJsonFile: string;
+  readonly branchType: BranchType;
+  readonly branchState: BranchState;
+}
+
 export const versionFromReleaseBranch = (branchName: string): Promise<MajorMinorVersion> =>
   PromiseUtils.eitherToPromise(versionFromReleaseBranchE(branchName));
 
-export const isFeatureBranch = (branchName: string): boolean =>
-  startsWith(branchName, 'feature/');
-
-export const isHotfixBranch = (branchName: string): boolean =>
-  startsWith(branchName, 'hotfix/');
-
-export const isSpikeBranch = (branchName: string): boolean =>
-  startsWith(branchName, 'spike/');
-
-export const isReleaseBranch = (branchName: string): boolean =>
-  E.isRight(versionFromReleaseBranchE(branchName));
-
 export const mainBranchName = 'main';
 
-export const isMainBranch = (branchName: string): boolean =>
-  branchName === mainBranchName;
+export const getBranchType = (branchName: string): Option<BranchType> => {
+  if (branchName === mainBranchName) {
+    return O.some(BranchType.Main);
+  } else {
+    const parts = branchName.split('/');
+    if (parts.length === 0) {
+      return O.none;
+    } else {
+      switch (parts[0]) {
+        case 'feature':
+          return O.some(BranchType.Feature);
+        case 'hotfix':
+          return O.some(BranchType.Hotfix);
+        case 'spike':
+          return O.some(BranchType.Spike);
+        case 'release':
+          return O.some(BranchType.Release);
+        default:
+          return O.none;
+      }
+    }
+  }
+};
 
-export const detectRepoState = async (dir: string): Promise<RepoState> => {
+export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
   const fail = PromiseUtils.fail;
   const git = gitP(dir);
 
@@ -64,76 +95,76 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
   const version = await PromiseUtils.optionToPromise(packageJson.version, 'Version missing in package.json file');
   const majorMinorVersion = Version.toMajorMinor(version);
 
-  const baseRepoState: BaseRepoState = ({
+  const baseState = {
     gitUrl,
     currentBranch,
     version,
     majorMinorVersion,
     packageJson,
     packageJsonFile
-  });
+  };
 
   const loc = `${currentBranch} branch: package.json version`;
   const sPackageVersion = Version.versionToString(version);
+  const sPre = showStringOrUndefined(version.preRelease);
 
-  if (version.buildMetaData !== undefined) {
-    return fail(`package.json version has an unexpected buildMetaData part`);
-  } else if (isMainBranch(currentBranch)) {
+  const invalidBranchName = (): Promise<BranchDetails> =>
+    fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, spike/*, release/x.y');
+
+  const validateMainBranch = async (): Promise<BranchState.Main> => {
     if (version.patch !== 0) {
       return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
     } else if (version.preRelease !== PreRelease.mainBranch) {
-      return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}", but is ${showStringOrUndefined(version.preRelease)}`);
+      return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}", but is ${sPre}`);
     } else {
-      return {
-        kind: 'Main',
-        ...baseRepoState
-      };
+      return BranchState.Main;
     }
-  } else if (isReleaseBranch(currentBranch)) {
-    const branchVersion = await versionFromReleaseBranch(currentBranch);
+  };
 
+  const validateReleaseBranch = async (): Promise<BranchState.ReleaseCandidate | BranchState.ReleaseReady> => {
+    const branchVersion = await versionFromReleaseBranch(currentBranch);
     const sBranchVersion = Version.majorMinorVersionToString(branchVersion);
 
     if (version.major !== branchVersion.major || version.minor !== branchVersion.minor) {
       return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
     } else if (version.preRelease === undefined) {
-      return {
-        kind: 'Release',
-        ...baseRepoState
-      };
+      return BranchState.ReleaseReady;
     } else if (version.preRelease === PreRelease.releaseCandidate) {
-      return {
-        kind: 'ReleaseCandidate',
-        ...baseRepoState
-      };
+      return BranchState.ReleaseCandidate;
     } else {
-      const sPre = showStringOrUndefined(version.preRelease);
       return fail(`${loc}: prerelease version part should be either "${PreRelease.releaseCandidate}" or not set, but it is "${sPre}"`);
     }
-  } else if (isFeatureBranch(currentBranch)) {
-    const code = removeLeading(currentBranch, 'feature/');
-    return {
-      kind: 'Feature',
-      code,
-      ...baseRepoState
-    };
+  };
 
-  } else if (isHotfixBranch(currentBranch)) {
-    const code = removeLeading(currentBranch, 'hotfix/');
-    return {
-      kind: 'Hotfix',
-      code,
-      ...baseRepoState
-    };
+  const detect = async (branchType: BranchType): Promise<BranchState> => {
+    switch (branchType) {
+      case BranchType.Main:
+        return validateMainBranch();
+      case BranchType.Feature:
+        return BranchState.Feature;
+      case BranchType.Hotfix:
+        return BranchState.Hotfix;
+      case BranchType.Spike:
+        return BranchState.Spike;
+      case BranchType.Release:
+        return validateReleaseBranch();
+    }
+  };
 
-  } else if (isSpikeBranch(currentBranch)) {
-    const code = removeLeading(currentBranch, 'spike/');
-    return {
-      kind: 'Spike',
-      code,
-      ...baseRepoState
-    };
+  if (version.buildMetaData !== undefined) {
+    return fail(`package.json version has an unexpected buildMetaData part`);
   } else {
-    return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, spike/*, release/x.y');
+    const obt = getBranchType(currentBranch);
+    if (obt._tag === 'None') {
+      return invalidBranchName();
+    } else {
+      const branchType = obt.value;
+      const branchState = await detect(branchType);
+      return {
+        ...baseState,
+        branchState,
+        branchType
+      };
+    }
   }
 };

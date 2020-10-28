@@ -1,9 +1,9 @@
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
-import * as BranchLogic from '../core/BranchLogic';
 import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
+import { BranchState, inspectRepo, getReleaseBranchName } from '../core/BranchLogic';
 
 type Version = Version.Version;
 const { versionToString } = Version;
@@ -19,11 +19,11 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
 
-  const rbn = BranchLogic.releaseBranchName(fc.majorMinorVersion);
+  const rbn = getReleaseBranchName(fc.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await BranchLogic.detectRepoState(dir);
-  if (r.kind !== 'ReleaseCandidate') {
+  const r = await inspectRepo(dir);
+  if (r.branchState !== BranchState.ReleaseCandidate) {
     return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
   }
 

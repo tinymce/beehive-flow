@@ -5,35 +5,33 @@ import * as Git from '../utils/Git';
 import * as Version from '../core/Version';
 import * as Clock from '../core/Clock';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
-import * as RepoState from '../core/RepoState';
 import * as PreRelease from '../core/PreRelease';
-import { detectRepoState } from '../core/BranchLogic';
+import { BranchState, inspectRepo } from '../core/BranchLogic';
 
 type Version = Version.Version;
 type Clock = Clock.Clock;
-type RepoState = RepoState.RepoState;
 
 export const timeFormat = 'yyyyMMddHHmmssSSS';
 
 export const formatDate = (timeMillis: number): string =>
   DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat, { timeZone: 'utc' });
 
-export const chooseNewVersion = ({ kind, version }: Pick<RepoState, 'kind' | 'version'>, gitSha: string, timeMillis: number): Version => {
-  if (kind === 'Release') {
+export const chooseNewVersion = (branchState: BranchState, version: Version, gitSha: string, timeMillis: number): Version => {
+  if (branchState === BranchState.ReleaseReady) {
     return version;
   } else {
 
     const prePre = (() => {
-      switch (kind) {
-        case 'Main':
+      switch (branchState) {
+        case BranchState.Main:
           return PreRelease.mainBranch;
-        case 'ReleaseCandidate':
+        case BranchState.ReleaseCandidate:
           return PreRelease.releaseCandidate;
-        case 'Feature':
+        case BranchState.Feature:
           return PreRelease.featureBranch;
-        case 'Hotfix':
+        case BranchState.Hotfix:
           return PreRelease.hotfixBranch;
-        case 'Spike':
+        case BranchState.Spike:
           return PreRelease.spikeBranch;
       }
     })();
@@ -56,8 +54,8 @@ export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Pr
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);
 
-  const r = await detectRepoState(dir);
-  const newVersion = chooseNewVersion(r, gitSha, clock.getTimeMillis());
+  const r = await inspectRepo(dir);
+  const newVersion = chooseNewVersion(r.branchState, r.version, gitSha, clock.getTimeMillis());
   await writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
 
   console.log('Note: this command does not commit changes to package.json.');
