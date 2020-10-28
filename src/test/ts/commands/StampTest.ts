@@ -2,7 +2,11 @@ import { describe, it } from 'mocha';
 import { DateTime } from 'luxon';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import fc from 'fast-check';
 import * as Stamp from '../../../main/ts/commands/Stamp';
+import * as Version from '../../../main/ts/core/Version';
+
+type Version = Version.Version;
 
 const assert = chai.use(chaiAsPromised).assert;
 
@@ -17,63 +21,39 @@ describe('Stamp', () => {
     });
   });
 
-  // TODO: Rewrite
-  // describe('validateBranchAndChooseNewVersion', () => {
-  //   describe('behaviour on main branch', () => {
-  //     it('fails if version is missing prerelease', async () => {
-  //       await assert.isRejected(Stamp.chooseNewVersion('main', 123));
-  //     });
-  //     it('fails if version has wrong prerelease', async () => {
-  //       await assert.isRejected(Stamp.chooseNewVersion('main', 123));
-  //     });
-  //     it('fails if version has wrong minor', async () => {
-  //       await assert.isRejected(Stamp.chooseNewVersion('main', 123));
-  //     });
-  //     it('fails if version has wrong minor and wrong prerelease', async () => {
-  //       await assert.isRejected(Stamp.chooseNewVersion('main', 123));
-  //     });
-  //     it('passes if version is valid', async () => {
-  //       const actual = await Stamp.chooseNewVersion('main', 1603695425074);
-  //       const sactual = Version.versionToString(actual);
-  //       assert.equal(sactual, '1.2.0-alpha.20201026065705074+b0d52ad');
-  //     });
-  //   });
-  //
-  //   describe('behaviour on feature branch', () => {
-  //     it('passes if version is valid', async () => {
-  //       await fc.assert(fc.asyncProperty(fc.nat(), fc.nat(), async (major, minor) => {
-  //         const patch = 0;
-  //         const v = `${major}.${minor}.${patch}-main`;
-  //         const actual = await Stamp.chooseNewVersion('feature/TINY-1234', 1603695425074);
-  //         const sactual = Version.versionToString(actual);
-  //         assert.equal(sactual, `${major}.${minor}.${patch}-feature.20201026065705074+b0d52ad`);
-  //       }));
-  //     });
-  //   });
-  //
-  //   describe('behaviour on hotfix branch', () => {
-  //     it('passes if version is valid', async () => {
-  //       const actual = await Stamp.chooseNewVersion('hotfix/TINY-1234', 1603695425074);
-  //       const sactual = Version.versionToString(actual);
-  //       assert.equal(sactual, '1.2.0-hotfix.20201026065705074+b0d52ad');
-  //     });
-  //   });
-  //
-  //   describe('behaviour on release branch', () => {
-  //     it('fails on version mismatch', async () => {
-  //       await assert.isRejected(Stamp.chooseNewVersion('release/1.2', 123));
-  //     });
-  //     it('fails on wrong prerelease', async () => {
-  //       await assert.isRejected(Stamp.chooseNewVersion('release/1.2', 123));
-  //     });
-  //     it('passes if version is valid, but does not change the version', async () => {
-  //       await fc.assert(fc.asyncProperty(fc.nat(), fc.nat(), fc.nat(), async (major, minor, patch) => {
-  //         const v = `${major}.${minor}.${patch}`;
-  //         const actual = await Stamp.chooseNewVersion(`release/${major}.${minor}`, 1603695425074);
-  //         const sactual = Version.versionToString(actual);
-  //         assert.equal(sactual, v);
-  //       }));
-  //     });
-  //   });
-  // });
+  describe('chooseNewVersion', () => {
+    it('makes a timestamped version on main branch', () => {
+      it('passes if version is valid', () => {
+        const actual = Stamp.chooseNewVersion({ kind: 'Main', version: Version.parseVersionOrThrow('0.2.0-alpha') }, 'b0d52ad', 1603695425074);
+        assert.equal(Version.versionToString(actual), '1.2.0-alpha.20201026065705074+b0d52ad');
+      });
+    });
+
+    it('makes a timestamped version on feature branch', () => {
+      fc.assert(fc.property(fc.nat(), fc.nat(), (major, minor) => {
+        const patch = 0;
+        const v = `${major}.${minor}.${patch}-main`;
+        const actual = Stamp.chooseNewVersion({ kind: 'Feature', version: Version.parseVersionOrThrow(v) }, 'b0d59ad', 1603695425074);
+        assert.equal(Version.versionToString(actual), `${major}.${minor}.${patch}-feature.20201026065705074+b0d59ad`);
+      }));
+    });
+
+    it('makes a timestamped version on hotfix branch', () => {
+      const actual = Stamp.chooseNewVersion({ kind: 'Hotfix', version: Version.parseVersionOrThrow('1.2.0-rc') }, 'f0d52ad', 1603695425074);
+      assert.equal(Version.versionToString(actual), '1.2.0-hotfix.20201026065705074+f0d52ad');
+    });
+
+    // TODO: test prerelease state
+
+    it('does not change version for release version', () => {
+      it('passes if version is valid, but does not change the version', () => {
+        fc.assert(fc.property(fc.nat(), fc.nat(), fc.nat(), (major, minor, patch) => {
+          const v = `${major}.${minor}.${patch}`;
+          const actual = Stamp.chooseNewVersion({ kind: 'Release', version: Version.parseVersionOrThrow(v) }, 'aorseitnoarsetn', 1603695425074);
+          const sactual = Version.versionToString(actual);
+          assert.equal(sactual, v);
+        }));
+      });
+    });
+  });
 });

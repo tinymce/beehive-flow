@@ -18,7 +18,7 @@ export const timeFormat = 'yyyyMMddHHmmssSSS';
 export const formatDate = (timeMillis: number): string =>
   DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat, { timeZone: 'utc' });
 
-export const chooseNewVersion = ({ kind, version }: RepoState, gitSha: string, timeMillis: number): Version => {
+export const chooseNewVersion = ({ kind, version }: Pick<RepoState, 'kind' | 'version'>, gitSha: string, timeMillis: number): Version => {
   if (kind === 'Release') {
     return version;
   } else {
