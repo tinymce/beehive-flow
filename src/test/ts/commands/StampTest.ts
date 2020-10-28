@@ -43,17 +43,18 @@ describe('Stamp', () => {
       assert.equal(Version.versionToString(actual), '1.2.0-hotfix.20201026065705074+f0d52ad');
     });
 
-    // TODO: test prerelease state
+    it('makes a timestamped version in rc state', () => {
+      const actual = Stamp.chooseNewVersion({ kind: 'ReleaseCandidate', version: Version.parseVersionOrThrow('1.2.0-rc') }, 'f0d52ad', 1603695425074);
+      assert.equal(Version.versionToString(actual), '1.2.0-rc.20201026065705074+f0d52ad');
+    });
 
     it('does not change version for release version', () => {
-      it('passes if version is valid, but does not change the version', () => {
-        fc.assert(fc.property(fc.nat(), fc.nat(), fc.nat(), (major, minor, patch) => {
-          const v = `${major}.${minor}.${patch}`;
-          const actual = Stamp.chooseNewVersion({ kind: 'Release', version: Version.parseVersionOrThrow(v) }, 'aorseitnoarsetn', 1603695425074);
-          const sactual = Version.versionToString(actual);
-          assert.equal(sactual, v);
-        }));
-      });
+      fc.assert(fc.property(fc.nat(), fc.nat(), fc.nat(), (major, minor, patch) => {
+        const v = `${major}.${minor}.${patch}`;
+        const actual = Stamp.chooseNewVersion({ kind: 'Release', version: Version.parseVersionOrThrow(v) }, 'aorseitnoarsetn', 1603695425074);
+        const sactual = Version.versionToString(actual);
+        assert.equal(sactual, v);
+      }));
     });
   });
 });
