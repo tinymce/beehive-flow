@@ -5,7 +5,6 @@
  * @param s
  */
 export const showStringOrUndefined = (s: string | undefined): string =>
-  // TODO: test
   s === undefined ? 'undefined' : '"' + s.replace('"', '\\"') + '"';
 
 const checkRange = (str: string, substr: string, start: number): boolean =>
