@@ -1,6 +1,7 @@
 import * as yargs from 'yargs';
 import * as O from 'fp-ts/Option';
 import * as Version from '../core/Version';
+import * as PromiseUtils from '../utils/PromiseUtils';
 import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
@@ -90,7 +91,12 @@ const argParser =
       stampDescription
     )
     .demandCommand(1)
-    .wrap(120);
+    .wrap(120)
+    .strict()
+    .exitProcess(false)
+    .parserConfiguration({
+      'parse-numbers': false
+    });
 
 /**
  Removes the first two args, which are "node" and the script filename
@@ -98,14 +104,15 @@ const argParser =
 export const getRealArgs = (): string[] =>
   process.argv.slice(2);
 
-export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((resolve, reject) => {
-  const a = argParser
-    .strict()
-    .exitProcess(false)
-    .parserConfiguration({
-      'parse-numbers': false
-    })
-    .parse(args);
+export const parseArgs = async (args: string[]): Promise<BeehiveArgs> => {
+  let _a;
+  try {
+    _a = argParser.parse(args);
+  } catch (e) {
+    // Swallow error, so that the error handler in Main doesn't print it again
+    return PromiseUtils.fail('');
+  }
+  const a = _a;
 
   const cmd = a._[0];
   const dryRun = a['dry-run'];
@@ -113,26 +120,26 @@ export const parseArgs = (args: string[]): Promise<BeehiveArgs> => new Promise((
   const gitUrl = O.fromNullable(a['git-url']);
 
   if (cmd === 'prepare') {
-    resolve(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
+    return BeehiveArgs.prepareArgs(dryRun, temp, gitUrl);
 
   } else if (cmd === 'release') {
     const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
+    return BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm);
 
   } else if (cmd === 'advance') {
     const mm = a.majorDotMinor as MajorMinorVersion;
-    resolve(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
+    return BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm);
 
   } else if (cmd === 'advance-ci') {
-    resolve(BeehiveArgs.advanceCiArgs(dryRun));
+    return BeehiveArgs.advanceCiArgs(dryRun);
 
   } else if (a._[0] === 'stamp') {
-    resolve(BeehiveArgs.stampArgs(dryRun));
+    return BeehiveArgs.stampArgs(dryRun);
 
   } else {
-    reject();
+    return PromiseUtils.fail(`Unknown command: ${cmd}`);
   }
-});
+};
 
 export const parseProcessArgs = (): Promise<BeehiveArgs> =>
   parseArgs(getRealArgs());

@@ -8,7 +8,8 @@ const main = async () => {
   await Dispatch.dispatch(actualArgs);
 };
 
-main().catch((e) => {
-  console.error(e.message || e);
+main().catch((e: any) => {
+  const msg = e instanceof Error ? e.message : String(e);
+  console.error(msg);
   process.exit(1);
 });
