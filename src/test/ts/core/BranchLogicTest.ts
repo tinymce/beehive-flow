@@ -16,6 +16,7 @@ type PackageJson = PackageJson.PackageJson;
 
 const assert = chai.use(chaiAsPromised).assert;
 
+
 describe('BranchLogic', () => {
   describe('releaseBranchName', () => {
     it('makes branch names (manual cases)', () => {
@@ -41,14 +42,15 @@ describe('BranchLogic', () => {
   });
 
   describe('detectRepoState', () => {
-    it('detects valid main branch', async () => {
+
+    const setup = async (branchName: string, sVersion: string) => {
+      const version = Version.parseVersionOrThrow(sVersion);
+
       const hub = await Git.initInTempFolder(true);
       const gitUrl = hub.dir;
       const { dir, git } = await Git.cloneInTempFolder(gitUrl);
-      await Git.checkoutNewBranch(git, 'main');
+      await Git.checkoutNewBranch(git, branchName);
       const packageJsonFile = path.join(dir, 'package.json');
-
-      const version: Version = { major: 0, minor: 6, patch: 0, preRelease: 'alpha', buildMetaData: undefined };
 
       const packageJson: PackageJson = {
         version: O.some(version),
@@ -58,6 +60,11 @@ describe('BranchLogic', () => {
       await PackageJson.writePackageJsonFile(packageJsonFile, packageJson);
       await git.add(packageJsonFile);
       await git.commit('commit');
+      return { gitUrl, dir, packageJsonFile, version, packageJson };
+    };
+
+    it('detects valid main branch', async () => {
+      const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('main', '0.6.0-alpha');
 
       const expected: RepoState = {
         kind: 'Main',
@@ -70,6 +77,26 @@ describe('BranchLogic', () => {
       };
 
       await assert.becomes(BranchLogic.detectRepoState(dir), expected);
+    });
+
+    it('fails for main branch with wrong minor version', async () => {
+      const { dir } = await setup('main', '0.6.1-alpha');
+      await assert.isRejected(BranchLogic.detectRepoState(dir));
+    });
+
+    it('fails for main branch with rc version', async () => {
+      const { dir } = await setup('main', '0.6.0-rc');
+      await assert.isRejected(BranchLogic.detectRepoState(dir));
+    });
+
+    it('fails for main branch with release version', async () => {
+      const { dir } = await setup('main', '0.6.0');
+      await assert.isRejected(BranchLogic.detectRepoState(dir));
+    });
+
+    it('fails for main branch with buildmetadata', async () => {
+      const { dir } = await setup('main', '0.6.0+9nesste123.frog');
+      await assert.isRejected(BranchLogic.detectRepoState(dir));
     });
   });
 });
