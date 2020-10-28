@@ -9,6 +9,7 @@ import * as Git from '../../../main/ts/utils/Git';
 import * as RepoState from '../../../main/ts/core/RepoState';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
+import * as Files from '../../../main/ts/utils/Files';
 
 type RepoState = RepoState.RepoState;
 type PackageJson = PackageJson.PackageJson;
@@ -60,6 +61,18 @@ describe('BranchLogic', () => {
       await git.commit('commit');
       return { gitUrl, dir, packageJsonFile, version, packageJson };
     };
+
+    it('fails if dir is not a git repo', async () => {
+      const dir = await Files.tempFolder();
+      await assert.isRejected(BranchLogic.detectRepoState(dir));
+    });
+
+    it('fails if dir is not at the root of a git repo', async () => {
+      const { dir } = await Git.initInTempFolder();
+      const subbie = path.join(dir, 'subbie');
+      await Files.mkdir(subbie);
+      await assert.isRejected(BranchLogic.detectRepoState(subbie));
+    });
 
     it('detects valid main branch', async () => {
       const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('main', '0.6.0-alpha');
