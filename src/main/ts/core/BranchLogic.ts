@@ -134,6 +134,6 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
       ...baseRepoState
     };
   } else {
-    return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, release/x.y');
+    return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, spike/*, release/x.y');
   }
 };
