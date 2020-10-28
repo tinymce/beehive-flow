@@ -16,7 +16,22 @@ In the below description, an NPM/Yarn package.json project is assumed, and the t
 Branches
 --------
 
-A single mainline branch called "main" is used. All new features and fixes are merged first to the main branch, then cherry-picked to other branches as necessary.
+beehive-flow uses the following branch names, each forming part of the process:
+
+ - main
+ - release/x.y
+ - feature/FEATURE_CODE
+ - hotfix/FEATURE_CODE
+ - spike/FEATURE_CODE
+ 
+Note, there is no "develop" branch and "main" is used instead of "master" as it is GitHub's new default. 
+
+Branch names are enforced and beehive-flow will fail if it encounters other branch names. 
+
+A single mainline branch called "**main**" is used. 
+
+All features and fixes are merged first to the main branch (via feature branches),
+then cherry-picked to release branches as necessary (via hotfix branches).
 
 ```
   main
@@ -31,26 +46,60 @@ A single mainline branch called "main" is used. All new features and fixes are m
              (1.2.x-rc / 1.2.x)                  (1.3.x-rc / 1.3.x)
 ```
 
-Release branches are named "release/x.y" where x.y is the major.minor version. These are branched off the main branch at the beginning of *release preparation*.
+**release** branches are named "release/x.y" where x.y is the major.minor version. These are branched off the main branch at the beginning of *release preparation*.
 The release branch code is stabilised and then released.
 
-Support fixes are made first to the main branch (via a feature branch), then cherry-picked to a release/x.y branch (via a hotfix branch) and released.
+**feature** branches are branched off main. All new work is done here. It doesn't matter if it's a feature, improvement, task, refactor, bugfix or any other type of change. 
+These are all considered feature branches.
 
-The *only* acceptable branch names are as follows:
-- main
-- release/x.y
-- feature/FEATURE_CODE
-- hotfix/FEATURE_CODE
+```
+                       feature/BLAH-123
+  main                 +-----------
+ (x.y.0-alpha)         |           \
+  +---------+----------+------------+-----
+            |                             
+            |                             
+            |                             
+            +-----------------+           
 
-Feature branches are branched off main. All new work is done here. It doesn't matter if it's a feature, improvement, task, refactor, spike, bugfix or any other type of change. 
-These are all considered feature branches. 
+             release/1.2                  
+             (1.2.x-rc / 1.2.x)           
+```
 
-Hotfix branches are branched off a release branch. These are used to add changes during release preparation. Similar to feature branches, it doesn't matter what type of change
-is being made, the key part is that these are branched from a release branch.
+**spike** branches are also branched off main. These are treated similarly to feature branches, but are just intended to indicate that the work is experimental and not to be merged.
 
-Unlike git-flow, there is no "develop" branch. There is also no "master" branch. The branch "main" was chosen instead, as this has become GitHub's default. 
+```
+                       spike/BLAH-123
+  main                 +-----------
+ (x.y.0-alpha)         |           
+  +---------+----------+-----------------
+            |                            
+            |                            
+            |                            
+            +-----------------+          
 
-Note that the stamp command validates that branch names meet the spec.
+             release/1.2                 
+             (1.2.x-rc / 1.2.x)          
+```
+
+
+**hotfix** branches are branched off a release branch. These are used to add changes during release preparation. Similar to feature branches, it doesn't matter what type of change
+is being made, the key part is that these are branched from a release branch. 
+
+```
+  main
+ (x.y.0-alpha)
+  +---------+--------------------------------+
+            |              | |  cherry-pick and tweak
+            |              | |
+            |              ↓ ↓
+            |            +---------+  hotfix/BLAH-123
+            |            |          \
+            +------------+-----------+---+
+
+                   release/1.3
+                   (1.3.x-rc / 1.3.x)
+```
 
 Versions
 --------
@@ -68,9 +117,13 @@ As you can see, a release branch exists in one of two states:
 
 All patch releases for a major.minor release happen in the branch for the release/major.minor branch.
 
-Feature branches have a version "a.b.0-main", just like the main branch. However, the stamp command will change "main" to "feature". See below.
+Feature branches have a version "a.b.0-main", just like the main branch. 
 
-Hotfix branches have a version "a.b.c-rc", just like a release branch. However, the stamp command will change "rc" to "hotfix". See below.
+Spike branches have a version "a.b.0-main", just like the main branch. 
+
+Hotfix branches have a version "a.b.c-rc", just like a release branch. 
+
+Note that feature/spike/hotfix branch versions are not validated by beehive-flow.
 
 Operations
 ----------
@@ -112,8 +165,9 @@ The timestamping changes the package.json file. The idea is to build and publish
 Versions are changed thus:
 
  - On the main branch, `a.b.0-alpha` becomes `a.b.0-alpha.TIMESTAMP+GITSHA`
- - On a feature branch, `a.b.0-alpha` becomes `a.b.0-feature.TIMESTAMP+GITSHA`
- - On a hotfix branch, `a.b.c-rc` becomes `a.b.c-hotfix.TIMESTAMP+GITSHA`
+ - On a feature branch, `a.b.0-*` becomes `a.b.0-feature.TIMESTAMP+GITSHA`
+ - On a hotfix branch, `a.b.c-*` becomes `a.b.c-hotfix.TIMESTAMP+GITSHA`
+ - On a spike branch, `a.b.c-*` becomes `a.b.c-spike.TIMESTAMP+GITSHA`
  - On a release branch in prerelease state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP+GITSHA`
  - On a release branch in release state, no changes are made.
  
@@ -126,4 +180,4 @@ CI Instructions
 
 CI needs to check out a real branch, not just a detached head.
 
-At the start of the build, run "stamp". If the build is successful, run "advance".
+At the start of the build, run "stamp". If the build is successful, run "advance-ci".
