@@ -13,9 +13,8 @@ import * as PackageJson from './PackageJson';
 type MajorMinorVersion = Version.MajorMinorVersion;
 type Either<R, A> = E.Either<R, A>;
 
-// TODO: Test
-export const releaseBranchName = (v: MajorMinorVersion): string =>
-  `release/${v.major}.${v.minor}`;
+export const releaseBranchName = ({ major, minor }: MajorMinorVersion): string =>
+  `release/${major}.${minor}`;
 
 export const versionFromReleaseBranchE = (branchName: string): Either<string, MajorMinorVersion> => {
   const regexp = /^release\/(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
