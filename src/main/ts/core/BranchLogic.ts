@@ -127,7 +127,7 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
     };
 
   } else if (isSpikeBranch(currentBranch)) {
-    const code = removeLeading(currentBranch, 'hotfix/');
+    const code = removeLeading(currentBranch, 'spike/');
     return {
       kind: 'Spike',
       code,

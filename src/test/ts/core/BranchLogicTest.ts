@@ -110,6 +110,40 @@ describe('BranchLogic', () => {
       await assert.isRejected(BranchLogic.detectRepoState(dir));
     });
 
+    it('detects valid feature branch', async () => {
+      const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('feature/BLAH-1234', '0.6.0-alpha');
+
+      const expected: RepoState = {
+        kind: 'Feature',
+        packageJsonFile,
+        packageJson,
+        version,
+        gitUrl,
+        currentBranch: 'feature/BLAH-1234',
+        majorMinorVersion: Version.toMajorMinor(version),
+        code: 'BLAH-1234'
+      };
+
+      await assert.becomes(BranchLogic.detectRepoState(dir), expected);
+    });
+
+    it('detects valid spike branch', async () => {
+      const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('spike/BLAH-1234', '0.6.0-alpha');
+
+      const expected: RepoState = {
+        kind: 'Spike',
+        packageJsonFile,
+        packageJson,
+        version,
+        gitUrl,
+        currentBranch: 'spike/BLAH-1234',
+        majorMinorVersion: Version.toMajorMinor(version),
+        code: 'BLAH-1234'
+      };
+
+      await assert.becomes(BranchLogic.detectRepoState(dir), expected);
+    });
+
     // TODO: test other states
   });
 });
