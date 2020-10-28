@@ -35,7 +35,7 @@ export const cloneIn = async (gitUrl: string, dir: string): Promise<TempGit> => 
   return { dir, git };
 };
 
-export const cloneInTempFolder = async (gitUrl: string, temp: Option<string>): Promise<TempGit> => {
+export const cloneInTempFolder = async (gitUrl: string, temp: Option<string> = O.none): Promise<TempGit> => {
   const dir = temp._tag === 'Some' ? temp.value : (await Files.tempFolder());
   return await cloneIn(gitUrl, dir);
 };
