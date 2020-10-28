@@ -75,7 +75,7 @@ const updateMainBranch = async (mainBranch: string, git: SimpleGit, r: RepoState
   await updatePackageJsonFileForMainBranch(r.version, r.packageJson, r.packageJsonFile);
   await git.add(r.packageJsonFile);
   await git.commit(`Updating version`);
-  await Git.pushUnlessDryRun(fc, dir, git);
+  await Git.pushFfOnlyUnlessDryRun(fc, dir, git);
 };
 
 export const prepare = async (fc: PrepareArgs): Promise<void> => {

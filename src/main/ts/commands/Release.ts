@@ -39,5 +39,5 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
   await git.add(r.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');
 
-  await Git.pushUnlessDryRun(fc, dir, git);
+  await Git.pushFfOnlyUnlessDryRun(fc, dir, git);
 };

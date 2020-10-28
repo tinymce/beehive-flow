@@ -81,12 +81,12 @@ export const pushNewBranchUnlessDryRun = async (fc: BeehiveArgs, dir: string, gi
     await pushNewBranch(git);
   }
 };
-export const pushUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
+export const pushFfOnlyUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
   if (args.dryRun) {
     console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
-    await push(git);
+    await pushFfOnly(git);
   }
 };
 export const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise<void> => {
