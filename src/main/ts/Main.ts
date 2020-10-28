@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node -r "ts-node/register"
+#!/usr/bin/env -S node
 
 import * as Parser from './args/Parser';
 import * as Dispatch from './args/Dispatch';
@@ -9,6 +9,6 @@ const main = async () => {
 };
 
 main().catch((e) => {
-  console.error(e);
+  console.error(e.message || e);
   process.exit(1);
 });

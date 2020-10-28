@@ -17,13 +17,14 @@
     "yargs": "^16.1.0"
   },
   "scripts": {
-    "beehive-flow": "./src/main/ts/Main.ts",
+    "beehive-flow": "yarn node -r 'ts-node/register' src/main/ts/Main.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "testOnly": "nyc mocha -r esm --require ts-node/register --require source-map-support/register --recursive --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters-config.json src/test/ts/**/*Test.ts",
     "buildTestOnly": "yarn build && yarn testOnly",
     "test": "yarn build && yarn lint && yarn testOnly",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "buildAndInstall": "yarn build && yarn global add file:$PWD"
   },
   "devDependencies": {
     "@tinymce/eslint-plugin": "^1.4.1",
@@ -55,6 +56,13 @@
   "publishConfig": {
     "@tiny-premium:registry": "https://npm.cloudsmith.io/tiny/tiny-premium/"
   },
+  "bin": {
+    "beehive-flow": "lib/main/ts/Main.js"
+  },
+  "files": [
+    "lib/main",
+    "src"
+  ],
   "nyc": {
     "extension": [
       ".ts",
@@ -69,5 +77,8 @@
       "text"
     ],
     "all": true
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
