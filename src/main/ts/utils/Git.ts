@@ -27,8 +27,6 @@ export const initInTempFolder = async (bare: boolean = false): Promise<TempGit> 
   return { dir, git };
 };
 
-// TODO: are we removing these folders on exit?
-
 export const cloneIn = async (gitUrl: string, dir: string): Promise<TempGit> => {
   console.log(`Cloning ${gitUrl} to ${dir}`);
   const git = gitP(dir);
