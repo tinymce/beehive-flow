@@ -60,9 +60,6 @@ export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
 export const push = async (git: SimpleGit): Promise<PushResult> =>
   git.push(ASSUMED_REMOTE);
 
-export const pushFfOnly = async (git: SimpleGit): Promise<PushResult> =>
-  git.push(ASSUMED_REMOTE, undefined, { '--ff-only': null });
-
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
   return ObjUtils.hasKey(b.branches, 'remotes/origin/' + branchName);
@@ -81,12 +78,12 @@ export const pushNewBranchUnlessDryRun = async (fc: BeehiveArgs, dir: string, gi
     await pushNewBranch(git);
   }
 };
-export const pushFfOnlyUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
+export const pushUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
   if (args.dryRun) {
     console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
-    await pushFfOnly(git);
+    await push(git);
   }
 };
 export const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise<void> => {
