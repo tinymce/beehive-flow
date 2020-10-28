@@ -78,64 +78,62 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
 
   if (version.buildMetaData !== undefined) {
     return fail(`package.json version has an unexpected buildMetaData part`);
-  } else {
-    if (isMainBranch(currentBranch)) {
-      if (version.patch !== 0) {
-        return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
-      } else if (version.preRelease !== PreRelease.mainBranch) {
-        return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}", but is ${showStringOrUndefined(version.preRelease)}`);
-      } else {
-        return {
-          kind: 'Main',
-          ...baseRepoState
-        };
-      }
-    } else if (isReleaseBranch(currentBranch)) {
-      const branchVersion = await versionFromReleaseBranch(currentBranch);
-
-      const sBranchVersion = Version.majorMinorVersionToString(branchVersion);
-
-      if (version.major !== branchVersion.major || version.minor !== branchVersion.minor) {
-        return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
-      } else if (version.preRelease === undefined) {
-        return {
-          kind: 'Release',
-          ...baseRepoState
-        };
-      } else if (version.preRelease === PreRelease.releaseCandidate) {
-        return {
-          kind: 'ReleaseCandidate',
-          ...baseRepoState
-        };
-      } else {
-        const sPre = showStringOrUndefined(version.preRelease);
-        return fail(`${loc}: prerelease version part should be either "${PreRelease.releaseCandidate}" or not set, but it is "${sPre}"`);
-      }
-    } else if (isFeatureBranch(currentBranch)) {
-      const code = removeLeading(currentBranch, 'feature/');
+  } else if (isMainBranch(currentBranch)) {
+    if (version.patch !== 0) {
+      return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
+    } else if (version.preRelease !== PreRelease.mainBranch) {
+      return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}", but is ${showStringOrUndefined(version.preRelease)}`);
+    } else {
       return {
-        kind: 'Feature',
-        code,
+        kind: 'Main',
         ...baseRepoState
       };
+    }
+  } else if (isReleaseBranch(currentBranch)) {
+    const branchVersion = await versionFromReleaseBranch(currentBranch);
 
-    } else if (isHotfixBranch(currentBranch)) {
-      const code = removeLeading(currentBranch, 'hotfix/');
+    const sBranchVersion = Version.majorMinorVersionToString(branchVersion);
+
+    if (version.major !== branchVersion.major || version.minor !== branchVersion.minor) {
+      return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
+    } else if (version.preRelease === undefined) {
       return {
-        kind: 'Hotfix',
-        code,
+        kind: 'Release',
         ...baseRepoState
       };
-
-    } else if (isSpikeBranch(currentBranch)) {
-      const code = removeLeading(currentBranch, 'hotfix/');
+    } else if (version.preRelease === PreRelease.releaseCandidate) {
       return {
-        kind: 'Spike',
-        code,
+        kind: 'ReleaseCandidate',
         ...baseRepoState
       };
     } else {
-      return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, release/x.y');
+      const sPre = showStringOrUndefined(version.preRelease);
+      return fail(`${loc}: prerelease version part should be either "${PreRelease.releaseCandidate}" or not set, but it is "${sPre}"`);
     }
+  } else if (isFeatureBranch(currentBranch)) {
+    const code = removeLeading(currentBranch, 'feature/');
+    return {
+      kind: 'Feature',
+      code,
+      ...baseRepoState
+    };
+
+  } else if (isHotfixBranch(currentBranch)) {
+    const code = removeLeading(currentBranch, 'hotfix/');
+    return {
+      kind: 'Hotfix',
+      code,
+      ...baseRepoState
+    };
+
+  } else if (isSpikeBranch(currentBranch)) {
+    const code = removeLeading(currentBranch, 'hotfix/');
+    return {
+      kind: 'Spike',
+      code,
+      ...baseRepoState
+    };
+  } else {
+    return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, release/x.y');
   }
 };
