@@ -110,29 +110,19 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
       }
     } else if (isFeatureBranch(currentBranch)) {
       const code = removeLeading(currentBranch, 'feature/');
+      return {
+        kind: 'Feature',
+        code,
+        ...baseRepoState
+      };
 
-      if (version.patch !== 0) {
-        return fail(`${loc}: patch part should be 0, but is "${version.patch}".`);
-      } else if (version.preRelease !== PreRelease.mainBranch) {
-        return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}", but is ${showStringOrUndefined(version.preRelease)}`);
-      } else {
-        return {
-          kind: 'Feature',
-          code,
-          ...baseRepoState
-        };
-      }
     } else if (isHotfixBranch(currentBranch)) {
       const code = removeLeading(currentBranch, 'hotfix/');
-      if (version.preRelease !== PreRelease.releaseCandidate) {
-        return fail(`${loc}: prerelease part should be "${PreRelease.releaseCandidate}"`);
-      } else {
-        return {
-          kind: 'Hotfix',
-          code,
-          ...baseRepoState
-        };
-      }
+      return {
+        kind: 'Hotfix',
+        code,
+        ...baseRepoState
+      };
     } else {
       return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, release/x.y');
     }
