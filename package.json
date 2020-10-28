@@ -20,7 +20,7 @@
     "beehive-flow": "yarn node -r 'ts-node/register' src/main/ts/Main.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
-    "testOnly": "nyc mocha -r esm --require ts-node/register --require source-map-support/register --recursive --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters-config.json src/test/ts/**/*Test.ts",
+    "testOnly": "yarn nyc mocha",
     "buildTestOnly": "yarn build && yarn testOnly",
     "test": "yarn build && yarn lint && yarn testOnly",
     "prepublishOnly": "yarn build",
