@@ -96,5 +96,7 @@ describe('BranchLogic', () => {
       const { dir } = await setup('main', '0.6.0+9nesste123.frog');
       await assert.isRejected(BranchLogic.detectRepoState(dir));
     });
+
+    // TODO: test other states
   });
 });
