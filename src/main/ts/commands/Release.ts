@@ -6,7 +6,7 @@ import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 
 type Version = Version.Version;
-const { versionToString, majorMinorVersionToString } = Version;
+const { versionToString } = Version;
 
 export const updateVersion = (version: Version): Version => ({
   major: version.major,
@@ -15,9 +15,6 @@ export const updateVersion = (version: Version): Version => ({
 });
 
 export const release = async (fc: ReleaseArgs): Promise<void> => {
-  const sMajorMinor = majorMinorVersionToString(fc.majorMinorVersion);
-  console.log(`${sMajorMinor}`);
-
   const gitUrl = await Git.resolveGitUrl(fc.gitUrl);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
