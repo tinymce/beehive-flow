@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as tmp from 'tmp';
 
+type PathLike = fs.PathLike;
+
 export const fileMustExist = (filename: string): Promise<void> => new Promise<void>((resolve, reject) => {
   if (!fs.existsSync(filename)) {
     reject(new Error('file not found: ' + filename));
@@ -24,3 +26,6 @@ export const exists: (filename: string) => Promise<boolean> =
 
 export const tempFolder: () => Promise<string> =
   util.promisify(tmp.dir);
+
+export const mkdir: (path: PathLike) => Promise<void> =
+  util.promisify(fs.mkdir);
