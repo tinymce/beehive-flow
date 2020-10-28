@@ -49,7 +49,6 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
   const fail = PromiseUtils.fail;
   const git = gitP(dir);
 
-  // TODO: I'm expecting this to fail if we're not in a repo and at the root. Test this.
   await git.checkIsRepo(CheckRepoActions.IS_REPO_ROOT);
 
   const currentBranch = await Git.currentBranch(git);
