@@ -11,11 +11,9 @@ import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
 
 type RepoState = RepoState.RepoState;
-type Version = Version.Version;
 type PackageJson = PackageJson.PackageJson;
 
 const assert = chai.use(chaiAsPromised).assert;
-
 
 describe('BranchLogic', () => {
   describe('releaseBranchName', () => {
