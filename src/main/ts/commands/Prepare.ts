@@ -8,7 +8,6 @@ import * as BranchLogic from '../core/BranchLogic';
 import * as Files from '../utils/Files';
 import { PrepareArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
-import * as Inspect from '../core/Inspect';
 import * as RepoState from '../core/RepoState';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Prerelease from '../core/PreRelease';
@@ -79,7 +78,7 @@ const updateMainBranch = async (mainBranch: string, git: SimpleGit, r: RepoState
 };
 
 export const prepare = async (fc: PrepareArgs): Promise<void> => {
-  const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
+  const gitUrl = await Git.resolveGitUrl(fc.gitUrl);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
 

@@ -4,7 +4,6 @@ import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
-import * as Inspect from '../core/Inspect';
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { releaseCandidate } from '../core/PreRelease';
@@ -31,7 +30,7 @@ const go = async (version: Version, pj: PackageJson, pjFile: string, git: Simple
 };
 
 export const advance = async (fc: AdvanceArgs): Promise<void> => {
-  const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
+  const gitUrl = await Git.resolveGitUrl(fc.gitUrl);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
 

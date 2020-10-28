@@ -5,7 +5,6 @@ import * as PromiseUtils from '../utils/PromiseUtils';
 import { removeLeading, showStringOrUndefined, startsWith } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
 import * as Version from './Version';
-import * as Inspect from './Inspect';
 import * as PreRelease from './PreRelease';
 import { BaseRepoState, RepoState } from './RepoState';
 import * as PackageJson from './PackageJson';
@@ -55,7 +54,7 @@ export const detectRepoState = async (dir: string): Promise<RepoState> => {
 
   const currentBranch = await Git.currentBranch(git);
 
-  const gitUrl = await Inspect.detectGitUrl(git);
+  const gitUrl = await Git.detectGitUrl(git);
 
   const packageJsonFile = PackageJson.pjInFolder(dir);
   const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);

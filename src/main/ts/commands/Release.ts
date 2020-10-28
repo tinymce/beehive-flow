@@ -3,7 +3,6 @@ import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as BranchLogic from '../core/BranchLogic';
 import * as PackageJson from '../core/PackageJson';
-import * as Inspect from '../core/Inspect';
 import * as PromiseUtils from '../utils/PromiseUtils';
 
 type Version = Version.Version;
@@ -19,7 +18,7 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
   const sMajorMinor = majorMinorVersionToString(fc.majorMinorVersion);
   console.log(`${sMajorMinor}`);
 
-  const gitUrl = await Inspect.resolveGitUrl(fc.gitUrl);
+  const gitUrl = await Git.resolveGitUrl(fc.gitUrl);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
 

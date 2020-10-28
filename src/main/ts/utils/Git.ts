@@ -5,6 +5,7 @@ import { BeehiveArgs } from '../args/BeehiveArgs';
 import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
+import * as PromiseUtils from './PromiseUtils';
 
 type SimpleGit = gitP.SimpleGit;
 type Option<A> = O.Option<A>;
@@ -86,11 +87,13 @@ export const pushUnlessDryRun = async (args: BeehiveArgs, dir: string, git: Simp
     await push(git);
   }
 };
+
 export const branchShouldNotExist = async (git: SimpleGit, branchName: string): Promise<void> => {
   if (await doesRemoteBranchExist(git, branchName)) {
-    throw new Error(`Remote branch already exists: ${branchName}`);
+    return PromiseUtils.fail(`Remote branch already exists: ${branchName}`);
   }
 };
+
 export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
   checkout(git, mainBranchName);
 
@@ -99,3 +102,32 @@ export const checkout = async (git: SimpleGit, branchName: string): Promise<stri
   await git.checkout(branchName);
   return branchName;
 };
+
+export const detectGitUrl = async (g: SimpleGit): Promise<string> => {
+  const remotes = await g.getRemotes(true);
+  if (remotes.length === 1) {
+    return remotes[0].refs.fetch;
+  } else if (remotes.length === 0) {
+    return PromiseUtils.fail('Could not detect git url - the repo has no remotes.');
+  } else {
+    const res = remotes.find((r) => r.name === 'origin');
+    if (res !== undefined) {
+      return res.refs.fetch;
+    } else {
+      return PromiseUtils.fail('Could not detect git url - there were multiple remotes and none were called "origin"');
+    }
+  }
+};
+
+const detectGitUrlFromDir = async (dir: string): Promise<string> => {
+  const g = gitP(dir);
+  return await detectGitUrl(g);
+};
+
+export const detectGitUrlCwd = async (): Promise<string> => {
+  const s = process.cwd();
+  return await detectGitUrlFromDir(s);
+};
+
+export const resolveGitUrl = async (gitUrlArg: Option<string>): Promise<string> =>
+  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlCwd();
