@@ -91,4 +91,4 @@ export const fold = <T>(
 };
 
 export const commandName = (bh: BeehiveArgs): string =>
-  fold(bh, () => 'prepare', () => 'release', () => 'advance', () => 'advance-si', () => 'stamp');
+  fold(bh, () => 'prepare', () => 'release', () => 'advance', () => 'advance-ci', () => 'stamp');
