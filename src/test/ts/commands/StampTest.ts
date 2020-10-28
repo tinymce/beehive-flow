@@ -21,7 +21,7 @@ describe('Stamp', () => {
 
   describe('chooseNewVersion', () => {
     it('makes a timestamped version on main branch', () => {
-      const actual = Stamp.chooseNewVersion({ kind: 'Main', version: Version.parseVersionOrThrow('0.2.0-alpha') }, 'b0d52ad', 1603695425074);
+      const actual = Stamp.chooseNewVersion({ kind: 'Main', version: Version.parseVersionOrThrow('1.2.0-alpha') }, 'b0d52ad', 1603695425074);
       assert.equal(Version.versionToString(actual), '1.2.0-alpha.20201026065705074+b0d52ad');
     });
 
