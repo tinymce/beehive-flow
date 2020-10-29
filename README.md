@@ -1,11 +1,8 @@
 # beehive-cli
-experimental - see Dylan
 
 This project is a CLI tool that implements the Beehive Flow branch process.
 
-
-Beehive Flow Branch Process
-===========================
+# Beehive Flow Branch Process
 
 Beehive Flow roughly models the "GitLab flow with release versions" [https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow],
 and is compatible with Semantic Versioning.
@@ -13,8 +10,7 @@ and is compatible with Semantic Versioning.
 Beehive Flow augments the branch strategy with instructions on how to manage versions in key project files (e.g. package.json), and instructions for CI.  
 In the below description, an NPM/Yarn package.json project is assumed, and the tooling is built for this. However, the branch concepts can be applied more broadly. 
 
-Branches
---------
+## Branches
 
 beehive-flow uses the following branch names, each forming part of the process:
 
@@ -101,8 +97,7 @@ is being made, the key part is that these are branched from a release branch.
                    (1.3.x-rc / 1.3.x)
 ```
 
-Versions
---------
+## Versions
 
 Beehive Flow dictates how a project's internal version should be modeled. 
 
@@ -125,8 +120,7 @@ Hotfix branches have a version "a.b.c-rc", just like a release branch.
 
 Note that feature/spike/hotfix branch versions are not validated by beehive-flow.
 
-Operations
-----------
+## Commands
 
 Note: the "stamp" command operates on a checkout in the current working directory, whereas the other commands make their own checkout.
 
@@ -175,8 +169,7 @@ Timestamp format is `yyyyMMddHHmmssSSS` in UTC. The short git sha format is used
 
 Note: this is the only command that operates on the checkout in the current working directory.
 
-CI Instructions
----------------
+## CI Instructions
 
 CI needs to check out a real branch, not just a detached head.
 
