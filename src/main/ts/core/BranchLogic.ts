@@ -1,4 +1,3 @@
-import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
 import { CheckRepoActions } from 'simple-git';
@@ -11,25 +10,11 @@ import * as PackageJson from './PackageJson';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
 type Version = Version.Version;
-type Either<R, A> = E.Either<R, A>;
 type Option<A> = O.Option<A>;
 type PackageJson = PackageJson.PackageJson;
 
 export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): string =>
   `release/${major}.${minor}`;
-
-export const versionFromReleaseBranchE = (branchName: string): Either<string, MajorMinorVersion> => {
-  const regexp = /^release\/(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
-  const r = regexp.exec(branchName);
-  if (r === null || r.groups === undefined) {
-    return E.left('Could not parse major.minor version from branch name');
-  } else {
-    const g = r.groups;
-    const major = parseInt(g.major, 10);
-    const minor = parseInt(g.minor, 10);
-    return E.right({ major, minor });
-  }
-};
 
 export enum BranchType {
   Main, Feature, Hotfix, Spike, Release
@@ -48,8 +33,18 @@ export interface BranchDetails {
   readonly branchState: BranchState;
 }
 
-export const versionFromReleaseBranch = (branchName: string): Promise<MajorMinorVersion> =>
-  PromiseUtils.eitherToPromise(versionFromReleaseBranchE(branchName));
+export const versionFromReleaseBranch = async (branchName: string): Promise<MajorMinorVersion> => {
+  const regexp = /^release\/(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
+  const r = regexp.exec(branchName);
+  if (r === null || r.groups === undefined) {
+    return PromiseUtils.fail('Could not parse major.minor version from branch name');
+  } else {
+    const g = r.groups;
+    const major = parseInt(g.major, 10);
+    const minor = parseInt(g.minor, 10);
+    return { major, minor };
+  }
+};
 
 export const mainBranchName = 'main';
 
