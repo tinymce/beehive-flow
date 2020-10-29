@@ -19,7 +19,7 @@
     "no-empty": "off",
     "no-shadow": "off",
     "no-underscore-dangle": "off",
-    "max-len": ["warn", 200],
+    "max-len": ["warn", 160],
     "@typescript-eslint/no-floating-promises": "off"
   },
   "settings": {
