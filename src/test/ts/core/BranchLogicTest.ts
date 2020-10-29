@@ -80,7 +80,6 @@ describe('BranchLogic', () => {
         packageJson,
         version,
         currentBranch: 'main',
-        majorMinorVersion: Version.toMajorMinor(version),
         branchType: BranchType.Main,
         branchState: BranchState.Main
       };
@@ -116,7 +115,6 @@ describe('BranchLogic', () => {
         packageJson,
         version,
         currentBranch: 'feature/BLAH-1234',
-        majorMinorVersion: Version.toMajorMinor(version),
         branchType: BranchType.Feature,
         branchState: BranchState.Feature
       };
@@ -132,7 +130,6 @@ describe('BranchLogic', () => {
         packageJson,
         version,
         currentBranch: 'spike/BLAH-1234',
-        majorMinorVersion: Version.toMajorMinor(version),
         branchType: BranchType.Spike,
         branchState: BranchState.Spike
       };

@@ -42,7 +42,6 @@ export enum BranchState {
 export interface BranchDetails {
   readonly currentBranch: string;
   readonly version: Version;
-  readonly majorMinorVersion: MajorMinorVersion;
   readonly packageJson: PackageJson;
   readonly packageJsonFile: string;
   readonly branchType: BranchType;
@@ -90,12 +89,10 @@ export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
   const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
 
   const version = await PromiseUtils.optionToPromise(packageJson.version, 'Version missing in package.json file');
-  const majorMinorVersion = Version.toMajorMinor(version);
 
   const baseState = {
     currentBranch,
     version,
-    majorMinorVersion,
     packageJson,
     packageJsonFile
   };
