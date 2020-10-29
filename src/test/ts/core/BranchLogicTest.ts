@@ -28,8 +28,8 @@ describe('BranchLogic', () => {
   });
 
   describe('versionFromReleaseBranch', () => {
-    it('parses versions', () => {
-      fc.assert(fc.asyncProperty(fc.nat(1000), fc.nat(1000), async (major, minor) => {
+    it('parses versions', async () => {
+      await fc.assert(fc.asyncProperty(fc.nat(1000), fc.nat(1000), async (major, minor) => {
         await assert.becomes(
           versionFromReleaseBranch(`release/${major}.${minor}`),
           { major, minor }
