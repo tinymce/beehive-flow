@@ -28,6 +28,7 @@ export interface AdvanceArgs extends BaseArgs {
 export interface AdvanceCiArgs extends BaseArgs {
   readonly kind: 'AdvanceCiArgs';
 }
+
 export interface StampArgs extends BaseArgs {
   readonly kind: 'StampArgs';
 }
