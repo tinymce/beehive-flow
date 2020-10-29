@@ -10,19 +10,6 @@ import * as Files from '../../../main/ts/utils/Files';
 const assert = chai.use(chaiAsPromised).assert;
 
 describe('Files', () => {
-  describe('fileMustExist', () => {
-    it('Passes when file exists', async () => {
-      const { name } = tmp.fileSync();
-      await Files.fileMustExist(name);
-    });
-
-    it('Fails when file does not exist', async () => {
-      const { name } = tmp.fileSync();
-      fs.unlinkSync(name);
-      await assert.isRejected(Files.fileMustExist(name), `file not found: ${name}`);
-    });
-  });
-
   describe('writeFile/readFile', () => {
     it('reads the written content', async () => {
       await fc.assert(fc.asyncProperty(fc.string(), async (contents) => {

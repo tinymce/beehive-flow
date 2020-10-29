@@ -50,41 +50,6 @@ describe('Version', () => {
     });
   });
 
-  describe('isReleaseVersion', () => {
-    it('returns true for normal 3-point versions', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), (major, minor, patch) => {
-        assert.isTrue(Version.isReleaseVersion({ major, minor, patch }));
-        assert.isTrue(Version.isReleaseVersion({ major, minor, patch, buildMetaData: undefined }));
-        assert.isTrue(Version.isReleaseVersion({ major, minor, patch, preRelease: undefined }));
-        assert.isTrue(Version.isReleaseVersion({ major, minor, patch, buildMetaData: undefined, preRelease: undefined }));
-      }));
-    });
-
-    it('returns false if buildmetadata is specified', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), smallNatString(),
-        (major, minor, patch, buildMetaData) => {
-          assert.isFalse(Version.isReleaseVersion({ major, minor, patch, buildMetaData }));
-          assert.isFalse(Version.isReleaseVersion({ major, minor, patch, buildMetaData, preRelease: undefined }));
-        }));
-    });
-
-    it('returns false if prerelease is specified', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), smallNatString(),
-        (major, minor, patch, preRelease) => {
-          assert.isFalse(Version.isReleaseVersion({ major, minor, patch, preRelease }));
-          assert.isFalse(Version.isReleaseVersion({ major, minor, patch, preRelease, buildMetaData: undefined }));
-        }));
-    });
-
-    it('returns false if prerelease and buildmetadata are specified', () => {
-      fc.assert(fc.property(
-        smallNat(), smallNat(), smallNat(), smallNatString(), smallNatString(),
-        (major, minor, patch, preRelease, buildMetaData) => {
-          assert.isFalse(Version.isReleaseVersion({ major, minor, patch, preRelease, buildMetaData }));
-        }));
-    });
-  });
-
   const invalid2Points = [
     '1.2.3',
     'cat.3',

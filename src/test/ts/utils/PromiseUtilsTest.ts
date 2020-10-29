@@ -46,21 +46,6 @@ describe('PromiseUtils', () => {
     });
   });
 
-  describe('eitherToPromiseVoid', () => {
-    it('succeeds for right', async () => {
-      await fc.assert(fc.asyncProperty(fc.integer(), async (i) => {
-        await PromiseUtils.eitherToPromiseVoid(E.right(i));
-      }));
-    });
-
-    it('fails for left', async () => {
-      await fc.assert(fc.asyncProperty(fc.string(), async (s) => {
-        const p = PromiseUtils.eitherToPromiseVoid(E.left(s));
-        await assert.isRejected(p);
-      }));
-    });
-  });
-
   describe('optionToPromise', () => {
     it('succeeds for some', async () => {
       await fc.assert(fc.asyncProperty(fc.integer(), async (i) => {

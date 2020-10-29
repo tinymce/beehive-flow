@@ -63,9 +63,6 @@ export const parseMajorMinorVersion = (input: string): Either<string, MajorMinor
 export const parseMajorMinorVersionOrThrow = (s: string): MajorMinorVersion =>
   EitherUtils.getOrThrow(parseMajorMinorVersion(s));
 
-export const isReleaseVersion = (v: Version): boolean =>
-  v.preRelease === undefined && v.buildMetaData === undefined;
-
 export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
   `${v.major}.${v.minor}`;
 

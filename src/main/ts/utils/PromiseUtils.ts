@@ -8,12 +8,6 @@ export const eitherToPromise = <R, A>(e: Either<R, A>): Promise<A> =>
     E.fold(reject, resolve)(e);
   });
 
-export const eitherToPromiseVoid = <R, A>(e: Either<R, A>): Promise<void> =>
-  voidify(eitherToPromise(e));
-
-export const voidify = <A>(p: Promise<A>): Promise<void> =>
-  p.then(() => {});
-
 export const optionToPromise = <A>(o: O.Option<A>, e?: unknown): Promise<A> =>
   new Promise((resolve, reject) => {
     O.fold(() => reject(e), resolve)(o);

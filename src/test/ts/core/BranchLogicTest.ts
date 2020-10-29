@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import { describe, it } from 'mocha';
 import fc from 'fast-check';
 import * as chai from 'chai';
@@ -68,7 +69,7 @@ describe('BranchLogic', () => {
     it('fails if dir is not at the root of a git repo', async () => {
       const { dir } = await Git.initInTempFolder();
       const subbie = path.join(dir, 'subbie');
-      await Files.mkdir(subbie);
+      fs.mkdirSync(subbie);
       await assert.isRejected(inspectRepo(subbie));
     });
 
