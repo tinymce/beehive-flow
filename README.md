@@ -201,3 +201,18 @@ Note: this is the only command that operates on the checkout in the current work
 CI needs to check out a real branch, not just a detached head.
 
 At the start of the build, run `stamp`. If the build is successful, run `advance-ci`.
+
+## FAQ
+
+### How do I update my major version?
+
+Set the version manually in package.json in your `main` branch. 
+The idea is that you should decide what major.minor version you are releasing before running `prepare`.
+
+### Does beehive-flow work with yarn workspaces, lerna or monorepos?
+
+Not yet. This is something that would be valuable to add.
+
+### Does beehive-flow work with any types of package other than NPM?
+
+Not at this stage.
