@@ -108,9 +108,6 @@ export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
   const sPackageVersion = Version.versionToString(version);
   const sPre = showStringOrUndefined(version.preRelease);
 
-  const invalidBranchName = (): Promise<BranchDetails> =>
-    fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, spike/*, release/x.y');
-
   const validateMainBranch = async (): Promise<BranchState.Main> => {
     if (version.patch !== 0) {
       return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
@@ -156,7 +153,7 @@ export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
   } else {
     const obt = getBranchType(currentBranch);
     if (obt._tag === 'None') {
-      return invalidBranchName();
+      return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, spike/*, release/x.y');
     } else {
       const branchType = obt.value;
       const branchState = await detect(branchType);
