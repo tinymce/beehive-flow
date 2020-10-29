@@ -51,10 +51,10 @@ export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
 };
 
 export const currentRevisionSha = (git: SimpleGit): Promise<string> =>
-  git.revparse({ HEAD: null });
+  git.revparse([ 'HEAD' ]);
 
 export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
-  git.revparse({ 'HEAD': null, '--short': null });
+  git.revparse([ '--short', 'HEAD' ]);
 
 export const push = async (git: SimpleGit): Promise<PushResult> =>
   git.push(ASSUMED_REMOTE);
