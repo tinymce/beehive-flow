@@ -3,13 +3,11 @@ import { DateTime } from 'luxon';
 import { StampArgs } from '../args/BeehiveArgs';
 import * as Git from '../utils/Git';
 import * as Version from '../core/Version';
-import * as Clock from '../core/Clock';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PreRelease from '../core/PreRelease';
 import { BranchState, inspectRepo } from '../core/BranchLogic';
 
 type Version = Version.Version;
-type Clock = Clock.Clock;
 
 export const timeFormat = 'yyyyMMddHHmmssSSS';
 
@@ -49,13 +47,13 @@ export const chooseNewVersion = (branchState: BranchState, version: Version, git
   }
 };
 
-export const stamp = async (fc: StampArgs, clock: Clock = Clock.realClock()): Promise<void> => {
+export const stamp = async (_fc: StampArgs): Promise<void> => {
   const dir = process.cwd();
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);
 
   const r = await inspectRepo(dir);
-  const newVersion = chooseNewVersion(r.branchState, r.version, gitSha, clock.getTimeMillis());
+  const newVersion = chooseNewVersion(r.branchState, r.version, gitSha, Date.now());
   await writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
 
   console.log('Note: this command does not commit changes to package.json.');
