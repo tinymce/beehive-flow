@@ -40,7 +40,6 @@ export enum BranchState {
 }
 
 export interface BranchDetails {
-  readonly gitUrl: string;
   readonly currentBranch: string;
   readonly version: Version;
   readonly majorMinorVersion: MajorMinorVersion;
@@ -87,8 +86,6 @@ export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
 
   const currentBranch = await Git.currentBranch(git);
 
-  const gitUrl = await Git.detectGitUrl(git);
-
   const packageJsonFile = PackageJson.pjInFolder(dir);
   const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
 
@@ -96,7 +93,6 @@ export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
   const majorMinorVersion = Version.toMajorMinor(version);
 
   const baseState = {
-    gitUrl,
     currentBranch,
     version,
     majorMinorVersion,

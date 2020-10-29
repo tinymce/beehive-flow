@@ -73,13 +73,12 @@ describe('BranchLogic', () => {
     });
 
     it('detects valid main branch', async () => {
-      const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('main', '0.6.0-alpha');
+      const { dir, packageJsonFile, version, packageJson } = await setup('main', '0.6.0-alpha');
 
       const expected: BranchDetails = {
         packageJsonFile,
         packageJson,
         version,
-        gitUrl,
         currentBranch: 'main',
         majorMinorVersion: Version.toMajorMinor(version),
         branchType: BranchType.Main,
@@ -110,13 +109,12 @@ describe('BranchLogic', () => {
     });
 
     it('detects valid feature branch', async () => {
-      const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('feature/BLAH-1234', '0.6.0-alpha');
+      const { dir, packageJsonFile, version, packageJson } = await setup('feature/BLAH-1234', '0.6.0-alpha');
 
       const expected: BranchDetails = {
         packageJsonFile,
         packageJson,
         version,
-        gitUrl,
         currentBranch: 'feature/BLAH-1234',
         majorMinorVersion: Version.toMajorMinor(version),
         branchType: BranchType.Feature,
@@ -127,13 +125,12 @@ describe('BranchLogic', () => {
     });
 
     it('detects valid spike branch', async () => {
-      const { gitUrl, dir, packageJsonFile, version, packageJson } = await setup('spike/BLAH-1234', '0.6.0-alpha');
+      const { dir, packageJsonFile, version, packageJson } = await setup('spike/BLAH-1234', '0.6.0-alpha');
 
       const expected: BranchDetails = {
         packageJsonFile,
         packageJson,
         version,
-        gitUrl,
         currentBranch: 'spike/BLAH-1234',
         majorMinorVersion: Version.toMajorMinor(version),
         branchType: BranchType.Spike,
