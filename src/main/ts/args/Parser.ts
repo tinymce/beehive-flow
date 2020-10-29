@@ -1,11 +1,10 @@
 import * as yargs from 'yargs';
 import * as O from 'fp-ts/Option';
-import * as Version from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
+import { parseMajorMinorVersion } from '../core/Version';
 import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
-type MajorMinorVersion = Version.MajorMinorVersion;
 
 const prepDescription =
   `Branches main as releases/x.y and tweaks versions. 
@@ -66,8 +65,7 @@ const argParser =
         yargs
           .positional('majorDotMinor', {
             describe: 'major.minor version',
-            type: 'string',
-            coerce: Version.parseMajorMinorVersionOrThrow
+            type: 'string'
           });
       }
     )
@@ -77,8 +75,7 @@ const argParser =
         yargs
           .positional('majorDotMinor', {
             describe: 'major.minor version',
-            type: 'string',
-            coerce: Version.parseMajorMinorVersionOrThrow
+            type: 'string'
           });
       }
     )
@@ -123,11 +120,11 @@ export const parseArgs = async (args: string[]): Promise<BeehiveArgs> => {
     return BeehiveArgs.prepareArgs(dryRun, temp, gitUrl);
 
   } else if (cmd === 'release') {
-    const mm = a.majorDotMinor as MajorMinorVersion;
+    const mm = await parseMajorMinorVersion(a.majorDotMinor as string);
     return BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm);
 
   } else if (cmd === 'advance') {
-    const mm = a.majorDotMinor as MajorMinorVersion;
+    const mm = await parseMajorMinorVersion(a.majorDotMinor as string);
     return BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm);
 
   } else if (cmd === 'advance-ci') {

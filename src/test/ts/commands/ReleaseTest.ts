@@ -5,13 +5,13 @@ import * as Version from '../../../main/ts/core/Version';
 
 describe('Release', () => {
   describe('updateVersion', () => {
-    it('Updates versions', () => {
-      const check = (input: string, expected: string): void => {
-        assert.equal(Version.versionToString(Release.updateVersion(Version.parseVersionOrThrow(input))), expected);
+    it('Updates versions', async () => {
+      const check = async (input: string, expected: string) => {
+        assert.equal(Version.versionToString(Release.updateVersion(await Version.parseVersion(input))), expected);
       };
-      check('0.0.0-rc', '0.0.0');
-      check('1.0.0-rc', '1.0.0');
-      check('0.300.100-rc', '0.300.100');
+      await check('0.0.0-rc', '0.0.0');
+      await check('1.0.0-rc', '1.0.0');
+      await check('0.300.100-rc', '0.300.100');
     });
   });
 });

@@ -1,9 +1,10 @@
 import { describe, it } from 'mocha';
-import { assert } from 'chai';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
 import fc from 'fast-check';
-import * as E from 'fp-ts/Either';
 import * as Version from '../../../main/ts/core/Version';
-import * as EitherUtils from '../../../main/ts/utils/EitherUtils';
+
+const assert = chai.use(chaiAsPromised).assert;
 
 const mmThrowMessage = 'Could not parse major.minor version string';
 
@@ -13,39 +14,35 @@ const smallNatString = () => smallNat().map(String);
 
 describe('Version', () => {
   describe('parseVersion', () => {
-    it('parses a correct 3-point version', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), (major, minor, patch) => {
+    it('parses a correct 3-point version', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), smallNat(), async (major, minor, patch) => {
         const input = `${major}.${minor}.${patch}`;
-        const actual = Version.parseVersion(input);
-        const expected = E.right({ major, minor, patch, preRelease: undefined, buildMetaData: undefined });
-        assert.deepEqual(actual, expected);
+        const expected = { major, minor, patch, preRelease: undefined, buildMetaData: undefined };
+        await assert.becomes(Version.parseVersion(input), expected);
       }));
     });
 
-    it('fails on 2-point versions', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), (major, minor) => {
+    it('fails on 2-point versions', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), async (major, minor) => {
         const input = `${major}.${minor}`;
-        const actual = Version.parseVersion(input);
-        const expected = E.left('Could not parse version string');
-        assert.deepEqual(actual, expected);
+        await assert.isRejected(Version.parseVersion(input), 'Could not parse version string');
       }));
     });
 
-    it('parses a correct 3-point version with preRelease', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), smallNat(), (major, minor, patch, preRelease) => {
+    it('parses a correct 3-point version with preRelease', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), smallNat(), smallNat(), async (major, minor, patch, preRelease) => {
         const input = `${major}.${minor}.${patch}-${preRelease}`;
-        const actual = Version.parseVersion(input);
-        const expected = E.right({ major, minor, patch, preRelease: String(preRelease), buildMetaData: undefined });
-        assert.deepEqual(actual, expected);
+        const expected = { major, minor, patch, preRelease: String(preRelease), buildMetaData: undefined };
+        await assert.becomes(Version.parseVersion(input), expected);
       }));
     });
 
-    it('parses a correct 3-point version with buildmeta', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), fc.integer(1, 100), (major, minor, patch, buildMetaData) => {
+    it('parses a correct 3-point version with buildmeta', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), smallNat(), fc.integer(1, 100), async (major, minor, patch, buildMetaData) => {
         const input = `${major}.${minor}.${patch}+${buildMetaData}`;
         const actual = Version.parseVersion(input);
-        const expected = E.right({ major, minor, patch, preRelease: undefined, buildMetaData: String(buildMetaData) });
-        assert.deepEqual(actual, expected);
+        const expected = { major, minor, patch, preRelease: undefined, buildMetaData: String(buildMetaData) };
+        await assert.becomes(actual, expected);
       }));
     });
   });
@@ -60,68 +57,55 @@ describe('Version', () => {
   ];
 
   describe('parseMajorMinorVersion', () => {
-    it('parses 2-point version', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), (major, minor) => {
-        assert.deepEqual(Version.parseMajorMinorVersion(`${major}.${minor}`), E.right({ major, minor }));
+    it('parses 2-point version', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), async (major, minor) => {
+        await assert.becomes(Version.parseMajorMinorVersion(`${major}.${minor}`), { major, minor });
       }));
     });
 
-    it('fails for invalid input (manual cases)', () => {
+    it('fails for invalid input (manual cases)', async () => {
       for (const x of invalid2Points) {
-        assert.deepEqual(Version.parseMajorMinorVersion(x), E.left(mmThrowMessage));
-      }
-    });
-  });
-
-  describe('parseMajorMinorVersionOrThrow', () => {
-    it('parses 2-point version', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), (major, minor) => {
-        assert.deepEqual(Version.parseMajorMinorVersionOrThrow(`${major}.${minor}`), { major, minor });
-      }));
-    });
-
-    it('fails for invalid input (manual cases)', () => {
-      for (const x of invalid2Points) {
-        assert.throws(() => Version.parseMajorMinorVersionOrThrow(x), mmThrowMessage);
+        await assert.isRejected(Version.parseMajorMinorVersion(x), mmThrowMessage);
       }
     });
   });
 
   describe('majorMinorVersionToString', () => {
-    it('round-trips', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), (major, minor) => {
+    it('round-trips', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), async (major, minor) => {
         const s = `${major}.${minor}`;
-        assert.deepEqual(Version.majorMinorVersionToString(Version.parseMajorMinorVersionOrThrow(s)), s);
+        const v = await Version.parseMajorMinorVersion(s);
+        assert.deepEqual(Version.majorMinorVersionToString(v), s);
       }));
     });
   });
 
   describe('versionToString', () => {
-    it('round-trips for 3-point version', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), (major, minor, patch) => {
+    it('round-trips for 3-point version', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), smallNat(), async (major, minor, patch) => {
         const sVersion = `${major}.${minor}.${patch}`;
-        const version = EitherUtils.getOrThrow(Version.parseVersion(sVersion));
+        const version = await Version.parseVersion(sVersion);
         const actual = Version.versionToString(version);
         assert.deepEqual(actual, sVersion);
       }));
     });
 
-    it('round-trips for version with prerelease', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), smallNatString(),
-        (major, minor, patch, preRelease) => {
+    it('round-trips for version with prerelease', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), smallNat(), smallNatString(),
+        async (major, minor, patch, preRelease) => {
           const input = `${major}.${minor}.${patch}-${preRelease}`;
-          const version = EitherUtils.getOrThrow(Version.parseVersion(input));
+          const version = await Version.parseVersion(input);
           const actual = Version.versionToString(version);
           assert.deepEqual(actual, input);
         }
       ));
     });
 
-    it('round-trips for version with buildmeta', () => {
-      fc.assert(fc.property(smallNat(), smallNat(), smallNat(), smallNatString(),
-        (major, minor, patch, buildMetaData) => {
+    it('round-trips for version with buildmeta', async () => {
+      await fc.assert(fc.asyncProperty(smallNat(), smallNat(), smallNat(), smallNatString(),
+        async (major, minor, patch, buildMetaData) => {
           const input = `${major}.${minor}.${patch}+${buildMetaData}`;
-          const version = EitherUtils.getOrThrow(Version.parseVersion(input));
+          const version = await Version.parseVersion(input);
           const actual = Version.versionToString(version);
           assert.deepEqual(actual, input);
         }

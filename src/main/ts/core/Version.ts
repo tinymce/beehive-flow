@@ -1,7 +1,4 @@
-import * as E from 'fp-ts/Either';
-import * as EitherUtils from '../utils/EitherUtils';
-
-type Either<R, A> = E.Either<R, A>;
+import * as PromiseUtils from '../utils/PromiseUtils';
 
 export interface Version {
   readonly major: number;
@@ -16,7 +13,7 @@ export interface MajorMinorVersion {
   readonly minor: number;
 }
 
-export const parseVersion = (input: string): Either<string, Version> => {
+export const parseVersion = async (input: string): Promise<Version> => {
   // based on https://semver.org/
   // eslint-disable-next-line max-len
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
@@ -24,7 +21,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
   const r = regexp.exec(input);
 
   if (r === null || r.groups === undefined) {
-    return E.left('Could not parse version string');
+    return PromiseUtils.fail('Could not parse version string');
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
@@ -34,34 +31,28 @@ export const parseVersion = (input: string): Either<string, Version> => {
     const preRelease = r.groups.prerelease;
     const buildMetaData = r.groups.buildmetadata;
 
-    return E.right({
+    return {
       major,
       minor,
       patch,
       preRelease,
       buildMetaData
-    });
+    };
   }
 };
 
-export const parseVersionOrThrow = (s: string): Version =>
-  EitherUtils.getOrThrow(parseVersion(s));
-
-export const parseMajorMinorVersion = (input: string): Either<string, MajorMinorVersion> => {
+export const parseMajorMinorVersion = async (input: string): Promise<MajorMinorVersion> => {
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
   const r = regexp.exec(input);
   if (r === null || r.groups === undefined) {
-    return E.left('Could not parse major.minor version string');
+    return PromiseUtils.fail('Could not parse major.minor version string');
   } else {
     const g = r.groups;
     const major = parseInt(g.major, 10);
     const minor = parseInt(g.minor, 10);
-    return E.right({ major, minor });
+    return { major, minor };
   }
 };
-
-export const parseMajorMinorVersionOrThrow = (s: string): MajorMinorVersion =>
-  EitherUtils.getOrThrow(parseMajorMinorVersion(s));
 
 export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
   `${v.major}.${v.minor}`;
@@ -71,4 +62,3 @@ export const versionToString = (v: Version): string => {
   const metaBit = v.buildMetaData === undefined ? '' : '+' + v.buildMetaData;
   return [ v.major, v.minor, v.patch ].join('.') + preBit + metaBit;
 };
-

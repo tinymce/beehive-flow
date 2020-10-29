@@ -42,7 +42,7 @@ describe('BranchLogic', () => {
   describe('inspectRepo', () => {
 
     const setup = async (branchName: string, sVersion: string) => {
-      const version = Version.parseVersionOrThrow(sVersion);
+      const version = await Version.parseVersion(sVersion);
 
       const hub = await Git.initInTempFolder(true);
       const gitUrl = hub.dir;
