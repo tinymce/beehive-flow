@@ -12,9 +12,6 @@ type Option<A> = O.Option<A>;
 
 const ASSUMED_REMOTE = 'origin'; // This module assumes a single remote called 'origin'
 
-export const isClean = (git: SimpleGit): Promise<boolean> =>
-  git.status().then((s) => s.isClean());
-
 export interface TempGit {
   readonly git: SimpleGit;
   readonly dir: string;
@@ -49,9 +46,6 @@ export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
   const cur = await currentBranch(git);
   return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
 };
-
-export const currentRevisionSha = (git: SimpleGit): Promise<string> =>
-  git.revparse([ 'HEAD' ]);
 
 export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
   git.revparse([ '--short', 'HEAD' ]);
