@@ -9,7 +9,7 @@ const main = async () => {
 };
 
 main().catch((e: any) => {
-  const msg = e instanceof Error ? e : String(e);
+  const msg = e instanceof Error ? e.message : String(e);
   console.error(msg);
   process.exit(1);
 });
