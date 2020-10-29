@@ -44,9 +44,6 @@ export const toJson = (pj: PackageJson): JsonRecord => ({
 export const writePackageJsonFile = (file: string, pj: PackageJson): Promise<void> =>
   JsonUtils.writeJsonFile(file, toJson(pj));
 
-export const writePackageJsonFileInFolder = (folder: string, pj: PackageJson): Promise<void> =>
-  writePackageJsonFile(pjInFolder(folder), pj);
-
 export const setVersion = (pj: PackageJson, version: Option<Version>): PackageJson => ({
   ...pj,
   version
