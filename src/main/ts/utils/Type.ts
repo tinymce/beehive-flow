@@ -1,4 +1,6 @@
-import kind_of = require('kind-of');
+export const isString = (x: unknown): x is string =>
+  typeof x === 'string';
 
-export const isString = (s: unknown): s is string =>
-  kind_of(s) === 'string';
+export const isObject = (x: unknown): x is object =>
+  typeof x === 'object' && x !== null;
+

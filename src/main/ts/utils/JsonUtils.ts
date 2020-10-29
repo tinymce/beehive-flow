@@ -1,4 +1,3 @@
-import kind_of = require('kind-of');
 import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as PromiseUtils from './PromiseUtils';
@@ -21,7 +20,7 @@ export const parseJsonRecord = (s: string): Promise<E.JsonRecord> => {
 };
 
 export const isJsonRecord = (j: Json): j is JsonRecord =>
-  kind_of(j) === 'object';
+  Type.isObject(j);
 
 export const parseJsonFile = async (path: string): Promise<Json> => {
   const s = await Files.readFileAsString(path);
