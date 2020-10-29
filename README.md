@@ -106,7 +106,7 @@ Versions
 
 Beehive Flow dictates how a project's internal version should be modeled. 
 
-The main branch should have a version "a.b.0-main". As soon as a release branch is created, main's version should be incremented to "a.c.0-main".  
+The main branch should have a version "a.b.0-alpha". As soon as a release branch is created, main's version should be incremented to "a.c.0-alpha".  
 
 The release branches start with a version "a.b.0-rc". When stabilization is complete, the release branch version is changed to "a.b.0". 
 This indicates to CI that this version can now be released. Once release is complete, the version is changed to "a.b.1-rc".
@@ -117,9 +117,9 @@ As you can see, a release branch exists in one of two states:
 
 All patch releases for a major.minor release happen in the branch for the release/major.minor branch.
 
-Feature branches have a version "a.b.0-main", just like the main branch. 
+Feature branches have a version "a.b.0-alpha", just like the main branch. 
 
-Spike branches have a version "a.b.0-main", just like the main branch. 
+Spike branches have a version "a.b.0-alpha", just like the main branch. 
 
 Hotfix branches have a version "a.b.c-rc", just like a release branch. 
 
@@ -136,7 +136,7 @@ This signifies that the mainline is ready for stabilization.
 main is branched as release/a.b, where a.b come from package.json
 
 Version changes
-- main: a.b.0-main -> a.c.0-main
+- main: a.b.0-alpha -> a.c.0-alpha
 - release/a.b: a.b.0-rc
 
 ### release a.b
