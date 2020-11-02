@@ -25,6 +25,7 @@ describe('Lifecycle', () => {
     await Git.checkoutNewBranch(git, 'main');
     await Files.writeFile(path.join(dir, 'package.json'), `
     {
+      "name": "@beehive-test/lifecycle-test",
       "version": "0.1.0-alpha"
     }
     `);

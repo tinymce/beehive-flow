@@ -14,12 +14,12 @@ export const updateVersion = (version: Version): Version => ({
   patch: version.patch
 });
 
-export const release = async (fc: ReleaseArgs): Promise<void> => {
-  const gitUrl = await Git.resolveGitUrl(fc.gitUrl);
+export const release = async (args: ReleaseArgs): Promise<void> => {
+  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
-  const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
+  const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
-  const rbn = getReleaseBranchName(fc.majorMinorVersion);
+  const rbn = getReleaseBranchName(args.majorMinorVersion);
   await Git.checkout(git, rbn);
 
   const r = await inspectRepo(dir);
@@ -35,5 +35,5 @@ export const release = async (fc: ReleaseArgs): Promise<void> => {
   await git.add(r.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');
 
-  await Git.pushUnlessDryRun(fc, dir, git);
+  await Git.pushUnlessDryRun(args, dir, git);
 };

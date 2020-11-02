@@ -51,6 +51,7 @@ describe('BranchLogic', () => {
       const packageJsonFile = path.join(dir, 'package.json');
 
       const packageJson: PackageJson = {
+        name: '@beehive-test/dummypackage',
         version: O.some(version),
         other: {}
       };

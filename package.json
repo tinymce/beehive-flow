@@ -37,6 +37,7 @@
     "@types/yargs": "^15.0.9",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
+    "@verdaccio/types": "^9.7.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^7.12.1",
@@ -44,13 +45,15 @@
     "eslint-plugin-prefer-arrow": "^1.2.2",
     "esm": "^3.2.25",
     "fast-check": "^2.6.0",
+    "get-port": "^5.1.1",
     "mocha": "^8.2.0",
     "mocha-junit-reporter": "^2.0.0",
     "mocha-multi-reporters": "^1.1.7",
     "nyc": "^15.1.0",
     "source-map-support": "^0.5.19",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "verdaccio": "^4.8.1"
   },
   "publishConfig": {
     "@tiny-premium:registry": "https://npm.cloudsmith.io/tiny/tiny-premium/"

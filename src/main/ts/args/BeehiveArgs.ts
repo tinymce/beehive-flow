@@ -3,6 +3,7 @@ import { MajorMinorVersion } from '../core/Version';
 
 export interface BaseArgs {
   readonly dryRun: boolean;
+  readonly workingDir: string;
 }
 
 export interface PrepareArgs extends BaseArgs {
@@ -33,41 +34,59 @@ export interface StampArgs extends BaseArgs {
   readonly kind: 'StampArgs';
 }
 
-export const prepareArgs = (dryRun: boolean, temp: Option<string>, gitUrl: Option<string>): PrepareArgs => ({
+export interface PublishArgs extends BaseArgs {
+  readonly kind: 'PublishArgs';
+}
+
+export const prepareArgs = (dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>): PrepareArgs => ({
   kind: 'PrepareArgs',
   dryRun,
+  workingDir,
   temp,
   gitUrl
 });
 
-export const releaseArgs = (dryRun: boolean, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion): ReleaseArgs => ({
+export const releaseArgs = (
+  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion
+): ReleaseArgs => ({
   kind: 'ReleaseArgs',
   dryRun,
+  workingDir,
   temp,
   gitUrl,
   majorMinorVersion
 });
 
-export const advanceArgs = (dryRun: boolean, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion): AdvanceArgs => ({
+export const advanceArgs = (
+  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion
+): AdvanceArgs => ({
   kind: 'AdvanceArgs',
   dryRun,
+  workingDir,
   temp,
   gitUrl,
   majorMinorVersion
 });
 
-export const stampArgs = (dryRun: boolean): StampArgs => ({
+export const stampArgs = (dryRun: boolean, workingDir: string): StampArgs => ({
   kind: 'StampArgs',
+  workingDir,
   dryRun
 });
 
-
-export const advanceCiArgs = (dryRun: boolean): AdvanceCiArgs => ({
+export const advanceCiArgs = (dryRun: boolean, workingDir: string): AdvanceCiArgs => ({
   kind: 'AdvanceCiArgs',
-  dryRun
+  dryRun,
+  workingDir
 });
 
-export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | AdvanceCiArgs | StampArgs;
+export const publishArgs = (dryRun: boolean, workingDir: string): PublishArgs => ({
+  kind: 'PublishArgs',
+  dryRun,
+  workingDir
+});
+
+export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | AdvanceCiArgs | StampArgs | PublishArgs;
 
 export const fold = <T>(
   bh: BeehiveArgs,
@@ -75,7 +94,8 @@ export const fold = <T>(
   ifRelease: (a: ReleaseArgs) => T,
   ifAdvance: (a: AdvanceArgs) => T,
   ifAdvanceCi: (a: AdvanceCiArgs) => T,
-  ifStamp: (a: StampArgs) => T
+  ifStamp: (a: StampArgs) => T,
+  ifPublish: (a: PublishArgs) => T
 ): T => {
   switch (bh.kind) {
     case 'PrepareArgs':
@@ -88,8 +108,10 @@ export const fold = <T>(
       return ifAdvanceCi(bh);
     case 'StampArgs':
       return ifStamp(bh);
+    case 'PublishArgs':
+      return ifPublish(bh);
   }
 };
 
 export const commandName = (bh: BeehiveArgs): string =>
-  fold(bh, () => 'prepare', () => 'release', () => 'advance', () => 'advance-ci', () => 'stamp');
+  fold(bh, () => 'prepare', () => 'release', () => 'advance', () => 'advance-ci', () => 'stamp', () => 'publish');

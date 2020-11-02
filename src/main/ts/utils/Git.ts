@@ -124,10 +124,5 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
   return await detectGitUrl(g);
 };
 
-export const detectGitUrlCwd = async (): Promise<string> => {
-  const s = process.cwd();
-  return await detectGitUrlFromDir(s);
-};
-
-export const resolveGitUrl = async (gitUrlArg: Option<string>): Promise<string> =>
-  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlCwd();
+export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
+  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);

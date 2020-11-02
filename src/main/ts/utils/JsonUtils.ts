@@ -37,11 +37,22 @@ export const prettyPrint = (j: Json): string =>
 export const writeJsonFile = async (path: string, j: Json): Promise<void> =>
   Files.writeFile(path, prettyPrint(j) + '\n');
 
+export const field = async (o: JsonRecord, k: string): Promise<Json> =>
+  PromiseUtils.optionToPromise(ObjUtils.lookup(o, k));
+
+export const stringField = async (o: JsonRecord, k: string): Promise<string> => {
+  const f = await field(o, k);
+  return mustBeString(k)(f);
+};
+
 export const optionalField = async (o: JsonRecord, k: string): Promise<O.Option<Json>> =>
   PromiseUtils.succeed(ObjUtils.lookup(o, k));
 
+const mustBeString = (k: string) => async (j: Json): Promise<string> =>
+  Type.isString(j) ? j : PromiseUtils.fail(`Expected key: ${k} to be a string`);
+
 export const optionalStringField = async (o: JsonRecord, k: string): Promise<O.Option<string>> =>
-  optionalFieldSuchThat(o, k, async (j) => Type.isString(j) ? j : PromiseUtils.fail(`Expected key: ${k} to be a string`));
+  optionalFieldSuchThat(o, k, mustBeString(k));
 
 export const optionalFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: Json) => Promise<A>): Promise<O.Option<A>> => {
   const oa = await optionalField(o, k);

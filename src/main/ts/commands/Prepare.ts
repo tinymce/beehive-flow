@@ -75,10 +75,10 @@ const updateMainBranch = async (mainBranch: string, git: SimpleGit, bd: BranchDe
   await Git.pushUnlessDryRun(fc, dir, git);
 };
 
-export const prepare = async (fc: PrepareArgs): Promise<void> => {
-  const gitUrl = await Git.resolveGitUrl(fc.gitUrl);
+export const prepare = async (args: PrepareArgs): Promise<void> => {
+  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
-  const { dir, git } = await Git.cloneInTempFolder(gitUrl, fc.temp);
+  const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
   const mainBranch = await Git.checkoutMainBranch(git);
 
@@ -90,6 +90,6 @@ export const prepare = async (fc: PrepareArgs): Promise<void> => {
   const releaseBranchName = getReleaseBranchName(r.version);
 
   await Git.branchShouldNotExist(git, releaseBranchName);
-  await createReleaseBranch(releaseBranchName, git, dir, r, fc);
-  await updateMainBranch(mainBranch, git, r, fc, dir);
+  await createReleaseBranch(releaseBranchName, git, dir, r, args);
+  await updateMainBranch(mainBranch, git, r, args, dir);
 };

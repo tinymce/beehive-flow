@@ -9,11 +9,11 @@ const BranchState = BranchLogic.BranchState;
 
 type BranchState = BranchLogic.BranchState;
 
-export const pickTags = async (branchName: string, branchState: BranchState, getBranches: () => Promise<string[]>): Promise<string[]> => {
+export const pickTags = async (branchName: string, branchState: BranchState, getBranches: () => Promise<string[]>): Promise<[string, string?]> => {
   // ASSUMPTION: all valid git branch names are valid npm tags
   const mainTag = branchName;
 
-  const tagsForReleaseReadyState = async (): Promise<string[]> => {
+  const tagsForReleaseReadyState = async (): Promise<[string, string?]> => {
     const branches = await getBranches();
     const versions = await PromiseUtils.filterMap(branches, BranchLogic.versionFromReleaseBranch);
     const og = ArrayUtils.greatest(versions, Version.compareMajorMinorVersions);
@@ -25,5 +25,5 @@ export const pickTags = async (branchName: string, branchState: BranchState, get
   return branchState === BranchState.ReleaseReady ? await tagsForReleaseReadyState() : [ mainTag ];
 };
 
-export const pickTagsGit = async (branchName: string, branchState: BranchState, git: SimpleGit): Promise<string[]> =>
+export const pickTagsGit = async (branchName: string, branchState: BranchState, git: SimpleGit): Promise<[string, string?]> =>
   pickTags(branchName, branchState, () => Git.remoteBranchNames(git));
