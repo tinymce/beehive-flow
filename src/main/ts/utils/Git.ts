@@ -6,6 +6,7 @@ import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
 import * as PromiseUtils from './PromiseUtils';
+import * as StringUtils from './StringUtils';
 
 type SimpleGit = gitP.SimpleGit;
 type Option<A> = O.Option<A>;
@@ -52,6 +53,13 @@ export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
 
 export const push = async (git: SimpleGit): Promise<PushResult> =>
   git.push(ASSUMED_REMOTE);
+
+export const remoteBranchNames = async (git: SimpleGit): Promise<string[]> => {
+  const rbs = await git.branch();
+  return rbs.all
+    .filter((r) => StringUtils.startsWith(r, 'remotes/origin/'))
+    .map((r) => StringUtils.removeLeading(r, 'remotes/origin/'));
+};
 
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
