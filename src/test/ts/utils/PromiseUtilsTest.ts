@@ -59,5 +59,39 @@ describe('PromiseUtils', () => {
       await assert.isRejected(p);
     });
   });
+
+  describe('tryPromise', () => {
+    it('succeeds with right on success', async () => {
+      await fc.assert(fc.asyncProperty(fc.integer(), async (i) => {
+        await assert.becomes(PromiseUtils.tryPromise(PromiseUtils.succeed(i)), E.right(i));
+      }));
+    });
+  });
+
+  it('succeeds with left on failure', async () => {
+    await fc.assert(fc.asyncProperty(fc.integer(), async (i) => {
+      await assert.becomes(PromiseUtils.tryPromise(PromiseUtils.fail(i)), E.left(i));
+    }));
+  });
+
+  describe('filterMap', () => {
+    it('maps', async () => {
+      await fc.assert(fc.asyncProperty(fc.array(fc.integer()), async (xs) => {
+        await assert.becomes(
+          PromiseUtils.filterMap(xs, (x) => PromiseUtils.succeed(x + 1)),
+          xs.map((x) => x + 1)
+        );
+      }));
+    });
+
+    it('filters', async () => {
+      await fc.assert(fc.asyncProperty(fc.array(fc.integer()), async (xs) => {
+        await assert.becomes(
+          PromiseUtils.filterMap(xs, (x) => x > 5 ? PromiseUtils.succeed(x) : PromiseUtils.fail(x)),
+          xs.filter((x) => x > 5)
+        );
+      }));
+    });
+  });
 });
 
