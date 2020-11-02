@@ -64,5 +64,8 @@ export const versionToString = (v: Version): string => {
   return [ v.major, v.minor, v.patch ].join('.') + preBit + metaBit;
 };
 
+export const compareMajorMinorVersions = (a: MajorMinorVersion, b: MajorMinorVersion): number =>
+  a.major !== b.major ? a.major - b.major : a.minor - b.minor;
+
 export const sortMajorMinorVersions = (vs: MajorMinorVersion[]): MajorMinorVersion[] =>
-  ArrayUtils.sort(vs, (a, b) => a.major !== b.major ? a.major - b.major : a.minor - b.minor);
+  ArrayUtils.sort(vs, compareMajorMinorVersions);
