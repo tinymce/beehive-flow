@@ -94,14 +94,14 @@ export const branchShouldNotExist = async (git: SimpleGit, branchName: string): 
   }
 };
 
-export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
-  checkout(git, mainBranchName);
-
 export const checkout = async (git: SimpleGit, branchName: string): Promise<string> => {
   console.log(`Checking out branch: ${branchName}`);
   await git.checkout(branchName);
   return branchName;
 };
+
+export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
+  checkout(git, mainBranchName);
 
 export const detectGitUrl = async (g: SimpleGit): Promise<string> => {
   const remotes = await g.getRemotes(true);

@@ -9,7 +9,7 @@ const main = async () => {
   await forEachAsync(actualArgs, Dispatch.dispatch);
 };
 
-main().catch((e: any) => {
+main().catch((e: unknown) => {
   const msg = e instanceof Error ? e.message : String(e);
   console.error(msg);
   process.exit(1);

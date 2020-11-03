@@ -5,7 +5,6 @@ import { inspectRepo } from '../core/BranchLogic';
 import * as NpmTags from '../core/NpmTags';
 import * as Version from '../core/Version';
 
-
 export const publish = async (args: PublishArgs): Promise<void> => {
   const dir = args.workingDir;
   const git = gitP(dir);

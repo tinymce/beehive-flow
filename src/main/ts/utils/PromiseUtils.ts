@@ -27,8 +27,8 @@ export const fail = <A>(error?: unknown): Promise<A> =>
 export const tryPromise = <A> (p: Promise<A>): Promise<Either<unknown, A>> =>
   p.then(E.right, E.left);
 
-export const filterMap = async <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
-  parMap(input, (a) => tryPromise(p(a))).then(EitherUtils.rights);
-
 export const parMap = <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
   Promise.all(input.map(p));
+
+export const filterMap = async <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
+  parMap(input, (a) => tryPromise(p(a))).then(EitherUtils.rights);

@@ -13,9 +13,22 @@
       "groups": ["builtin", "external", "internal", "parent", "sibling", "index"]
     }],
     "@tinymce/no-unimported-promise": "off",
+    "@typescript-eslint/no-namespace": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-implied-eval": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-call": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
     "no-console": "off",
     "no-underscore-dangle": "off",
-    "max-len": ["warn", 160]
+    "max-len": ["warn", 160],
+    "prefer-arrow-callback": "error",
+    "camelcase": "error",
+    "no-fallthrough": "error",
+    "no-invalid-this": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
+    "prefer-promise-reject-errors": "error"
   },
   "settings": {
     "import/internal-regex": "^(ephox|tinymce)/.*"

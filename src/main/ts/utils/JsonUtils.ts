@@ -14,13 +14,13 @@ export const parse = (s: string): Promise<Json> => {
   return PromiseUtils.eitherToPromise(result);
 };
 
+export const isJsonRecord = (j: Json): j is JsonRecord =>
+  Type.isObject(j);
+
 export const parseJsonRecord = (s: string): Promise<E.JsonRecord> => {
   const e = E.filterOrElse(isJsonRecord, () => 'JSON value was not an object')(E.parseJSON(s, String));
   return PromiseUtils.eitherToPromise(e);
 };
-
-export const isJsonRecord = (j: Json): j is JsonRecord =>
-  Type.isObject(j);
 
 export const parseJsonFile = async (path: string): Promise<Json> => {
   const s = await Files.readFileAsString(path);
@@ -41,6 +41,9 @@ export const writeJsonFile = async (path: string, j: Json): Promise<void> =>
 export const field = async (o: JsonRecord, k: string): Promise<Json> =>
   PromiseUtils.optionToPromise(ObjUtils.lookup(o, k));
 
+const mustBeString = (k: string) => async (j: Json): Promise<string> =>
+  Type.isString(j) ? j : PromiseUtils.fail(`Expected key: ${k} to be a string`);
+
 export const stringField = async (o: JsonRecord, k: string): Promise<string> => {
   const f = await field(o, k);
   return mustBeString(k)(f);
@@ -49,16 +52,13 @@ export const stringField = async (o: JsonRecord, k: string): Promise<string> => 
 export const optionalField = async (o: JsonRecord, k: string): Promise<O.Option<Json>> =>
   PromiseUtils.succeed(ObjUtils.lookup(o, k));
 
-const mustBeString = (k: string) => async (j: Json): Promise<string> =>
-  Type.isString(j) ? j : PromiseUtils.fail(`Expected key: ${k} to be a string`);
-
-export const optionalStringField = async (o: JsonRecord, k: string): Promise<O.Option<string>> =>
-  optionalFieldSuchThat(o, k, mustBeString(k));
-
 export const optionalFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: Json) => Promise<A>): Promise<O.Option<A>> => {
   const oa = await optionalField(o, k);
   return mapAsync(oa, f);
 };
+
+export const optionalStringField = async (o: JsonRecord, k: string): Promise<O.Option<string>> =>
+  optionalFieldSuchThat(o, k, mustBeString(k));
 
 export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Promise<A>): Promise<O.Option<A>> => {
   const os = await optionalStringField(o, k);
