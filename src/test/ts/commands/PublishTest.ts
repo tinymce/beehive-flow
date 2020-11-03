@@ -10,7 +10,9 @@ import * as Dispatch from '../../../main/ts/args/Dispatch';
 
 const beehiveFlow = async (args: string[]): Promise<void> => {
   const a = await Parser.parseArgs(args);
-  await Dispatch.dispatch(a);
+  if (a._tag === 'Some') {
+    await Dispatch.dispatch(a.value);
+  }
 };
 
 const getTags = (cwd: string): Record<string, string> => {
