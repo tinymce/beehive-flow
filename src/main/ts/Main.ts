@@ -5,7 +5,9 @@ import * as Dispatch from './args/Dispatch';
 
 const main = async () => {
   const actualArgs = await Parser.parseProcessArgs();
-  await Dispatch.dispatch(actualArgs);
+  if (actualArgs._tag === 'Some') {
+    await Dispatch.dispatch(actualArgs.value);
+  }
 };
 
 main().catch((e: any) => {
