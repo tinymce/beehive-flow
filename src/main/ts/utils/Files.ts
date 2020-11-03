@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as tmp from 'tmp';
 
+tmp.setGracefulCleanup();
+
 export const readFile: (filename: string) => Promise<Buffer> =
   util.promisify(fs.readFile);
 
@@ -14,5 +16,7 @@ export const writeFile: (filename: string, contents: string) => Promise<void> =
 export const exists: (filename: string) => Promise<boolean> =
   util.promisify(fs.exists);
 
-export const tempFolder: () => Promise<string> =
-  util.promisify(tmp.dir);
+export const tempFolder = (options: tmp.DirOptions = { keep: false, prefix: 'beehive-flow', unsafeCleanup: true }): Promise<string> => {
+  const tf: (options?: tmp.DirOptions) => Promise<string> = util.promisify(tmp.dir);
+  return tf(options);
+};
