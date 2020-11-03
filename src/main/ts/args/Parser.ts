@@ -5,6 +5,7 @@ import { parseMajorMinorVersion } from '../core/Version';
 import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
+type Option<A> = O.Option<A>;
 
 const prepDescription =
   `Branches main as releases/x.y and tweaks versions. 
@@ -101,7 +102,7 @@ const argParser =
 export const getRealArgs = (): string[] =>
   process.argv.slice(2);
 
-export const parseArgs = async (args: string[]): Promise<BeehiveArgs> => {
+export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> => {
   let _a;
   try {
     _a = argParser.parse(args);
@@ -111,32 +112,36 @@ export const parseArgs = async (args: string[]): Promise<BeehiveArgs> => {
   }
   const a = _a;
 
+  if (a.help) {
+    return O.none;
+  }
+
   const cmd = a._[0];
   const dryRun = a['dry-run'];
   const temp = O.fromNullable(a.temp);
   const gitUrl = O.fromNullable(a['git-url']);
 
   if (cmd === 'prepare') {
-    return BeehiveArgs.prepareArgs(dryRun, temp, gitUrl);
+    return O.some(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
 
   } else if (cmd === 'release') {
     const mm = await parseMajorMinorVersion(a.majorDotMinor as string);
-    return BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm);
+    return O.some(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
 
   } else if (cmd === 'advance') {
     const mm = await parseMajorMinorVersion(a.majorDotMinor as string);
-    return BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm);
+    return O.some(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
 
   } else if (cmd === 'advance-ci') {
-    return BeehiveArgs.advanceCiArgs(dryRun);
+    return O.some(BeehiveArgs.advanceCiArgs(dryRun));
 
   } else if (cmd === 'stamp') {
-    return BeehiveArgs.stampArgs(dryRun);
+    return O.some(BeehiveArgs.stampArgs(dryRun));
 
   } else {
     return PromiseUtils.fail(`Unknown command: ${cmd}`);
   }
 };
 
-export const parseProcessArgs = (): Promise<BeehiveArgs> =>
+export const parseProcessArgs = (): Promise<Option<BeehiveArgs>> =>
   parseArgs(getRealArgs());

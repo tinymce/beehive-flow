@@ -14,7 +14,9 @@ const assert = chai.use(chaiAsPromised).assert;
 
 const beehiveFlow = async (args: string[]): Promise<void> => {
   const a = await Parser.parseArgs(args);
-  await Dispatch.dispatch(a);
+  if (a._tag === 'Some') {
+    await Dispatch.dispatch(a.value);
+  }
 };
 
 describe('Lifecycle', () => {
