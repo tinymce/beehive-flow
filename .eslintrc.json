@@ -8,16 +8,12 @@
   },
   "rules": {
     "@typescript-eslint/member-ordering": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-unnecessary-type-assertion": "off",
     "comma-dangle": ["error", "never"],
     "import/order": ["error", {
       "groups": ["builtin", "external", "internal", "parent", "sibling", "index"]
     }],
     "@tinymce/no-unimported-promise": "off",
     "no-console": "off",
-    "no-empty": "off",
-    "no-shadow": "off",
     "no-underscore-dangle": "off",
     "max-len": ["warn", 160]
   },

@@ -16,10 +16,12 @@ type PackageJson = PackageJson.PackageJson;
 export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): string =>
   `release/${major}.${minor}`;
 
+// eslint-disable-next-line no-shadow
 export enum BranchType {
   Main, Feature, Hotfix, Spike, Release
 }
 
+// eslint-disable-next-line no-shadow
 export enum BranchState {
   Main, Feature, Hotfix, Spike, ReleaseReady, ReleaseCandidate
 }

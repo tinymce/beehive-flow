@@ -70,14 +70,14 @@ const argParser =
     .command(
       'prepare',
       prepDescription,
-      (yargs) => yargs
+      (y) => y
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
     )
     .command(
       'release <majorDotMinor>',
       releaseDescription,
-      (yargs) => yargs
+      (y) => y
         .positional('majorDotMinor', majorDotMinorOptions)
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
@@ -85,7 +85,7 @@ const argParser =
     .command(
       'advance <majorDotMinor>',
       advanceDescription,
-      (yargs) => yargs
+      (y) => y
         .positional('majorDotMinor', majorDotMinorOptions)
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)

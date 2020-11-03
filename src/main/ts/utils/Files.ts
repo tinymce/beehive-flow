@@ -17,6 +17,6 @@ export const exists: (filename: string) => Promise<boolean> =
   util.promisify(fs.exists);
 
 export const tempFolder = (options: tmp.DirOptions = { keep: false, prefix: 'beehive-flow', unsafeCleanup: true }): Promise<string> => {
-  const tf: (options?: tmp.DirOptions) => Promise<string> = util.promisify(tmp.dir);
+  const tf: (o?: tmp.DirOptions) => Promise<string> = util.promisify(tmp.dir);
   return tf(options);
 };
