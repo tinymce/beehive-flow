@@ -8,15 +8,13 @@ import * as Git from '../../../main/ts/utils/Git';
 import * as Parser from '../../../main/ts/args/Parser';
 import * as Dispatch from '../../../main/ts/args/Dispatch';
 
-type TempGit = Git.TempGit;
-
 const beehiveFlow = async (args: string[]): Promise<void> => {
   const a = await Parser.parseArgs(args);
   await Dispatch.dispatch(a);
 };
 
-const getTags = function (working: TempGit): Record<string, string> {
-  const output = cp.execSync('npm dist-tag ls @beehive-test/beehive-test', { cwd: working.dir }).toString();
+const getTags = (cwd: string): Record<string, string> => {
+  const output = cp.execSync('npm dist-tag ls @beehive-test/beehive-test', { cwd }).toString();
   const lines = output.split('\n').filter((x) => x.length > 0);
   const r: Record<string, string> = {};
 
@@ -51,6 +49,13 @@ const publish = async (dir: string): Promise<void> => {
   await beehiveFlow([ 'publish', '--working-dir', dir ]);
 };
 
+const writeNpmrc = async (port: number, dir: string): Promise<string> => {
+  const npmrc = `@beehive-test:registry=http://0.0.0.0:${port}/`;
+  const npmrcFile = path.join(dir, '.npmrc');
+  await Files.writeFile(npmrcFile, npmrc);
+  return npmrcFile;
+};
+
 describe('Publish', () => {
   it('publishes', async () => {
     const { port, verdaccio } = await startVerdaccio();
@@ -58,14 +63,12 @@ describe('Publish', () => {
     try {
       const branchName = 'feature/TINY-BLAH';
 
-      const working = await Git.initInTempFolder(false);
-      await Git.checkoutNewBranch(working.git, branchName);
+      const { dir, git } = await Git.initInTempFolder(false);
+      await Git.checkoutNewBranch(git, branchName);
 
-      const npmrc = `@beehive-test:registry=http://0.0.0.0:${port}/`;
-      const npmrcFile = path.join(working.dir, '.npmrc');
-      await Files.writeFile(npmrcFile, npmrc);
+      const npmrcFile = await writeNpmrc(port, dir);
 
-      const pjFile = path.join(working.dir, 'package.json');
+      const pjFile = path.join(dir, 'package.json');
 
       const go = async (version: string) => {
         const pj = `
@@ -77,10 +80,10 @@ describe('Publish', () => {
           }
         }`;
         await Files.writeFile(pjFile, pj);
-        await working.git.add([ npmrcFile, pjFile ]);
-        await working.git.commit('commit');
-        await publish(working.dir);
-        return getTags(working);
+        await git.add([ npmrcFile, pjFile ]);
+        await git.commit('commit');
+        await publish(dir);
+        return getTags(dir);
       };
 
       const version1 = `0.1.0-alpha`;
