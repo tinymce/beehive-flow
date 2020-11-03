@@ -27,11 +27,9 @@ const getTags = function (working: TempGit): Record<string, string> {
   return r;
 };
 
-describe('blah', () => {
-  it('blahs', async () => {
-
-    const configDir = await Files.tempFolder();
-    const config = `
+const startVerdaccio = async () => {
+  const configDir = await Files.tempFolder();
+  const config = `
 storage: ${configDir}/storage
 packages:
   '@beehive-test/*':
@@ -41,19 +39,26 @@ packages:
 web:
   enable: false
 `;
-    const configFile = path.join(configDir, 'config.yml');
-    await Files.writeFile(configFile, config);
+  const configFile = path.join(configDir, 'config.yml');
+  await Files.writeFile(configFile, config);
 
-    const port = await getPort();
-    const verdaccio = cp.spawn('yarn', [ 'verdaccio', '--listen', String(port), '--config', configFile ], { stdio: 'inherit' });
+  const port = await getPort();
+  const verdaccio = cp.spawn('yarn', [ 'verdaccio', '--listen', String(port), '--config', configFile ], { stdio: 'inherit' });
+  return { port, verdaccio };
+};
 
-    const publish = async (dir: string): Promise<void> => {
-      await beehiveFlow([ 'publish', '--working-dir', dir ]);
-    };
+const publish = async (dir: string): Promise<void> => {
+  await beehiveFlow([ 'publish', '--working-dir', dir ]);
+};
+
+describe('Publish', () => {
+  it('publishes', async () => {
+    const { port, verdaccio } = await startVerdaccio();
 
     try {
-      const working = await Git.initInTempFolder(false);
       const branchName = 'feature/TINY-BLAH';
+
+      const working = await Git.initInTempFolder(false);
       await Git.checkoutNewBranch(working.git, branchName);
 
       const npmrc = `@beehive-test:registry=http://0.0.0.0:${port}/`;
@@ -86,9 +91,8 @@ web:
 
       const version2 = `0.2.0-alpha`;
       const tags2 = await go(version2);
-
-      // NOTE: first publish always ends up tagged latest
       assert.deepEqual(tags2, { latest: version1, [ branchName ]: version2 });
+
     } finally {
       verdaccio.kill();
     }
