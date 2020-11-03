@@ -4,14 +4,14 @@ import fc from 'fast-check';
 import * as StringUtils from '../../../main/ts/utils/StringUtils';
 
 describe('StringUtils', () => {
-  describe('endsWith', () => {
-    it('ends with a suffix', () => {
+  describe('startsWith', () => {
+    it('starts with a prefix', () => {
       fc.assert(fc.property(fc.asciiString(), fc.asciiString(), (a, b) => {
         assert.isTrue(StringUtils.startsWith(a + b, a));
       }));
     });
 
-    it('does not end with a not suffix', () => {
+    it('does not start with a prefix', () => {
       assert.isFalse(StringUtils.startsWith('abc', 'def'));
     });
   });
