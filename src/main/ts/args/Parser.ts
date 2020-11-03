@@ -126,7 +126,7 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
   }
   const a = _a;
 
-  if (a.help) {
+  if (Boolean(a.help)) {
     return O.none;
   }
 
