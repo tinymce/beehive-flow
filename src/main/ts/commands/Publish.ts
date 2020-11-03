@@ -11,7 +11,8 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const git = gitP(dir);
   const r = await inspectRepo(dir);
 
-  const [ mainTag, otherTag ] = await NpmTags.pickTagsGit(r.currentBranch, r.branchState, git);
+  const tags = await NpmTags.pickTagsGit(r.currentBranch, r.branchState, git);
+  const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
 
@@ -21,9 +22,15 @@ export const publish = async (args: PublishArgs): Promise<void> => {
 
   cp.execSync(publishCmd, { stdio: 'inherit', cwd: dir });
 
-  if (otherTag !== undefined) {
+  /*
+    Yes, we're setting the mainTag again in this loop.
+    If this is the very first publish of a package, the --tag above is ignored
+    and "latest" is used. At least on Verdaccio - need to test other NPM registries.
+    Even if the extra dist-tag call is not required, it doesn't hurt.
+   */
+  for (const t of tags) {
     const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
-    const tagCmd = [ 'npm', 'dist-tag', 'add', fullPackageName ].join(' ');
+    const tagCmd = [ 'npm', 'dist-tag', 'add', fullPackageName, t ].join(' ');
     cp.execSync(tagCmd, { stdio: 'inherit', cwd: dir });
   }
 };
