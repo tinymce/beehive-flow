@@ -57,7 +57,7 @@ export const push = async (git: SimpleGit): Promise<PushResult> =>
 export const remoteBranchNames = async (git: SimpleGit): Promise<string[]> => {
   const rbs = await git.branch();
   return rbs.all
-    .filter((r) => StringUtils.startsWith(r, 'remotes/origin/'))
+    .filter((r) => r.startsWith('remotes/origin/'))
     .map((r) => StringUtils.removeLeading(r, 'remotes/origin/'));
 };
 
