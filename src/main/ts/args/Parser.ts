@@ -34,6 +34,23 @@ const stampDescription =
   Operates on current directory.
   You should not commit the changes this command makes.`;
 
+const gitUrlOptions: yargs.Options = {
+  type: 'string',
+  default: null,
+  description: 'URL of git repo to operate on. Defaults to the git repo in the current directory.'
+};
+
+const majorDotMinorOptions: yargs.PositionalOptions = {
+  describe: 'major.minor version',
+  type: 'string'
+};
+
+const tempOptions: yargs.Options = {
+  type: 'string',
+  default: null,
+  description: 'Temp folder for git checkout. If not specified, a system temp folder is used.'
+};
+
 const argParser =
   yargs
     .scriptName('beehive-flow')
@@ -42,43 +59,28 @@ const argParser =
       default: false,
       description: 'Don\'t push changes to remote systems.'
     })
-    .option('temp', {
-      type: 'string',
-      default: null,
-      description:
-        `Temp folder for git checkout.
-        If not specified, a system temp folder is used.`
-    })
-    .option('git-url', {
-      type: 'string',
-      default: null,
-      description:
-        `URL of git repo to operate on. Defaults to the git repo in the current directory.
-        Ignored by stamp and advance-ci commands, which always work in current directory.`
-    })
     .command(
       'prepare',
-      prepDescription
+      prepDescription,
+      (yargs) => yargs
+        .option('git-url', gitUrlOptions)
+        .option('temp', tempOptions)
     )
     .command(
       'release <majorDotMinor>',
-      releaseDescription, (yargs) => {
-        yargs
-          .positional('majorDotMinor', {
-            describe: 'major.minor version',
-            type: 'string'
-          });
-      }
+      releaseDescription,
+      (yargs) => yargs
+        .positional('majorDotMinor', majorDotMinorOptions)
+        .option('git-url', gitUrlOptions)
+        .option('temp', tempOptions)
     )
     .command(
       'advance <majorDotMinor>',
-      advanceDescription, (yargs) => {
-        yargs
-          .positional('majorDotMinor', {
-            describe: 'major.minor version',
-            type: 'string'
-          });
-      }
+      advanceDescription,
+      (yargs) => yargs
+        .positional('majorDotMinor', majorDotMinorOptions)
+        .option('git-url', gitUrlOptions)
+        .option('temp', tempOptions)
     )
     .command(
       'advance-ci',
@@ -118,19 +120,19 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
 
   const cmd = a._[0];
   const dryRun = a['dry-run'];
-  const temp = O.fromNullable(a.temp);
-  const gitUrl = O.fromNullable(a['git-url']);
+
+  const temp = () => O.fromNullable(a.temp as string | null);
+  const gitUrl = () => O.fromNullable(a['git-url'] as string | null);
+  const majorDotMinor = () => parseMajorMinorVersion(a.majorDotMinor as string);
 
   if (cmd === 'prepare') {
-    return O.some(BeehiveArgs.prepareArgs(dryRun, temp, gitUrl));
+    return O.some(BeehiveArgs.prepareArgs(dryRun, temp(), gitUrl()));
 
   } else if (cmd === 'release') {
-    const mm = await parseMajorMinorVersion(a.majorDotMinor as string);
-    return O.some(BeehiveArgs.releaseArgs(dryRun, temp, gitUrl, mm));
+    return O.some(BeehiveArgs.releaseArgs(dryRun, temp(), gitUrl(), await majorDotMinor()));
 
   } else if (cmd === 'advance') {
-    const mm = await parseMajorMinorVersion(a.majorDotMinor as string);
-    return O.some(BeehiveArgs.advanceArgs(dryRun, temp, gitUrl, mm));
+    return O.some(BeehiveArgs.advanceArgs(dryRun, temp(), gitUrl(), await majorDotMinor()));
 
   } else if (cmd === 'advance-ci') {
     return O.some(BeehiveArgs.advanceCiArgs(dryRun));
