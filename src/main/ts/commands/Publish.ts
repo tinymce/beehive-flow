@@ -28,9 +28,14 @@ export const publish = async (args: PublishArgs): Promise<void> => {
     and "latest" is used. At least on Verdaccio - need to test other NPM registries.
     Even if the extra dist-tag call is not required, it doesn't hurt.
    */
-  for (const t of tags) {
-    const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
-    const tagCmd = [ 'npm', 'dist-tag', 'add', fullPackageName, t ].join(' ');
-    cp.execSync(tagCmd, { stdio: 'inherit', cwd: dir });
+  if (args.dryRun) {
+    console.log('dry run - not tagging');
+    console.log('Would have added tags: ', tags);
+  } else {
+    for (const t of tags) {
+      const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
+      const tagCmd = [ 'npm', 'dist-tag', 'add', fullPackageName, t ].join(' ');
+      cp.execSync(tagCmd, { stdio: 'inherit', cwd: dir });
+    }
   }
 };

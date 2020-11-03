@@ -45,8 +45,9 @@ web:
   return { port, verdaccio };
 };
 
-const publish = async (dir: string): Promise<void> => {
-  await beehiveFlow([ 'publish', '--working-dir', dir ]);
+const publish = async (dir: string, dryRun: boolean): Promise<void> => {
+  const dryRunArgs = dryRun ? [ '--dry-run' ] : [];
+  await beehiveFlow([ 'publish', '--working-dir', dir, ...dryRunArgs ]);
 };
 
 const writeNpmrc = async (port: number, dir: string): Promise<string> => {
@@ -70,7 +71,7 @@ describe('Publish', () => {
 
       const pjFile = path.join(dir, 'package.json');
 
-      const go = async (version: string) => {
+      const go = async (version: string, dryRun: boolean) => {
         const pj = `
         {
           "name": "@beehive-test/beehive-test",
@@ -82,19 +83,23 @@ describe('Publish', () => {
         await Files.writeFile(pjFile, pj);
         await git.add([ npmrcFile, pjFile ]);
         await git.commit('commit');
-        await publish(dir);
+        await publish(dir, dryRun);
         return getTags(dir);
       };
 
       const version1 = `0.1.0-alpha`;
-      const tags1 = await go(version1);
+      const tags1 = await go(version1, false);
 
       // NOTE: first publish always ends up tagged latest
       assert.deepEqual(tags1, { latest: version1, [ branchName ]: version1 });
 
       const version2 = `0.2.0-alpha`;
-      const tags2 = await go(version2);
+      const tags2 = await go(version2, false);
       assert.deepEqual(tags2, { latest: version1, [ branchName ]: version2 });
+
+      const version3 = `0.3.0-alpha`;
+      const tags3 = await go(version3, true);
+      assert.deepEqual(tags3, { latest: version1, [ branchName ]: version2 });
 
     } finally {
       verdaccio.kill();
