@@ -130,7 +130,7 @@ export const parseArgs = async (args: string[]): Promise<BeehiveArgs> => {
   } else if (cmd === 'advance-ci') {
     return BeehiveArgs.advanceCiArgs(dryRun);
 
-  } else if (a._[0] === 'stamp') {
+  } else if (cmd === 'stamp') {
     return BeehiveArgs.stampArgs(dryRun);
 
   } else {
