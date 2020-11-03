@@ -2,12 +2,11 @@
 
 import * as Parser from './args/Parser';
 import * as Dispatch from './args/Dispatch';
+import { forEachAsync } from './utils/OptionUtils';
 
 const main = async () => {
   const actualArgs = await Parser.parseProcessArgs();
-  if (actualArgs._tag === 'Some') {
-    await Dispatch.dispatch(actualArgs.value);
-  }
+  await forEachAsync(actualArgs, Dispatch.dispatch);
 };
 
 main().catch((e: any) => {

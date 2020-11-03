@@ -9,14 +9,13 @@ import * as Parser from '../../../main/ts/args/Parser';
 import * as Dispatch from '../../../main/ts/args/Dispatch';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
+import { forEachAsync } from '../../../main/ts/utils/OptionUtils';
 
 const assert = chai.use(chaiAsPromised).assert;
 
 const beehiveFlow = async (args: string[]): Promise<void> => {
   const a = await Parser.parseArgs(args);
-  if (a._tag === 'Some') {
-    await Dispatch.dispatch(a.value);
-  }
+  await forEachAsync(a, Dispatch.dispatch);
 };
 
 describe('Lifecycle', () => {

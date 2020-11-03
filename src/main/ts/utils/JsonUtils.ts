@@ -4,6 +4,7 @@ import * as PromiseUtils from './PromiseUtils';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
 import * as Type from './Type';
+import { mapAsync } from './OptionUtils';
 
 type Json = E.Json;
 type JsonRecord = E.JsonRecord;
@@ -56,18 +57,13 @@ export const optionalStringField = async (o: JsonRecord, k: string): Promise<O.O
 
 export const optionalFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: Json) => Promise<A>): Promise<O.Option<A>> => {
   const oa = await optionalField(o, k);
-
-  if (oa._tag === 'None') {
-    return O.none;
-  } else {
-    return O.some(await f(oa.value));
-  }
+  return mapAsync(oa, f);
 };
 
-export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Promise<A>): Promise<O.Option<A>> =>
-  optionalFieldSuchThat(o, k, (j) =>
-    Type.isString(j) ? f(j) : PromiseUtils.fail(`field ${k} was not a string`)
-  );
+export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Promise<A>): Promise<O.Option<A>> => {
+  const os = await optionalStringField(o, k);
+  return mapAsync(os, f);
+};
 
 export const optionalToJsonRecord = <A>(k: string, oa: O.Option<A>, f: (a: A) => Json): JsonRecord =>
   O.fold<A, JsonRecord>(
