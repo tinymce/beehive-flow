@@ -62,10 +62,12 @@ describe('Publish', () => {
     const { port, verdaccio } = await startVerdaccio();
 
     try {
-      const branchName = 'feature/TINY-BLAH';
+      const featureBranch = 'feature/TINY-BLAH';
 
-      const { dir, git } = await Git.initInTempFolder(false);
-      await Git.checkoutNewBranch(git, branchName);
+      const hub = await Git.initInTempFolder(true);
+
+      const { dir, git } = await Git.cloneInTempFolder(hub.dir);
+      await Git.checkoutNewBranch(git, featureBranch);
 
       const npmrcFile = await writeNpmrc(port, dir);
 
@@ -83,23 +85,38 @@ describe('Publish', () => {
         await Files.writeFile(pjFile, pj);
         await git.add([ npmrcFile, pjFile ]);
         await git.commit('commit');
+        await Git.pushNewBranch(git);
         await publish(dir, dryRun);
         return getTags(dir);
       };
 
-      const version1 = `0.1.0-alpha`;
-      const tags1 = await go(version1, false);
-
+      // PUBLISH 1 - feature branch
       // NOTE: first publish always ends up tagged latest
-      assert.deepEqual(tags1, { latest: version1, [ branchName ]: version1 });
+      const tags1 = await go('0.1.0-alpha', false);
+      assert.deepEqual(tags1, { latest: '0.1.0-alpha', [ featureBranch ]: '0.1.0-alpha' });
 
-      const version2 = `0.2.0-alpha`;
-      const tags2 = await go(version2, false);
-      assert.deepEqual(tags2, { latest: version1, [ branchName ]: version2 });
+      // PUBLISH 2 - feature branch
+      const tags2 = await go('0.2.0-alpha', false);
+      assert.deepEqual(tags2, { latest: '0.1.0-alpha', [ featureBranch ]: '0.2.0-alpha' });
 
-      const version3 = `0.3.0-alpha`;
-      const tags3 = await go(version3, true);
-      assert.deepEqual(tags3, { latest: version1, [ branchName ]: version2 });
+      // PUBLISH 3 - dry-run
+      const tags3 = await go('0.3.0-alpha', true);
+      assert.deepEqual(tags3, { latest: '0.1.0-alpha', [ featureBranch ]: '0.2.0-alpha' });
+
+      // PUBLISH 4 - release state
+      await Git.checkoutNewBranch(git, 'release/0.1');
+      const tags4 = await go('0.1.0', false);
+      assert.deepEqual(tags4, { 'latest': '0.1.0', [ featureBranch ]: '0.2.0-alpha', 'release/0.1': '0.1.0' });
+
+      // PUBLISH 5 - next release
+      await Git.checkoutNewBranch(git, 'release/0.2');
+      const tags5 = await go('0.2.0', false);
+      assert.deepEqual(tags5, { 'latest': '0.2.0', [ featureBranch ]: '0.2.0-alpha', 'release/0.1': '0.1.0', 'release/0.2': '0.2.0' });
+
+      // PUBLISH 6 - re-release 0.1
+      await git.checkout('release/0.1');
+      const tags6 = await go('0.1.1', false);
+      assert.deepEqual(tags6, { 'latest': '0.2.0', [ featureBranch ]: '0.2.0-alpha', 'release/0.1': '0.1.1', 'release/0.2': '0.2.0' });
 
     } finally {
       verdaccio.kill();
