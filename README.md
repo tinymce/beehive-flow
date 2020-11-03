@@ -10,10 +10,10 @@ In the below description, an NPM/Yarn package.json project is assumed, and the t
 
 Key concepts:
 
-- All new work happens in feature/* branches which are merged to the main branch.
-- Main is branched to release/x.y branches to produce release candidates and releases.
-- hotfix/* branches are used to make updates to release/x.y branches.
-- The beehive-flow CLI tool defines several commands, used to perform key actions involved in branching and releasing.
+- All new work happens in `feature/*` branches which are merged to the `main` branch.
+- The `main` branch is branched to `release/x.y` branches to produce release candidates and releases.
+- `hotfix/*` branches are used to make updates to `release/x.y` branches.
+- The `beehive-flow` CLI tool defines several commands, used to perform key actions involved in branching and releasing.
 
 ## Branches
 
@@ -25,7 +25,7 @@ beehive-flow uses the following branch names, each forming part of the process:
  - hotfix/FEATURE_CODE
  - spike/FEATURE_CODE
  
-Note, there is no "develop" branch and "main" is used instead of "master" as it is GitHub's new default. 
+Note, there is no `develop` branch and `main` is used instead of `master` as it is GitHub's new default. 
 
 Branch names are enforced and beehive-flow will fail if it encounters other branch names. 
 
