@@ -60,8 +60,7 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
   await updatePackageJsonFileForReleaseBranch(bd.version, bd.packageJson, bd.packageJsonFile);
-  await git.add(buildPropertiesFile);
-  await git.add(bd.packageJsonFile);
+  await git.add([ buildPropertiesFile, bd.packageJsonFile]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
   await Git.pushNewBranchUnlessDryRun(fc, dir, git);
 };
