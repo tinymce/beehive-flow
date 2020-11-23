@@ -205,7 +205,7 @@ This command does an `npm publish` and sets npm tags based on the repository sta
  - If your repo is on a release branch in "release ready" state, and your release branch has the 
    greatest version number of all release branches, the build also gets tagged "latest".
    
-Note: it appears that npm also tags the very published build of each repo with "latest". 
+Note: it appears that npm also tags the very first published build of each repo with "latest". 
 
 ## CI Instructions
 
