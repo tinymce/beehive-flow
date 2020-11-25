@@ -5,7 +5,7 @@ import fc from 'fast-check';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
-import { BranchDetails, BranchState, BranchType, getReleaseBranchName, versionFromReleaseBranch, inspectRepo } from '../../../main/ts/core/BranchLogic';
+import { BranchDetails, BranchState, BranchType, getReleaseBranchName, versionFromReleaseBranch, getBranchDetails } from '../../../main/ts/core/BranchLogic';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
@@ -39,7 +39,7 @@ describe('BranchLogic', () => {
     });
   });
 
-  describe('inspectRepo', () => {
+  describe('getBranchDetails', () => {
 
     const setup = async (branchName: string, sVersion: string) => {
       const version = await Version.parseVersion(sVersion);
@@ -64,14 +64,14 @@ describe('BranchLogic', () => {
 
     it('fails if dir is not a git repo', async () => {
       const dir = await Files.tempFolder();
-      await assert.isRejected(inspectRepo(dir));
+      await assert.isRejected(getBranchDetails(dir));
     });
 
     it('fails if dir is not at the root of a git repo', async () => {
       const { dir } = await Git.initInTempFolder();
       const subbie = path.join(dir, 'subbie');
       fs.mkdirSync(subbie);
-      await assert.isRejected(inspectRepo(subbie));
+      await assert.isRejected(getBranchDetails(subbie));
     });
 
     it('detects valid main branch', async () => {
@@ -86,27 +86,27 @@ describe('BranchLogic', () => {
         branchState: BranchState.Main
       };
 
-      await assert.becomes(inspectRepo(dir), expected);
+      await assert.becomes(getBranchDetails(dir), expected);
     });
 
     it('fails for main branch with wrong minor version', async () => {
       const { dir } = await setup('main', '0.6.1-alpha');
-      await assert.isRejected(inspectRepo(dir));
+      await assert.isRejected(getBranchDetails(dir));
     });
 
     it('fails for main branch with rc version', async () => {
       const { dir } = await setup('main', '0.6.0-rc');
-      await assert.isRejected(inspectRepo(dir));
+      await assert.isRejected(getBranchDetails(dir));
     });
 
     it('fails for main branch with release version', async () => {
       const { dir } = await setup('main', '0.6.0');
-      await assert.isRejected(inspectRepo(dir));
+      await assert.isRejected(getBranchDetails(dir));
     });
 
     it('fails for main branch with buildmetadata', async () => {
       const { dir } = await setup('main', '0.6.0+9nesste123.frog');
-      await assert.isRejected(inspectRepo(dir));
+      await assert.isRejected(getBranchDetails(dir));
     });
 
     it('detects valid feature branch', async () => {
@@ -121,7 +121,7 @@ describe('BranchLogic', () => {
         branchState: BranchState.Feature
       };
 
-      await assert.becomes(inspectRepo(dir), expected);
+      await assert.becomes(getBranchDetails(dir), expected);
     });
 
     it('detects valid spike branch', async () => {
@@ -136,7 +136,7 @@ describe('BranchLogic', () => {
         branchState: BranchState.Spike
       };
 
-      await assert.becomes(inspectRepo(dir), expected);
+      await assert.becomes(getBranchDetails(dir), expected);
     });
 
     // TODO: test other states

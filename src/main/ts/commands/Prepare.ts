@@ -4,7 +4,7 @@ import * as O from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git';
 import * as Git from '../utils/Git';
 import * as PackageJson from '../core/PackageJson';
-import { BranchState, BranchDetails, inspectRepo, getReleaseBranchName } from '../core/BranchLogic';
+import { BranchState, BranchDetails, getBranchDetails, getReleaseBranchName } from '../core/BranchLogic';
 import * as Files from '../utils/Files';
 import { PrepareArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
@@ -81,7 +81,7 @@ export const prepare = async (args: PrepareArgs): Promise<void> => {
 
   const mainBranch = await Git.checkoutMainBranch(git);
 
-  const r = await inspectRepo(dir);
+  const r = await getBranchDetails(dir);
   if (r.branchState !== BranchState.Main) {
     return PromiseUtils.fail('main branch not in correct state.');
   }

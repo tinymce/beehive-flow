@@ -3,7 +3,7 @@ import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { BranchState, inspectRepo, getReleaseBranchName } from '../core/BranchLogic';
+import { BranchState, getBranchDetails, getReleaseBranchName } from '../core/BranchLogic';
 
 type Version = Version.Version;
 const { versionToString } = Version;
@@ -22,7 +22,7 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   const rbn = getReleaseBranchName(args.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await inspectRepo(dir);
+  const r = await getBranchDetails(dir);
   if (r.branchState !== BranchState.ReleaseCandidate) {
     return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
   }

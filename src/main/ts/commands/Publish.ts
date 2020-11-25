@@ -1,14 +1,14 @@
 import * as cp from 'child_process';
 import { gitP } from 'simple-git';
 import { PublishArgs } from '../args/BeehiveArgs';
-import { inspectRepo } from '../core/BranchLogic';
+import { getBranchDetails } from '../core/BranchLogic';
 import * as NpmTags from '../core/NpmTags';
 import * as Version from '../core/Version';
 
 export const publish = async (args: PublishArgs): Promise<void> => {
   const dir = args.workingDir;
   const git = gitP(dir);
-  const r = await inspectRepo(dir);
+  const r = await getBranchDetails(dir);
 
   const tags = await NpmTags.pickTagsGit(r.currentBranch, r.branchState, git);
   const [ mainTag ] = tags;
