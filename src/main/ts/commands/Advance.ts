@@ -26,7 +26,7 @@ const go = async (version: Version, pj: PackageJson, pjFile: string, git: Simple
   await git.add(pjFile);
   await git.commit('Advancing to release candidate version for next patch release');
 
-  await Git.pushUnlessDryRun(args, dir, git);
+  await Git.pushUnlessDryRun(dir, git, args.dryRun);
 };
 
 export const advance = async (args: AdvanceArgs): Promise<void> => {

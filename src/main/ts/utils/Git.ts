@@ -1,7 +1,6 @@
 import * as gitP from 'simple-git/promise';
 import { PushResult } from 'simple-git';
 import * as O from 'fp-ts/Option';
-import { BeehiveArgs } from '../args/BeehiveArgs';
 import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
@@ -71,16 +70,16 @@ const dryRunMessage = async (dir: string, git: SimpleGit): Promise<string> => {
   return `dry-run - not pushing. To complete, push "${curBranch}" branch from ${dir}`;
 };
 
-export const pushNewBranchUnlessDryRun = async (fc: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
-  if (fc.dryRun) {
+export const pushNewBranchUnlessDryRun = async (dir: string, git: SimpleGit, dryRun: boolean): Promise<void> => {
+  if (dryRun) {
     console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
     await pushNewBranch(git);
   }
 };
-export const pushUnlessDryRun = async (args: BeehiveArgs, dir: string, git: SimpleGit): Promise<void> => {
-  if (args.dryRun) {
+export const pushUnlessDryRun = async (dir: string, git: SimpleGit, dryRun: boolean): Promise<void> => {
+  if (dryRun) {
     console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
