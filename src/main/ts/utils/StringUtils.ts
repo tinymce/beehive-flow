@@ -3,4 +3,4 @@
  * @param s
  */
 export const showStringOrUndefined = (s: string | undefined): string =>
-  s === undefined ? 'undefined' : '"' + s.replace('"', '\\"') + '"';
+  s === undefined ? 'undefined' : '"' + s.replace(/"/g, '\\"') + '"';
