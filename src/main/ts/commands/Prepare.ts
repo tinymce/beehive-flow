@@ -55,23 +55,23 @@ const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJ
   return newMainVersion;
 };
 
-const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, dir: string, bd: BranchDetails, fc: PrepareArgs): Promise<void> => {
+const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, dir: string, bd: BranchDetails, args: PrepareArgs): Promise<void> => {
   console.log(`Creating ${releaseBranchName} branch`);
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
   await updatePackageJsonFileForReleaseBranch(bd.version, bd.packageJson, bd.packageJsonFile);
   await git.add([ buildPropertiesFile, bd.packageJsonFile ]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
-  await Git.pushNewBranchUnlessDryRun(fc, dir, git);
+  await Git.pushNewBranchUnlessDryRun(args, dir, git);
 };
 
-const updateMainBranch = async (mainBranch: string, git: SimpleGit, bd: BranchDetails, fc: PrepareArgs, dir: string): Promise<void> => {
+const updateMainBranch = async (mainBranch: string, git: SimpleGit, bd: BranchDetails, args: PrepareArgs, dir: string): Promise<void> => {
   console.log(`Updating ${mainBranch} branch`);
   await git.checkout(mainBranch);
   await updatePackageJsonFileForMainBranch(bd.version, bd.packageJson, bd.packageJsonFile);
   await git.add(bd.packageJsonFile);
   await git.commit(`Updating version`);
-  await Git.pushUnlessDryRun(fc, dir, git);
+  await Git.pushUnlessDryRun(args, dir, git);
 };
 
 export const prepare = async (args: PrepareArgs): Promise<void> => {
@@ -81,14 +81,14 @@ export const prepare = async (args: PrepareArgs): Promise<void> => {
 
   const mainBranch = await Git.checkoutMainBranch(git);
 
-  const r = await getBranchDetails(dir);
-  if (r.branchState !== BranchState.Main) {
+  const branchDetails = await getBranchDetails(dir);
+  if (branchDetails.branchState !== BranchState.Main) {
     return PromiseUtils.fail('main branch not in correct state.');
   }
 
-  const releaseBranchName = getReleaseBranchName(r.version);
+  const releaseBranchName = getReleaseBranchName(branchDetails.version);
 
   await Git.branchShouldNotExist(git, releaseBranchName);
-  await createReleaseBranch(releaseBranchName, git, dir, r, args);
-  await updateMainBranch(mainBranch, git, r, args, dir);
+  await createReleaseBranch(releaseBranchName, git, dir, branchDetails, args);
+  await updateMainBranch(mainBranch, git, branchDetails, args, dir);
 };

@@ -22,17 +22,17 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   const rbn = getReleaseBranchName(args.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await getBranchDetails(dir);
-  if (r.branchState !== BranchState.ReleaseCandidate) {
+  const branchDetails = await getBranchDetails(dir);
+  if (branchDetails.branchState !== BranchState.ReleaseCandidate) {
     return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
   }
 
-  const newVersion = updateVersion(r.version);
-  console.log(`Updating version from ${versionToString(r.version)} to ${versionToString(newVersion)}`);
+  const newVersion = updateVersion(branchDetails.version);
+  console.log(`Updating version from ${versionToString(branchDetails.version)} to ${versionToString(newVersion)}`);
 
-  await PackageJson.writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
+  await PackageJson.writePackageJsonFileWithNewVersion(branchDetails.packageJson, newVersion, branchDetails.packageJsonFile);
 
-  await git.add(r.packageJsonFile);
+  await git.add(branchDetails.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');
 
   await Git.pushUnlessDryRun(args, dir, git);
