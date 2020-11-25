@@ -53,21 +53,17 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
     return O.some(BranchType.Main);
   } else {
     const parts = branchName.split('/');
-    if (parts.length === 0) {
-      return O.none;
-    } else {
-      switch (parts[0]) {
-        case 'feature':
-          return O.some(BranchType.Feature);
-        case 'hotfix':
-          return O.some(BranchType.Hotfix);
-        case 'spike':
-          return O.some(BranchType.Spike);
-        case 'release':
-          return O.some(BranchType.Release);
-        default:
-          return O.none;
-      }
+    switch (parts[0]) {
+      case 'feature':
+        return O.some(BranchType.Feature);
+      case 'hotfix':
+        return O.some(BranchType.Hotfix);
+      case 'spike':
+        return O.some(BranchType.Spike);
+      case 'release':
+        return O.some(BranchType.Release);
+      default:
+        return O.none;
     }
   }
 };
