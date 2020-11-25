@@ -16,11 +16,11 @@ type PackageJson = PackageJson.PackageJson;
 export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): string =>
   `release/${major}.${minor}`;
 
-export enum BranchType {
+export const enum BranchType {
   Main, Feature, Hotfix, Spike, Release
 }
 
-export enum BranchState {
+export const enum BranchState {
   Main, Feature, Hotfix, Spike, ReleaseReady, ReleaseCandidate
 }
 
