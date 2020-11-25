@@ -1,15 +1,12 @@
 import * as gitP from 'simple-git/promise';
 import { SimpleGit } from 'simple-git';
 import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
-import * as Version from '../core/Version';
+import { Version, versionToString } from '../core/Version';
 import * as Git from '../utils/Git';
 import { BranchState, getReleaseBranchName, inspectRepo } from '../core/BranchLogic';
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { releaseCandidate } from '../core/PreRelease';
-
-type Version = Version.Version;
-const { versionToString } = Version;
 
 export const updateVersion = (version: Version): Version => ({
   major: version.major,
