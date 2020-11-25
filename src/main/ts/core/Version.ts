@@ -1,35 +1,19 @@
-import { Either, left, right } from 'fp-ts/Either';
-import { impossible } from './Impossible';
+import * as PromiseUtils from '../utils/PromiseUtils';
 
-export interface ReleaseVersion {
-  readonly kind: 'ReleaseVersion';
+export interface Version {
   readonly major: number;
   readonly minor: number;
   readonly patch: number;
+  readonly preRelease?: string;
+  readonly buildMetaData?: string;
 }
 
-export interface PreReleaseVersion {
-  readonly kind: 'PreReleaseVersion';
+export interface MajorMinorVersion {
   readonly major: number;
   readonly minor: number;
-  readonly patch: number;
-  readonly preRelease: string;
 }
 
-export type Version = ReleaseVersion | PreReleaseVersion;
-
-export const releaseVersion = (major: number, minor: number, patch: number): ReleaseVersion => ({
-  kind: 'ReleaseVersion',
-  major, minor, patch
-});
-
-export const preReleaseVersion = (major: number, minor: number, patch: number, preRelease: string): PreReleaseVersion => ({
-  kind: 'PreReleaseVersion',
-  major, minor, patch, preRelease
-});
-
-// TODO: capture the "build metadata" in the semver spec
-export const parseVersion = (input: string): Either<string, Version> => {
+export const parseVersion = async (input: string): Promise<Version> => {
   // based on https://semver.org/
   // eslint-disable-next-line max-len
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
@@ -37,7 +21,7 @@ export const parseVersion = (input: string): Either<string, Version> => {
   const r = regexp.exec(input);
 
   if (r === null || r.groups === undefined) {
-    return left('Could not parse version string');
+    return PromiseUtils.fail('Could not parse version string');
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
@@ -45,35 +29,36 @@ export const parseVersion = (input: string): Either<string, Version> => {
     const minor = parseInt(g.minor, 10);
     const patch = parseInt(g.patch, 10);
     const preRelease = r.groups.prerelease;
+    const buildMetaData = r.groups.buildmetadata;
 
-    const v = preRelease === undefined
-      ? releaseVersion(major, minor, patch)
-      : preReleaseVersion(major, minor, patch, preRelease);
-    return right(v);
+    return {
+      major,
+      minor,
+      patch,
+      preRelease,
+      buildMetaData
+    };
   }
 };
 
-
-// TODO: Test
-export const foldVersion = <T> (v: Version, ifRelease: (r: ReleaseVersion) => T, ifPreRelease: (r: PreReleaseVersion) => T): T => {
-  switch (v.kind) {
-    case 'ReleaseVersion':
-      return ifRelease(v);
-    case 'PreReleaseVersion':
-      return ifPreRelease(v);
-    default:
-      return impossible(v);
+export const parseMajorMinorVersion = async (input: string): Promise<MajorMinorVersion> => {
+  const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;
+  const r = regexp.exec(input);
+  if (r === null || r.groups === undefined) {
+    return PromiseUtils.fail('Could not parse major.minor version string');
+  } else {
+    const g = r.groups;
+    const major = parseInt(g.major, 10);
+    const minor = parseInt(g.minor, 10);
+    return { major, minor };
   }
 };
 
-// TODO: Test
-export const versionToString = (v: Version): string =>
-  foldVersion(
-    v,
-    (r) => [ r.major, r.minor, r.patch ].join('.'),
-    (r) => [ r.major, r.minor, r.patch ].join('.') + '-' + r.preRelease
-  );
+export const majorMinorVersionToString = (v: MajorMinorVersion): string =>
+  `${v.major}.${v.minor}`;
 
-// TODO: Test
-export const releaseBranchName = (v: Version): string =>
-  `release/${v.major}.${v.minor}`;
+export const versionToString = (v: Version): string => {
+  const preBit = v.preRelease === undefined ? '' : '-' + v.preRelease;
+  const metaBit = v.buildMetaData === undefined ? '' : '+' + v.buildMetaData;
+  return [ v.major, v.minor, v.patch ].join('.') + preBit + metaBit;
+};
