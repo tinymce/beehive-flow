@@ -56,5 +56,5 @@ export const stamp = async (_fc: StampArgs): Promise<void> => {
   const newVersion = chooseNewVersion(r.branchState, r.version, gitSha, Date.now());
   await writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
 
-  console.log('Note: this command does not commit changes to package.json.');
+  console.log('Note: changes have been made to package.json but they have not been committed.');
 };
