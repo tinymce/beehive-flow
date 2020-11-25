@@ -7,12 +7,11 @@ import * as PackageJson from '../core/PackageJson';
 import { BranchState, BranchDetails, getBranchDetails, getReleaseBranchName } from '../core/BranchLogic';
 import * as Files from '../utils/Files';
 import { PrepareArgs } from '../args/BeehiveArgs';
-import * as Version from '../core/Version';
+import { Version } from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Prerelease from '../core/PreRelease';
 
 type PackageJson = PackageJson.PackageJson;
-type Version = Version.Version;
 
 const writeBuildPropertiesFile = async (dir: string, releaseBranchName: string): Promise<string> => {
   const buildPropertiesFile = path.resolve(dir, 'build.properties');
@@ -62,7 +61,7 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
   await updatePackageJsonFileForReleaseBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
   await git.add([ buildPropertiesFile, branchDetails.packageJsonFile ]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
-  await Git.pushNewBranchUnlessDryRun(dir, git, fc.dryRun);
+  await Git.pushNewBranchUnlessDryRun(dir, git, args.dryRun);
 };
 
 const updateMainBranch = async (mainBranch: string, git: SimpleGit, branchDetails: BranchDetails, args: PrepareArgs, dir: string): Promise<void> => {

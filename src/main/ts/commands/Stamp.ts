@@ -52,9 +52,9 @@ export const stamp = async (args: StampArgs): Promise<void> => {
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);
 
-  const r = await getBranchDetails(dir);
-  const newVersion = chooseNewVersion(r.branchState, r.version, gitSha, Date.now());
-  await writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
+  const branchDetails = await getBranchDetails(dir);
+  const newVersion = chooseNewVersion(branchDetails.branchState, branchDetails.version, gitSha, Date.now());
+  await writePackageJsonFileWithNewVersion(branchDetails.packageJson, newVersion, branchDetails.packageJsonFile);
 
-  console.log('Note: this command does not commit changes to package.json.');
+  console.log('Note: changes have been made to package.json but they have not been committed.');
 };

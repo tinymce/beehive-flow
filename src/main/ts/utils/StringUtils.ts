@@ -5,7 +5,7 @@
  * @param s
  */
 export const showStringOrUndefined = (s: string | undefined): string =>
-  s === undefined ? 'undefined' : '"' + s.replace('"', '\\"') + '"';
+  s === undefined ? 'undefined' : '"' + s.replace(/"/g, '\\"') + '"';
 
 export const removeLeading = (str: string, prefix: string): string =>
   str.startsWith(prefix) ? str.substring(prefix.length) : str;

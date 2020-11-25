@@ -139,6 +139,6 @@ describe('BranchLogic', () => {
       await assert.becomes(getBranchDetails(dir), expected);
     });
 
-    // TODO: test other states
+    // TODO TINY-6707 test other states
   });
 });
