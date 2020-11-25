@@ -7,32 +7,15 @@ import * as BeehiveArgs from './BeehiveArgs';
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 type Option<A> = O.Option<A>;
 
-const prepDescription =
-  `Branches main as releases/x.y and tweaks versions. 
-  Run this command when you are preparing to stabilize "main" as a new release.
-  Operates on a fresh clone.`;
+const prepDescription = 'Branches main as releases/x.y and tweaks versions';
 
-const releaseDescription =
-  `Changes version in release/x.y branch to a release version. 
-  Run this when you are ready to release.
-  Operates on a fresh clone.`;
+const releaseDescription = 'Sets release/x.y branch to a release version.';
 
-const advanceDescription =
-  `Changes version in release/x.y branch to the next prerelease version. 
-  Run this once you have completed a release.
-  Operates on a fresh clone.`;
+const advanceDescription = 'Advances release/x.y branch to the next prerelease version.';
 
-const advanceCiDescription =
-  `Changes version in release/x.y branch to the next prerelease version, 
-  but only if on a release branch in release state.
-  Operates on current directory.
-  Suitable for running at the end of a CI build.`;
+const advanceCiDescription = 'Advances current checkout to the next prerelease version, if required.';
 
-const stampDescription =
-  `Changes version in current branch to add the git sha to the prerelease version, if applicable.
-  Run this at the start of a CI build. 
-  Operates on current directory.
-  You should not commit the changes this command makes.`;
+const stampDescription = 'Adds metadata to version in current checkout';
 
 const gitUrlOptions: yargs.Options = {
   type: 'string',
