@@ -55,21 +55,21 @@ const updatePackageJsonFileForMainBranch = async (version: Version, pj: PackageJ
   return newMainVersion;
 };
 
-const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, dir: string, bd: BranchDetails, args: PrepareArgs): Promise<void> => {
+const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, dir: string, branchDetails: BranchDetails, args: PrepareArgs): Promise<void> => {
   console.log(`Creating ${releaseBranchName} branch`);
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
-  await updatePackageJsonFileForReleaseBranch(bd.version, bd.packageJson, bd.packageJsonFile);
-  await git.add([ buildPropertiesFile, bd.packageJsonFile ]);
+  await updatePackageJsonFileForReleaseBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
+  await git.add([ buildPropertiesFile, branchDetails.packageJsonFile ]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
   await Git.pushNewBranchUnlessDryRun(args, dir, git);
 };
 
-const updateMainBranch = async (mainBranch: string, git: SimpleGit, bd: BranchDetails, args: PrepareArgs, dir: string): Promise<void> => {
+const updateMainBranch = async (mainBranch: string, git: SimpleGit, branchDetails: BranchDetails, args: PrepareArgs, dir: string): Promise<void> => {
   console.log(`Updating ${mainBranch} branch`);
   await git.checkout(mainBranch);
-  await updatePackageJsonFileForMainBranch(bd.version, bd.packageJson, bd.packageJsonFile);
-  await git.add(bd.packageJsonFile);
+  await updatePackageJsonFileForMainBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
+  await git.add(branchDetails.packageJsonFile);
   await git.commit(`Updating version`);
   await Git.pushUnlessDryRun(args, dir, git);
 };
