@@ -51,6 +51,9 @@ const tempOptions: yargs.Options = {
   description: 'Temp folder for git checkout. If not specified, a system temp folder is used.'
 };
 
+const getColumns = (): number =>
+  Math.min(120, yargs.terminalWidth());
+
 const argParser =
   yargs
     .scriptName('beehive-flow')
@@ -91,7 +94,7 @@ const argParser =
       stampDescription
     )
     .demandCommand(1)
-    .wrap(120)
+    .wrap(getColumns())
     .strict()
     .exitProcess(false)
     .parserConfiguration({
