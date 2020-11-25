@@ -5,7 +5,7 @@ import * as Git from '../utils/Git';
 import * as Version from '../core/Version';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PreRelease from '../core/PreRelease';
-import { BranchState, inspectRepo } from '../core/BranchLogic';
+import { BranchState, getBranchDetails } from '../core/BranchLogic';
 
 type Version = Version.Version;
 
@@ -52,9 +52,9 @@ export const stamp = async (_args: StampArgs): Promise<void> => {
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);
 
-  const r = await inspectRepo(dir);
-  const newVersion = chooseNewVersion(r.branchState, r.version, gitSha, Date.now());
-  await writePackageJsonFileWithNewVersion(r.packageJson, newVersion, r.packageJsonFile);
+  const branchDetails = await getBranchDetails(dir);
+  const newVersion = chooseNewVersion(branchDetails.branchState, branchDetails.version, gitSha, Date.now());
+  await writePackageJsonFileWithNewVersion(branchDetails.packageJson, newVersion, branchDetails.packageJsonFile);
 
   console.log('Note: changes have been made to package.json but they have not been committed.');
 };

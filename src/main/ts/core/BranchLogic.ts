@@ -72,7 +72,7 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
   }
 };
 
-export const inspectRepo = async (dir: string): Promise<BranchDetails> => {
+export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const fail = PromiseUtils.fail;
   const git = gitP(dir);
 
