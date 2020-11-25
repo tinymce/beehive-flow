@@ -47,7 +47,7 @@ export const chooseNewVersion = (branchState: BranchState, version: Version, git
   }
 };
 
-export const stamp = async (_fc: StampArgs): Promise<void> => {
+export const stamp = async (_args: StampArgs): Promise<void> => {
   const dir = process.cwd();
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);
