@@ -1,4 +1,4 @@
-import * as cp from 'child_process';
+import * as cs from 'cross-spawn-promise';
 import { gitP } from 'simple-git';
 import { PublishArgs } from '../args/BeehiveArgs';
 import { getBranchDetails } from '../core/BranchLogic';
@@ -15,11 +15,11 @@ export const publish = async (args: PublishArgs): Promise<void> => {
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
 
-  const publishCmd = [ 'npm', 'publish', '--tag', mainTag, ...dryRunArgs ].join(' ');
+  const publishCmd = [ 'publish', '--tag', mainTag, ...dryRunArgs ];
 
-  console.log(publishCmd);
+  console.log([ 'npm', ...publishCmd ].join(' '));
 
-  cp.execSync(publishCmd, { stdio: 'inherit', cwd: dir });
+  await cs('npm', publishCmd, { stdio: 'inherit', cwd: dir });
 
   /*
     Yes, we're setting the mainTag again in this loop.
@@ -33,8 +33,9 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   } else {
     for (const t of tags) {
       const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
-      const tagCmd = [ 'npm', 'dist-tag', 'add', fullPackageName, t ].join(' ');
-      cp.execSync(tagCmd, { stdio: 'inherit', cwd: dir });
+      const tagCmd = [ 'dist-tag', 'add', fullPackageName, t ];
+      console.log([ 'npm', ...tagCmd ].join(' '));
+      await cs('npm', tagCmd, { stdio: 'inherit', cwd: dir });
     }
   }
 };

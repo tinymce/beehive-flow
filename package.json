@@ -5,6 +5,7 @@
   "repository": "git@github.com:tinymce/beehive-cli.git",
   "license": "MIT",
   "dependencies": {
+    "cross-spawn-promise": "^0.10.2",
     "fp-ts": "^2.8.5",
     "luxon": "^1.25.0",
     "properties-reader": "^2.1.1",
