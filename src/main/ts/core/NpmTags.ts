@@ -6,7 +6,6 @@ import { BranchState, versionFromReleaseBranch, getReleaseBranchName } from './B
 import * as Version from './Version';
 
 export const pickTags = async (branchName: string, branchState: BranchState, getBranches: () => Promise<string[]>): Promise<[string, string?]> => {
-  // ASSUMPTION: all valid git branch names are valid npm tags
   const mainTag = branchName;
 
   const tagsForReleaseReadyState = async (): Promise<[string, string?]> => {
