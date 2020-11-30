@@ -11,10 +11,10 @@ export const pickTags = async (branchName: string, branchState: BranchState, get
   const tagsForReleaseReadyState = async (): Promise<[string, string?]> => {
     const branches = await getBranches();
     const versions = await PromiseUtils.filterMap(branches, versionFromReleaseBranch);
-    const og = ArrayUtils.greatest(versions, Version.compareMajorMinorVersions);
-    const g = await PromiseUtils.optionToPromise(og, 'Could not find any release branches with valid names.');
-    const bn = getReleaseBranchName(g);
-    return branchName === bn ? [ mainTag, 'latest' ] : [ mainTag ];
+    const greatestOpt = ArrayUtils.greatest(versions, Version.compareMajorMinorVersions);
+    const greatest = await PromiseUtils.optionToPromise(greatestOpt, 'Could not find any release branches with valid names.');
+    const releaseBranchName = getReleaseBranchName(greatest);
+    return branchName === releaseBranchName ? [ mainTag, 'latest' ] : [ mainTag ];
   };
 
   return branchState === BranchState.ReleaseReady ? await tagsForReleaseReadyState() : [ mainTag ];
