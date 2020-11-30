@@ -2,7 +2,7 @@ import * as O from 'fp-ts/Option';
 
 type Option<A> = O.Option<A>;
 
-export const forEachAsync = async <A> (o: Option<A>, f: (a: A) => Promise<void>): Promise<void> => {
+export const eachAsync = async <A> (o: Option<A>, f: (a: A) => Promise<void>): Promise<void> => {
   if (o._tag === 'Some') {
     return f(o.value);
   }
