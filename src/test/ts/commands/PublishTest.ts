@@ -43,8 +43,11 @@ web:
   await Files.writeFile(configFile, config);
 
   const port = await getPort();
-  const verdaccio = cp.spawn('yarn', [ 'verdaccio', '--listen', String(port), '--config', configFile ], { stdio: 'inherit' });
-  return { port, verdaccio };
+  const hostAndPort = `127.0.0.1:${port}`;
+  const verdaccio = cp.spawn('yarn', [ 'verdaccio', '--listen', hostAndPort, '--config', configFile ], { stdio: 'inherit' });
+
+  const address = `http://${hostAndPort}`;
+  return { port, verdaccio, address };
 };
 
 const publish = async (dir: string, dryRun: boolean): Promise<void> => {
@@ -52,8 +55,8 @@ const publish = async (dir: string, dryRun: boolean): Promise<void> => {
   await beehiveFlow([ 'publish', '--working-dir', dir, ...dryRunArgs ]);
 };
 
-const writeNpmrc = async (port: number, dir: string): Promise<string> => {
-  const npmrc = `@beehive-test:registry=http://0.0.0.0:${port}/`;
+const writeNpmrc = async (address: string, dir: string): Promise<string> => {
+  const npmrc = `@beehive-test:registry=${address}`;
   const npmrcFile = path.join(dir, '.npmrc');
   await Files.writeFile(npmrcFile, npmrc);
   return npmrcFile;
@@ -61,7 +64,7 @@ const writeNpmrc = async (port: number, dir: string): Promise<string> => {
 
 describe('Publish', () => {
   it('publishes', async () => {
-    const { port, verdaccio } = await startVerdaccio();
+    const { verdaccio, address } = await startVerdaccio();
 
     try {
       const featureBranch = 'feature/TINY-BLAH';
@@ -71,7 +74,7 @@ describe('Publish', () => {
       const { dir, git } = await Git.cloneInTempFolder(hub.dir);
       await Git.checkoutNewBranch(git, featureBranch);
 
-      const npmrcFile = await writeNpmrc(port, dir);
+      const npmrcFile = await writeNpmrc(address, dir);
 
       const pjFile = path.join(dir, 'package.json');
 
@@ -81,7 +84,7 @@ describe('Publish', () => {
           "name": "@beehive-test/beehive-test",
           "version": "${version}",
           "publishConfig": {
-            "@beehive-test:registry": "http://0.0.0.0:${port}/"
+            "@beehive-test:registry": "${address}"
           }
         }`;
         await Files.writeFile(pjFile, pj);
