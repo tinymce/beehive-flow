@@ -42,7 +42,7 @@ export const field = async (o: JsonRecord, k: string): Promise<Json> =>
   PromiseUtils.optionToPromise(ObjUtils.lookup(o, k));
 
 const mustBeString = (k: string) => async (j: Json): Promise<string> =>
-  Type.isString(j) ? j : PromiseUtils.fail(`Expected key: ${k} to be a string`);
+  Type.isString(j) ? j : PromiseUtils.fail(`Expected value for key "${k}" to be a string`);
 
 export const stringField = async (o: JsonRecord, k: string): Promise<string> => {
   const f = await field(o, k);
