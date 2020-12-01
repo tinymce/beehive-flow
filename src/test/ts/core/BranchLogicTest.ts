@@ -39,7 +39,7 @@ describe('BranchLogic', () => {
     });
   });
 
-  describe('inspectRepo', () => {
+  describe('getBranchDetails', () => {
 
     const setup = async (branchName: string, sVersion: string) => {
       const version = await Version.parseVersion(sVersion);
@@ -51,6 +51,7 @@ describe('BranchLogic', () => {
       const packageJsonFile = path.join(dir, 'package.json');
 
       const packageJson: PackageJson = {
+        name: '@beehive-test/dummypackage',
         version: O.some(version),
         other: {}
       };

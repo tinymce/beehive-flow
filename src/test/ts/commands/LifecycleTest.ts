@@ -9,14 +9,13 @@ import * as Parser from '../../../main/ts/args/Parser';
 import * as Dispatch from '../../../main/ts/args/Dispatch';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
+import { eachAsync } from '../../../main/ts/utils/OptionUtils';
 
 const assert = chai.use(chaiAsPromised).assert;
 
 const beehiveFlow = async (args: string[]): Promise<void> => {
   const a = await Parser.parseArgs(args);
-  if (a._tag === 'Some') {
-    await Dispatch.dispatch(a.value);
-  }
+  await eachAsync(a, Dispatch.dispatch);
 };
 
 describe('Lifecycle', () => {
@@ -27,6 +26,7 @@ describe('Lifecycle', () => {
     await Git.checkoutNewBranch(git, 'main');
     await Files.writeFile(path.join(dir, 'package.json'), `
     {
+      "name": "@beehive-test/lifecycle-test",
       "version": "0.1.0-alpha"
     }
     `);

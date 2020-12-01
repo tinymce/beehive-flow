@@ -5,6 +5,7 @@ import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
 import * as PromiseUtils from './PromiseUtils';
+import * as StringUtils from './StringUtils';
 
 type SimpleGit = gitP.SimpleGit;
 type Option<A> = O.Option<A>;
@@ -52,6 +53,13 @@ export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
 export const push = async (git: SimpleGit): Promise<PushResult> =>
   git.push(ASSUMED_REMOTE);
 
+export const remoteBranchNames = async (git: SimpleGit): Promise<string[]> => {
+  const rbs = await git.branch();
+  return rbs.all
+    .filter((r) => r.startsWith('remotes/origin/'))
+    .map((r) => StringUtils.removeLeading(r, 'remotes/origin/'));
+};
+
 export const doesRemoteBranchExist = async (git: SimpleGit, branchName: string): Promise<boolean> => {
   const b = await git.branch();
   return ObjUtils.hasKey(b.branches, 'remotes/origin/' + branchName);
@@ -85,14 +93,14 @@ export const branchShouldNotExist = async (git: SimpleGit, branchName: string): 
   }
 };
 
-export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
-  checkout(git, mainBranchName);
-
 export const checkout = async (git: SimpleGit, branchName: string): Promise<string> => {
   console.log(`Checking out branch: ${branchName}`);
   await git.checkout(branchName);
   return branchName;
 };
+
+export const checkoutMainBranch = (git: SimpleGit): Promise<string> =>
+  checkout(git, mainBranchName);
 
 export const detectGitUrl = async (g: SimpleGit): Promise<string> => {
   const remotes = await g.getRemotes(true);
@@ -115,10 +123,5 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
   return await detectGitUrl(g);
 };
 
-export const detectGitUrlCwd = async (): Promise<string> => {
-  const s = process.cwd();
-  return await detectGitUrlFromDir(s);
-};
-
-export const resolveGitUrl = async (gitUrlArg: Option<string>): Promise<string> =>
-  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlCwd();
+export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
+  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);

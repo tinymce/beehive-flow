@@ -59,8 +59,7 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
   await updatePackageJsonFileForReleaseBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
-  await git.add(buildPropertiesFile);
-  await git.add(branchDetails.packageJsonFile);
+  await git.add([ buildPropertiesFile, branchDetails.packageJsonFile ]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
   await Git.pushNewBranchUnlessDryRun(dir, git, args.dryRun);
 };
@@ -75,7 +74,7 @@ const updateMainBranch = async (mainBranch: string, git: SimpleGit, branchDetail
 };
 
 export const prepare = async (args: PrepareArgs): Promise<void> => {
-  const gitUrl = await Git.resolveGitUrl(args.gitUrl);
+  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 

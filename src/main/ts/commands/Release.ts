@@ -15,7 +15,7 @@ export const updateVersion = (version: Version): Version => ({
 });
 
 export const release = async (args: ReleaseArgs): Promise<void> => {
-  const gitUrl = await Git.resolveGitUrl(args.gitUrl);
+  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 

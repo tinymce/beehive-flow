@@ -1,5 +1,6 @@
 import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
+import * as EitherUtils from './EitherUtils';
 
 type Either<R, A> = E.Either<R, A>;
 
@@ -22,3 +23,12 @@ export const fail = <A>(error?: unknown): Promise<A> =>
   new Promise(((resolve, reject) => {
     reject(error);
   }));
+
+export const tryPromise = <A> (p: Promise<A>): Promise<Either<unknown, A>> =>
+  p.then(E.right, E.left);
+
+export const parMap = <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
+  Promise.all(input.map(p));
+
+export const filterMap = async <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
+  parMap(input, (a) => tryPromise(p(a))).then(EitherUtils.rights);

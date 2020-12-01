@@ -2,15 +2,14 @@
 
 import * as Parser from './args/Parser';
 import * as Dispatch from './args/Dispatch';
+import { eachAsync } from './utils/OptionUtils';
 
 const main = async () => {
   const actualArgs = await Parser.parseProcessArgs();
-  if (actualArgs._tag === 'Some') {
-    await Dispatch.dispatch(actualArgs.value);
-  }
+  await eachAsync(actualArgs, Dispatch.dispatch);
 };
 
-main().catch((e: any) => {
+main().catch((e: unknown) => {
   const msg = e instanceof Error ? e.message : String(e);
   console.error(msg);
   process.exit(1);

@@ -1,4 +1,5 @@
 import * as PromiseUtils from '../utils/PromiseUtils';
+import * as ArrayUtils from '../utils/ArrayUtils';
 
 export interface Version {
   readonly major: number;
@@ -62,3 +63,9 @@ export const versionToString = (v: Version): string => {
   const metaBit = v.buildMetaData === undefined ? '' : '+' + v.buildMetaData;
   return [ v.major, v.minor, v.patch ].join('.') + preBit + metaBit;
 };
+
+export const compareMajorMinorVersions = (a: MajorMinorVersion, b: MajorMinorVersion): number =>
+  a.major !== b.major ? a.major - b.major : a.minor - b.minor;
+
+export const sortMajorMinorVersions = (vs: MajorMinorVersion[]): MajorMinorVersion[] =>
+  ArrayUtils.sort(vs, compareMajorMinorVersions);

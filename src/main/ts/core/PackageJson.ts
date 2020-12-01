@@ -9,6 +9,7 @@ type Version = Version.Version;
 type JsonRecord = E.JsonRecord;
 
 export interface PackageJson {
+  readonly name: string;
   readonly version: Option<Version>;
   readonly other: Omit<JsonRecord, 'version'>;
 }
@@ -16,15 +17,21 @@ export interface PackageJson {
 const parsePackageJsonVersion = (pj: JsonRecord): Promise<Option<Version>> =>
   JsonUtils.optionalStringFieldSuchThat(pj, 'version', Version.parseVersion);
 
+// TODO: make sure name is valid (inc no spaces)
+const parsePackageJsonName = (pj: JsonRecord): Promise<string> =>
+  JsonUtils.stringField(pj, 'name');
+
 export const pjInFolder = (folder: string): string =>
   path.join(folder, 'package.json');
 
 const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
   const parsedVersion = await parsePackageJsonVersion(j);
+  const parsedName = await parsePackageJsonName(j);
 
-  const { version, ...other } = j;
+  const { version, name, ...other } = j;
 
   return {
+    name: parsedName,
     version: parsedVersion,
     other
   };
@@ -38,7 +45,8 @@ export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJso
 
 export const toJson = (pj: PackageJson): JsonRecord => ({
   ...pj.other,
-  ...JsonUtils.optionalToJsonRecord('version', pj.version, Version.versionToString)
+  ...JsonUtils.optionalToJsonRecord('version', pj.version, Version.versionToString),
+  name: pj.name
 });
 
 export const writePackageJsonFile = (file: string, pj: PackageJson): Promise<void> =>

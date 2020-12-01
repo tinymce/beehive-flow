@@ -27,22 +27,22 @@ const go = async (version: Version, pj: PackageJson, pjFile: string, git: Simple
 };
 
 export const advance = async (args: AdvanceArgs): Promise<void> => {
-  const gitUrl = await Git.resolveGitUrl(args.gitUrl);
+  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
   const rbn = getReleaseBranchName(args.majorMinorVersion);
   await Git.checkout(git, rbn);
 
-  const r = await getBranchDetails(dir);
-  if (r.branchState !== BranchState.ReleaseReady) {
+  const branchDetails = await getBranchDetails(dir);
+  if (branchDetails.branchState !== BranchState.ReleaseReady) {
     return PromiseUtils.fail('Branch is not in release ready state - can\'t advance. Check that the version is x.y.z with no suffix.');
   }
-  await go(r.version, r.packageJson, r.packageJsonFile, git, args, dir);
+  await go(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile, git, args, dir);
 };
 
 export const advanceCi = async (args: AdvanceCiArgs): Promise<void> => {
-  const dir = process.cwd();
+  const dir = args.workingDir;
 
   const branchDetails = await getBranchDetails(dir);
   if (branchDetails.branchState !== BranchState.ReleaseReady) {
