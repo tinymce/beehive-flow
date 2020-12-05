@@ -70,6 +70,9 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
   }
 };
 
+export const isValidPrerelease = (actual: string | undefined, expected: string): boolean =>
+  actual !== undefined && (actual === expected || actual.startsWith(`${expected}.`));
+
 export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const fail = PromiseUtils.fail;
   const git = gitP(dir);
@@ -97,8 +100,8 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const validateMainBranch = async (): Promise<BranchState.Main> => {
     if (version.patch !== 0) {
       return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
-    } else if (version.preRelease !== PreRelease.mainBranch) {
-      return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}", but is ${sPre}`);
+    } else if (!isValidPrerelease(version.preRelease, PreRelease.mainBranch)) {
+      return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}" or start with "${PreRelease.mainBranch}.", but is ${sPre}`);
     } else {
       return BranchState.Main;
     }
@@ -112,10 +115,11 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
       return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
     } else if (version.preRelease === undefined) {
       return BranchState.ReleaseReady;
-    } else if (version.preRelease === PreRelease.releaseCandidate) {
+    } else if (isValidPrerelease(version.preRelease, PreRelease.releaseCandidate)) {
       return BranchState.ReleaseCandidate;
     } else {
-      return fail(`${loc}: prerelease version part should be either "${PreRelease.releaseCandidate}" or not set, but it is "${sPre}"`);
+      const rc = PreRelease.releaseCandidate;
+      return fail(`${loc}: prerelease version part should be either "${rc}" or start with "${rc}." or not be set, but it is "${sPre}"`);
     }
   };
 
