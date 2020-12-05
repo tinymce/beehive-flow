@@ -32,3 +32,18 @@ export const parMap = <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]>
 
 export const filterMap = async <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
   parMap(input, (a) => tryPromise(p(a))).then(EitherUtils.rights);
+
+export const poll = async <B> (fn: () => Promise<B>, timeout: number, delay: number): Promise<B> => new Promise((resolve, reject) => {
+  const start = Date.now();
+  const check = () => {
+    fn().then(resolve, () => {
+      const now = Date.now();
+      if (now - start > timeout) {
+        reject(new Error('Timeout waiting for condition'));
+      } else {
+        setTimeout(check, delay);
+      }
+    });
+  };
+  check();
+});
