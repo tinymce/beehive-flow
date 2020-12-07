@@ -40,10 +40,11 @@ export const publish = async (args: PublishArgs): Promise<void> => {
        NPM registries can have a delay after publishing before the package is available.
        If we try and set other tags too early, it'll fail.
        So, retry for a while.
-       A 60s timeout was recommended by CloudSmith support.
+       A 60s timeout was recommended by CloudSmith support. Using 30s for now - might need to increase later.
+       In initial testing, CloudSmith packages seemed to be ok after about 4s.
        A side effect of this is that after `beehive-flow publish` is run, we can be sure the package is available
       */
-      await PromiseUtils.poll(() => cs('npm', tagCmd, { stdio: 'inherit', cwd: dir }), 60000, 1000);
+      await PromiseUtils.poll(() => cs('npm', tagCmd, { stdio: 'inherit', cwd: dir }), 30000, 3000);
     }
   }
 };
