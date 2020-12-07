@@ -114,7 +114,7 @@ describe('BranchLogic', () => {
       await assert.isRejected(getBranchDetails(dir));
     });
 
-    it('passes for main branch with p', async () => {
+    it('passes for main branch with prerelease version', async () => {
       const { dir } = await setup('main', '0.6.0+9nesste123.frog');
       await assert.isRejected(getBranchDetails(dir));
     });
