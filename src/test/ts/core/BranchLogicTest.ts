@@ -6,12 +6,7 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
 import {
-  BranchDetails,
-  BranchState,
-  BranchType,
-  getBranchDetails,
-  getReleaseBranchName,
-  versionFromReleaseBranch
+  BranchDetails, BranchState, BranchType, getBranchDetails, getReleaseBranchName, versionFromReleaseBranch
 } from '../../../main/ts/core/BranchLogic';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
