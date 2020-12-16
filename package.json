@@ -16,13 +16,11 @@
     "yargs": "^16.1.0"
   },
   "scripts": {
-    "beehive-flow": "yarn node -r 'ts-node/register' src/main/ts/Main.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
-    "testOnly": "yarn nyc mocha",
-    "buildTestOnly": "yarn build && yarn testOnly",
-    "test": "yarn build && yarn lint && yarn testOnly",
-    "prepublishOnly": "yarn build",
+    "test": "yarn nyc mocha",
+    "beehive-flow": "yarn node -r 'ts-node/register' src/main/ts/Main.ts",
+    "buildLintTest": "yarn build && yarn lint && yarn test",
     "buildAndInstall": "yarn build && yarn global add file:$PWD"
   },
   "devDependencies": {
