@@ -33,7 +33,7 @@ describe('Lifecycle', () => {
 
     await git.add('package.json');
     await git.commit('Initial');
-    await Git.pushExplicitAndSetUpstream(git);
+    await Git.push(git);
 
     const assertPjVersion = async (expected: string) => {
       const pj = await PackageJson.parsePackageJsonFileInFolder(dir);

@@ -17,7 +17,7 @@ const createBranch = async ({ dir, git }: TempGit, branchName: string): Promise<
   fs.writeFileSync(foofile, 'cat cat');
   await git.add(foofile);
   await git.commit('initial');
-  await Git.pushExplicitAndSetUpstream(git);
+  await Git.push(git);
 };
 
 describe('Git', () => {

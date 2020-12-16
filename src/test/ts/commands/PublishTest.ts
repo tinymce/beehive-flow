@@ -91,7 +91,7 @@ describe('Publish', () => {
         await Files.writeFile(pjFile, pjContents);
         await git.add([ npmrcFile, pjFile ]);
         await git.commit('commit');
-        await Git.pushExplicitAndSetUpstream(git);
+        await Git.push(git);
       };
 
       const go = async (version: string, dryRun: boolean) => {
