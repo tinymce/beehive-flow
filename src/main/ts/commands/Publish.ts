@@ -32,6 +32,8 @@ export const publish = async (args: PublishArgs): Promise<void> => {
     console.log('dry run - not tagging');
     console.log('Would have added tags: ', tags);
   } else {
+    console.log('Setting NPM tags.');
+    console.log('This will likely fail a few times, until the package is available in the registry - this is normal.');
     for (const t of tags) {
       const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
       const tagCmd = [ 'dist-tag', 'add', fullPackageName, t ];
