@@ -8,33 +8,41 @@ import * as PromiseUtils from '../../../main/ts/utils/PromiseUtils';
 const assert = chai.use(chaiAsPromised).assert;
 const succeed = PromiseUtils.succeed;
 
-const checkSimple = async (branchName: string, branchState: BranchState): Promise<void> => {
+const checkSimple = async (branchName: string, branchState: BranchState, branchTagName: string): Promise<void> => {
   await assert.becomes(
     NpmTags.pickTags(branchName, branchState, PromiseUtils.fail),
-    [ branchName ]
+    [ branchTagName ]
   );
 };
 
 describe('NpmTags', () => {
   describe('pickTags', () => {
-    it('uses the branch name for feature branches', () => checkSimple('feature/BLAH-123', BranchState.Feature));
-    it('uses the branch name for spike branches', () => checkSimple('spike/BLAH-123', BranchState.Spike));
-    it('uses the branch name for hotfix branches', () => checkSimple('hotfix/BLAH-123', BranchState.Hotfix));
-    it('uses the branch name for main branch', () => checkSimple('main', BranchState.ReleaseCandidate));
-    it('uses the branch name for rc state', () => checkSimple('hotfix/BLAH-123', BranchState.ReleaseCandidate));
+    it('uses the branch name for feature branches', () => checkSimple('feature/BLAH-123', BranchState.Feature, 'feature-BLAH-123'));
+    it('uses the branch name for spike branches', () => checkSimple('spike/BLAH-123', BranchState.Spike, 'spike-BLAH-123'));
+    it('uses the branch name for hotfix branches', () => checkSimple('hotfix/BLAH-123', BranchState.Hotfix, 'hotfix-BLAH-123'));
+    it('uses the branch name for main branch', () => checkSimple('main', BranchState.ReleaseCandidate, 'main'));
+    it('uses the branch name for rc state', () => checkSimple('hotfix/BLAH-123', BranchState.ReleaseCandidate, 'hotfix-BLAH-123'));
+
+    it('replaces sequences of characters other than alphanumeric/dot/underscore with dashes', () =>
+      checkSimple('hotfix/blah_32.7/b**@', BranchState.ReleaseCandidate, 'hotfix-blah_32.7-b-')
+    );
+
+    it('uses the branch name (replacing multiple slashes feature branches',
+      () => checkSimple('feature/BLAH/12/3', BranchState.Feature, 'feature-BLAH-12-3')
+    );
 
     it('uses the branch name for release ready state if not the latest release branch', async () => {
       await assert.becomes(
         NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, () => succeed([ 'release/1.3' ])),
-        [ 'release/1.2' ]
+        [ 'release-1.2' ]
       );
       await assert.becomes(
         NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, () => succeed([ 'release/1.2', 'release/1.3', 'main' ])),
-        [ 'release/1.2' ]
+        [ 'release-1.2' ]
       );
       await assert.becomes(
         NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, () => succeed([ 'release/2.0', 'feature/1.2' ])),
-        [ 'release/1.2' ]
+        [ 'release-1.2' ]
       );
     });
 
@@ -42,19 +50,19 @@ describe('NpmTags', () => {
       await assert.becomes(
         NpmTags.pickTags('release/6.7', BranchState.ReleaseReady,
           () => succeed([ 'main', 'frog', 'release/6.7', 'release/6.6', 'feature/1.2' ])),
-        [ 'release/6.7', 'latest' ]
+        [ 'release-6.7', 'latest' ]
       );
 
       await assert.becomes(
         NpmTags.pickTags('release/8.1', BranchState.ReleaseReady,
           () => succeed([ 'release/8.1', 'main', 'frog', 'release/6.7', 'release/8.0', 'release/6.6', 'feature/1.2' ])),
-        [ 'release/8.1', 'latest' ]
+        [ 'release-8.1', 'latest' ]
       );
 
       await assert.becomes(
         NpmTags.pickTags('release/8.1', BranchState.ReleaseReady,
           () => succeed([ 'main', 'frog', 'release/6.7', 'release/6.6', 'feature/1.2', 'release/8.1' ])),
-        [ 'release/8.1', 'latest' ]
+        [ 'release-8.1', 'latest' ]
       );
     });
 

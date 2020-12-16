@@ -5,8 +5,11 @@ import * as ArrayUtils from '../utils/ArrayUtils';
 import { BranchState, getReleaseBranchName, versionFromReleaseBranch } from './BranchLogic';
 import * as Version from './Version';
 
+const normalize = (branchName: string): string =>
+  branchName.replace(/[^\w.]+/g, '-');
+
 export const pickTags = async (branchName: string, branchState: BranchState, getBranches: () => Promise<string[]>): Promise<[string, string?]> => {
-  const mainTag = branchName;
+  const mainTag = normalize(branchName);
 
   if (branchState !== BranchState.ReleaseReady) {
     return [ mainTag ];

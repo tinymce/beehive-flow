@@ -1,6 +1,7 @@
 import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as EitherUtils from './EitherUtils';
+import * as Type from './Type';
 
 type Either<R, A> = E.Either<R, A>;
 
@@ -21,8 +22,11 @@ export const succeed = <A>(a: A): Promise<A> =>
 
 export const fail = <A>(error?: unknown): Promise<A> =>
   new Promise(((resolve, reject) => {
-    reject(error);
+    reject(errorify(error));
   }));
+
+const errorify = (error?: unknown): unknown =>
+  Type.isString(error) ? new Error(error) : error;
 
 export const tryPromise = <A> (p: Promise<A>): Promise<Either<unknown, A>> =>
   p.then(E.right, E.left);
