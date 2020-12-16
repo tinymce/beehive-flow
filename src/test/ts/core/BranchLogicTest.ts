@@ -5,7 +5,9 @@ import fc from 'fast-check';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
-import { BranchDetails, BranchState, BranchType, getReleaseBranchName, versionFromReleaseBranch, getBranchDetails } from '../../../main/ts/core/BranchLogic';
+import {
+  BranchDetails, BranchState, BranchType, getBranchDetails, getReleaseBranchName, versionFromReleaseBranch
+} from '../../../main/ts/core/BranchLogic';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
@@ -74,20 +76,28 @@ describe('BranchLogic', () => {
       await assert.isRejected(getBranchDetails(subbie));
     });
 
-    it('detects valid main branch', async () => {
-      const { dir, packageJsonFile, version, packageJson } = await setup('main', '0.6.0-alpha');
+    const check = async (currentBranch: string, sVersion: string, branchType: BranchType, branchState: BranchState): Promise<void> => {
+      const { dir, packageJsonFile, version, packageJson } = await setup(currentBranch, sVersion);
 
       const expected: BranchDetails = {
         packageJsonFile,
         packageJson,
         version,
-        currentBranch: 'main',
-        branchType: BranchType.Main,
-        branchState: BranchState.Main
+        currentBranch,
+        branchType,
+        branchState
       };
 
       await assert.becomes(getBranchDetails(dir), expected);
-    });
+    };
+
+    it('detects valid main branch', () =>
+      check('main', '0.6.0-alpha', BranchType.Main, BranchState.Main)
+    );
+
+    it('passes for timestamped version on main branch', () =>
+      check('main', '0.6.0-alpha.20020202020202.293la9', BranchType.Main, BranchState.Main)
+    );
 
     it('fails for main branch with wrong minor version', async () => {
       const { dir } = await setup('main', '0.6.1-alpha');
@@ -104,41 +114,37 @@ describe('BranchLogic', () => {
       await assert.isRejected(getBranchDetails(dir));
     });
 
-    it('fails for main branch with buildmetadata', async () => {
+    it('passes for main branch with prerelease version', async () => {
       const { dir } = await setup('main', '0.6.0+9nesste123.frog');
       await assert.isRejected(getBranchDetails(dir));
     });
 
-    it('detects valid feature branch', async () => {
-      const { dir, packageJsonFile, version, packageJson } = await setup('feature/BLAH-1234', '0.6.0-alpha');
+    it('detects valid feature branch', () =>
+      check('feature/BLAH-1234', '0.6.0-alpha', BranchType.Feature, BranchState.Feature)
+    );
 
-      const expected: BranchDetails = {
-        packageJsonFile,
-        packageJson,
-        version,
-        currentBranch: 'feature/BLAH-1234',
-        branchType: BranchType.Feature,
-        branchState: BranchState.Feature
-      };
+    it('detects valid spike branch', () =>
+      check('spike/BLAH-1234', '0.6.0-alpha', BranchType.Spike, BranchState.Spike)
+    );
 
-      await assert.becomes(getBranchDetails(dir), expected);
-    });
+    it('detects valid feature branch', () =>
+      check('feature/BLAH-ab3', '0.6.0-alpha', BranchType.Feature, BranchState.Feature)
+    );
 
-    it('detects valid spike branch', async () => {
-      const { dir, packageJsonFile, version, packageJson } = await setup('spike/BLAH-1234', '0.6.0-alpha');
+    it('passes for timestamped version on feature branch', () =>
+      check('feature/98qenaoects', '0.6.0-alpha.20020202020202.293la9', BranchType.Feature, BranchState.Feature)
+    );
 
-      const expected: BranchDetails = {
-        packageJsonFile,
-        packageJson,
-        version,
-        currentBranch: 'spike/BLAH-1234',
-        branchType: BranchType.Spike,
-        branchState: BranchState.Spike
-      };
+    it('detects valid rc state', () =>
+      check('release/8.1298', '8.1298.7-rc', BranchType.Release, BranchState.ReleaseCandidate)
+    );
 
-      await assert.becomes(getBranchDetails(dir), expected);
-    });
+    it('passes for timestamped version in rc state', () =>
+      check('release/9189382.88', '9189382.88.12-rc.20020202020202.293la9', BranchType.Release, BranchState.ReleaseCandidate)
+    );
 
-    // TODO TINY-6707 test other states
+    it('detects valid release state', () =>
+      check('release/8.1298', '8.1298.7', BranchType.Release, BranchState.ReleaseReady)
+    );
   });
 });

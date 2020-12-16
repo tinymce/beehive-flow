@@ -186,11 +186,11 @@ The timestamping changes the package.json file. The idea is to build and publish
 
 Versions are changed thus:
 
- - On the main branch, `a.b.0-alpha` becomes `a.b.0-alpha.TIMESTAMP+GITSHA`
- - On a feature branch, `a.b.0-*` becomes `a.b.0-feature.TIMESTAMP+GITSHA`
- - On a hotfix branch, `a.b.c-*` becomes `a.b.c-hotfix.TIMESTAMP+GITSHA`
- - On a spike branch, `a.b.c-*` becomes `a.b.c-spike.TIMESTAMP+GITSHA`
- - On a release branch in prerelease state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP+GITSHA`
+ - On the main branch, `a.b.0-alpha` becomes `a.b.0-alpha.TIMESTAMP.GITSHA`
+ - On a feature branch, `a.b.0-*` becomes `a.b.0-feature.TIMESTAMP.GITSHA`
+ - On a hotfix branch, `a.b.c-*` becomes `a.b.c-hotfix.TIMESTAMP.GITSHA`
+ - On a spike branch, `a.b.c-*` becomes `a.b.c-spike.TIMESTAMP.GITSHA`
+ - On a release branch in prerelease state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP.GITSHA`
  - On a release branch in release state, no changes are made.
  
 Timestamp format is `yyyyMMddHHmmssSSS` in UTC. The short git sha format is used.

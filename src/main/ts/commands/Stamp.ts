@@ -35,9 +35,9 @@ export const chooseNewVersion = (branchState: BranchState, version: Version, git
     })();
 
     const dt = formatDate(timeMillis);
-    const preRelease = `${prePre}.${dt}`;
+    const preRelease = `${prePre}.${dt}.${gitSha}`;
 
-    const buildMetaData = gitSha;
+    const buildMetaData = undefined;
 
     return {
       ...version,
