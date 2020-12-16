@@ -6,7 +6,7 @@ import { BranchState, getReleaseBranchName, versionFromReleaseBranch } from './B
 import * as Version from './Version';
 
 export const pickTags = async (branchName: string, branchState: BranchState, getBranches: () => Promise<string[]>): Promise<[string, string?]> => {
-  const mainTag = branchName;
+  const mainTag = branchName.replace(/\//g, '-');
 
   if (branchState !== BranchState.ReleaseReady) {
     return [ mainTag ];
