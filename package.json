@@ -1,12 +1,12 @@
 {
-  "name": "@tiny-premium/beehive-flow",
   "description": "A CLI tool implementing the beehive flow git branching process",
-  "keywords": [ "git" ],
+  "keywords": [
+    "git"
+  ],
   "bugs": "https://github.com/tinymce/beehive-flow/issues",
   "author": "Tiny Technologies",
   "contributors": [],
   "homepage": "https://github.com/tinymce/beehive-flow",
-  "version": "0.3.0-alpha",
   "main": "index.js",
   "repository": "https://github.com/tinymce/beehive-flow",
   "license": "MIT",
@@ -87,5 +87,7 @@
   },
   "engines": {
     "node": ">=12.0.0"
-  }
+  },
+  "version": "0.4.0-alpha",
+  "name": "@tiny-premium/beehive-flow"
 }
