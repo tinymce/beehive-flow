@@ -150,5 +150,5 @@ describe('Publish', () => {
     } finally {
       verdaccio.kill();
     }
-  }).timeout(120000);
+  }).timeout(120000); // Verdaccio runs pretty slowly on the build servers
 });
