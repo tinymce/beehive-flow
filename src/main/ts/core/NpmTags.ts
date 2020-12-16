@@ -6,7 +6,7 @@ import { BranchState, getReleaseBranchName, versionFromReleaseBranch } from './B
 import * as Version from './Version';
 
 const normalize = (branchName: string): string =>
-  branchName.replace(/[^\w\d.]/g, '-');
+  branchName.replace(/[^\w.]/g, '-');
 
 export const pickTags = async (branchName: string, branchState: BranchState, getBranches: () => Promise<string[]>): Promise<[string, string?]> => {
   const mainTag = normalize(branchName);
