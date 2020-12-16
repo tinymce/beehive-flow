@@ -42,7 +42,7 @@ export const checkoutNewBranch = (git: SimpleGit, branchName: string): Promise<s
 export const currentBranch = (git: SimpleGit): Promise<string> =>
   git.branch().then((b) => b.current);
 
-export const pushNewBranch = async (git: SimpleGit): Promise<PushResult> => {
+export const pushExplicitAndSetUpstream = async (git: SimpleGit): Promise<PushResult> => {
   const cur = await currentBranch(git);
   return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
 };
@@ -70,12 +70,12 @@ const dryRunMessage = async (dir: string, git: SimpleGit): Promise<string> => {
   return `dry-run - not pushing. To complete, push "${curBranch}" branch from ${dir}`;
 };
 
-export const pushNewBranchUnlessDryRun = async (dir: string, git: SimpleGit, dryRun: boolean): Promise<void> => {
+export const pushExplicitAndSetUpstreamUnlessDryRun = async (dir: string, git: SimpleGit, dryRun: boolean): Promise<void> => {
   if (dryRun) {
     console.log(await dryRunMessage(dir, git));
   } else {
     console.log('git push');
-    await pushNewBranch(git);
+    await pushExplicitAndSetUpstream(git);
   }
 };
 export const pushUnlessDryRun = async (dir: string, git: SimpleGit, dryRun: boolean): Promise<void> => {
