@@ -23,6 +23,10 @@ describe('NpmTags', () => {
     it('uses the branch name for main branch', () => checkSimple('main', BranchState.ReleaseCandidate, 'main'));
     it('uses the branch name for rc state', () => checkSimple('hotfix/BLAH-123', BranchState.ReleaseCandidate, 'hotfix-BLAH-123'));
 
+    it('uses the branch name (replacing multiple slashes feature branches',
+      () => checkSimple('feature/BLAH/12/3', BranchState.Feature, 'feature-BLAH-12-3')
+    );
+
     it('uses the branch name for release ready state if not the latest release branch', async () => {
       await assert.becomes(
         NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, () => succeed([ 'release/1.3' ])),

@@ -201,7 +201,7 @@ Note: this is the only command that operates on the checkout in the current work
 
 This command does an `npm publish` and sets npm tags based on the repository state.
 
- - All builds get tagged with their branch name.
+ - All builds get tagged with their branch name (with `/` replaced with `-`).
  - If your repo is on a release branch in "release ready" state, and your release branch has the 
    greatest version number of all release branches, the build also gets tagged "latest".
    
