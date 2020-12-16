@@ -23,6 +23,10 @@ describe('NpmTags', () => {
     it('uses the branch name for main branch', () => checkSimple('main', BranchState.ReleaseCandidate, 'main'));
     it('uses the branch name for rc state', () => checkSimple('hotfix/BLAH-123', BranchState.ReleaseCandidate, 'hotfix-BLAH-123'));
 
+    it('replaces characters other than alphanumeric/dot/underscore with dashes', () =>
+      checkSimple('hotfix/blah_32.7/b**@', BranchState.ReleaseCandidate, 'hotfix-blah_32.7-b---')
+    );
+
     it('uses the branch name (replacing multiple slashes feature branches',
       () => checkSimple('feature/BLAH/12/3', BranchState.Feature, 'feature-BLAH-12-3')
     );
