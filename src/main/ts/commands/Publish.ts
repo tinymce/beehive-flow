@@ -4,6 +4,7 @@ import { PublishArgs } from '../args/BeehiveArgs';
 import { getBranchDetails } from '../core/BranchLogic';
 import * as NpmTags from '../core/NpmTags';
 import * as Version from '../core/Version';
+import * as PromiseUtils from '../utils/PromiseUtils';
 
 export const publish = async (args: PublishArgs): Promise<void> => {
   const dir = args.workingDir;
@@ -35,7 +36,15 @@ export const publish = async (args: PublishArgs): Promise<void> => {
       const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
       const tagCmd = [ 'dist-tag', 'add', fullPackageName, t ];
       console.log([ 'npm', ...tagCmd ].join(' '));
-      await cs('npm', tagCmd, { stdio: 'inherit', cwd: dir });
+      /*
+       NPM registries can have a delay after publishing before the package is available.
+       If we try and set other tags too early, it'll fail.
+       So, retry for a while.
+       A 60s timeout was recommended by CloudSmith support. Using 30s for now - might need to increase later.
+       In initial testing, CloudSmith packages seemed to be ok after about 4s.
+       A side effect of this is that after `beehive-flow publish` is run, we can be sure the package is available
+      */
+      await PromiseUtils.poll(() => cs('npm', tagCmd, { stdio: 'inherit', cwd: dir }), 30000, 3000);
     }
   }
 };
