@@ -8,7 +8,7 @@
   "author": "Tiny Technologies",
   "contributors": [],
   "homepage": "https://github.com/tinymce/beehive-flow",
-  "main": "index.js",
+  "main": "lib/main/ts/Main.js",
   "repository": "https://github.com/tinymce/beehive-flow",
   "license": "Apache-2.0",
   "dependencies": {
