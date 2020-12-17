@@ -4,6 +4,7 @@
   "keywords": [
     "git"
   ],
+  "private": false,
   "bugs": "https://github.com/tinymce/beehive-flow/issues",
   "author": "Tiny Technologies",
   "contributors": [],
