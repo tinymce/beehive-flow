@@ -9,7 +9,7 @@
   "homepage": "https://github.com/tinymce/beehive-flow",
   "main": "index.js",
   "repository": "https://github.com/tinymce/beehive-flow",
-  "license": " Apache-2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "cross-spawn-promise": "^0.10.2",
     "fp-ts": "^2.9.1",
