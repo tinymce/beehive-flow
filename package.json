@@ -1,5 +1,4 @@
 {
-  "name": "@tinymce/beehive-flow",
   "description": "A CLI tool implementing the beehive flow git branching process",
   "keywords": [
     "git"
@@ -90,5 +89,6 @@
   "engines": {
     "node": ">=12.0.0"
   },
-  "version": "0.4.0-alpha"
+  "version": "0.4.0-rc",
+  "name": "@tinymce/beehive-flow"
 }
