@@ -29,7 +29,7 @@
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "test": "yarn nyc mocha",
-    "beehive-flow": "yarn node -r 'ts-node/register' src/main/ts/Main.ts",
+    "beehive-flow": "node -r 'ts-node/register' src/main/ts/Main.ts",
     "buildLintTest": "yarn build && yarn lint && yarn test",
     "buildAndInstall": "yarn build && yarn global add file:$PWD"
   },
