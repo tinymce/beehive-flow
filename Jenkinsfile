@@ -27,7 +27,7 @@ node("primary") {
   }
 
   stage("publish") {
-    sh "node -r 'ts-node/register' src/main/ts/Main.ts"
+    sh "node -r 'ts-node/register' src/main/ts/Main.ts publish"
     sh "yarn beehive-flow advance-ci"
   }
 }
