@@ -2,11 +2,13 @@
 
 This project is a CLI tool that implements the Beehive Flow branch process. This readme is the canonical definition of the process.
 
-Beehive Flow roughly models the "GitLab flow with release versions" [https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow],
-and is compatible with Semantic Versioning.
+Beehive Flow is similar to [GitLab flow with release versions](https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow),
+and is compatible with Semantic Versioning. It also takes inspiration from [git-flow](https://nvie.com/posts/a-successful-git-branching-model/). 
+Like git-flow, it is designed for packaged software and libraries, particularly those with many past versions requiring active support. 
 
-Beehive Flow augments the branch strategy with instructions on how to manage versions in key project files (e.g. package.json), and instructions for CI.  
-In the below description, an NPM/Yarn package.json project is assumed, and the tooling is built for this. However, the branch concepts can be applied more broadly. 
+Beehive Flow goes further than just a branch strategy and tooling. It specifies how to manage versions in key project files (e.g. package.json), 
+and has a recommended usage in CI. In the below description, an NPM/Yarn package.json project is assumed, and the tooling is built for this. 
+However, the branch concepts can be applied more broadly. 
 
 Key concepts:
 
