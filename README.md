@@ -1,16 +1,20 @@
 # beehive-flow
 
-This project is a CLI tool that implements the Beehive Flow branch process. This readme is the canonical definition of the process.
+Beehive Flow is a git branching process and a supporting CLI tool. It is designed for packaged software and libraries, 
+particularly those with many past versions requiring active support. Beehive Flow is prescriptive about what the project's
+version numbers are and how they change through the branching process. CI is explicitly considered in the process, 
+with a set of commands to be run at different stages of the build. 
+
+Beehive Flow is designed to support publishing prerelease versions of each build of each branch. It does this by timestamping
+version numbers at the start of a build. 
 
 Beehive Flow is similar to [GitLab flow with release versions](https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow),
 and is compatible with Semantic Versioning. It also takes inspiration from [git-flow](https://nvie.com/posts/a-successful-git-branching-model/). 
-Like git-flow, it is designed for packaged software and libraries, particularly those with many past versions requiring active support. 
 
-Beehive Flow goes further than just a branch strategy and tooling. It specifies how to manage versions in key project files (e.g. package.json), 
-and has a recommended usage in CI. In the below description, an NPM/Yarn package.json project is assumed, and the tooling is built for this. 
-However, the branch concepts can be applied more broadly. 
+This readme is the canonical definition of the branching process. This git repo implements the branch process for NPM projects. 
+Support for monorepos using yarn workspaces is planned.
 
-Key concepts:
+## Key concepts
 
 - All new work happens in `feature/*` branches which are merged to the `main` branch.
 - The `main` branch is branched to `release/x.y` branches to produce release candidates and releases.
@@ -33,10 +37,10 @@ Branch names are enforced and beehive-flow will fail if it encounters other bran
 
 ### main branch
 
-A single mainline branch called `main` is used. 
+A single mainline branch called `main` is used. All features and fixes are merged first to the main branch (via feature branches).
 
-All features and fixes are merged first to the main branch (via feature branches),
-then cherry-picked to release branches as necessary (via hotfix branches).
+If features need to be backported to older versions, commits should be cherry-picked to hotfix branches then merged to
+release branches - more on this below.
 
 ```
   main
@@ -53,8 +57,9 @@ then cherry-picked to release branches as necessary (via hotfix branches).
 
 ### release branches
 
-Release branches are named `release/x.y` where `x.y` is the major.minor version. These are branched off the `main` branch at the beginning of *release preparation*.
-The release branch code is stabilised and then released.
+Release branches are named `release/x.y` where `x.y` is the major.minor version. These are branched off the `main` branch at the beginning of
+*release preparation*. The release branch code is stabilised and then released. A release branch alternates between a "release candidate" state
+and a "release ready" state - more on this below.
 
 ### feature branches
 
@@ -77,7 +82,8 @@ refactor, bugfix or any other type of change (except for spikes - see below).
 
 ### spike branches
 
-Spike branches are also branched off main and named `spike/*`. These are treated similarly to feature branches, but are just intended to indicate that the work is experimental and not to be merged.
+Spike branches are also branched off main and named `spike/*`. These are treated similarly to feature branches, but are just intended to indicate that
+the work is experimental and not to be merged.
 
 ```
                        spike/BLAH-123
@@ -96,8 +102,8 @@ Spike branches are also branched off main and named `spike/*`. These are treated
 
 ### hotfix branches
 
-Hotfix branches are branched off a release branch. These are used to add changes during release preparation. Similar to feature branches, it doesn't matter what type of change
-is being made, the key part is that these are branched from a release branch. 
+Hotfix branches are branched off a release branch. These are used to add changes during release preparation. Similar to feature branches, it doesn't matter
+what type of change is being made, the key part is that these are branched from a release branch. 
 
 ```
   main
@@ -116,7 +122,7 @@ is being made, the key part is that these are branched from a release branch.
 
 ## Versions
 
-Beehive Flow dictates how a project's internal version should be modeled. 
+Beehive Flow dictates a project's version scheme and how it changes through the branch process.   
 
 The main branch should have a version `a.b.0-alpha`. As soon as a release branch is created, main's version should be incremented to `a.c.0-alpha`.  
 
@@ -225,7 +231,7 @@ The idea is that you should decide what major.minor version you are releasing be
 
 ### Does beehive-flow work with yarn workspaces, lerna or monorepos?
 
-Not yet. This is something that would be valuable to add.
+Not yet, but this is planned.
 
 ### Does beehive-flow work with any types of package other than NPM?
 
