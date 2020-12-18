@@ -27,7 +27,7 @@ node("primary") {
   }
 
   stage("publish") {
-    sh "yarn beehive-flow publish"
+    sh "npm run beehive-flow publish"
     sh "yarn beehive-flow advance-ci"
   }
 }
