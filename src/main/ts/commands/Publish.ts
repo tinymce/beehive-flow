@@ -11,7 +11,7 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const git = gitP(dir);
   const r = await getBranchDetails(dir);
 
-  const tags = await NpmTags.pickTagsGit(r.currentBranch, r.branchState, git);
+  const tags = await NpmTags.pickTagsGit(r.currentBranch, r.branchState, r.version, git);
   const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
