@@ -61,7 +61,7 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
   await updatePackageJsonFileForReleaseBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
   await git.add([ buildPropertiesFile, branchDetails.packageJsonFile ]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
-  await Git.pushNewBranchUnlessDryRun(dir, git, args.dryRun);
+  await Git.pushUnlessDryRun(dir, git, args.dryRun);
 };
 
 const updateMainBranch = async (mainBranch: string, git: SimpleGit, branchDetails: BranchDetails, args: PrepareArgs, dir: string): Promise<void> => {
