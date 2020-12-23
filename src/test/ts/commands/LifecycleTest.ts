@@ -62,5 +62,5 @@ describe('Lifecycle', () => {
     await beehiveFlow([ 'advance', '0.1', '--git-url', hub.dir ]);
     await git.pull();
     await assertPjVersion('0.1.2-rc');
-  });
+  }).timeout(45000); // this test is doing a lot, so it can be a bit slow
 });
