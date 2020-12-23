@@ -43,6 +43,6 @@ describe('Git', () => {
       await check([ 'cat', 'frog', 'chicken' ]);
       await check([]);
       await check([ 'zingo', 'release/1.2' ]);
-    });
+    }).timeout(45000); // this test can be a bit slow
   });
 });
