@@ -287,4 +287,4 @@ Not at this stage.
 ### Why does the Jenkinsfile example above run `beehive-flow publish` via npx instead of yarn?
 
 When `npm publish` is run from within yarn, yarn sets an environment variable to point to the yarn repo URL, not the NPM one. 
-This causes errors for beehive-flow's publishing phase.
+
