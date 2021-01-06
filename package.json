@@ -89,6 +89,6 @@
   "engines": {
     "node": ">=12.0.0"
   },
-  "version": "0.9.0-alpha",
+  "version": "0.9.0-rc",
   "name": "@tinymce/beehive-flow"
 }
