@@ -222,6 +222,53 @@ CI needs to check out a real branch, not just a detached head.
 
 At the start of the build, run `stamp`. If the build is successful, run `advance-ci`.
 
+## Adding beehive-flow to my project
+
+These instructions assume Jenkins, yarn, TypeScript, mocha and eslint. 
+
+ 1. Best to disable CI during the changeover.
+ 2. Ensure you have a "main" branch - e.g. change your "master" branch to "main"
+ 3. `yarn add -D @tinymce/beehive-flow`
+ 4. Change your `Jenkinsfile` to something like below. Note the use of `npx` (see FAQ below).
+    ```
+    node("primary") {
+      checkout scm
+    
+      stage("dependencies") {
+        sh "yarn install"
+      }
+    
+      stage("stamp") {
+        sh "yarn beehive-flow stamp"
+      }
+    
+      stage("build") {
+        sh "yarn build"
+      }
+    
+      stage("lint") {
+        sh "yarn lint"
+      }
+    
+      stage("test") {
+        sh "yarn test"
+      }
+    
+      stage("publish") {
+        sh "npx --no-install beehive-flow publish"
+        sshagent(credentials: ['jenkins2-github']) {
+          sh "yarn beehive-flow advance-ci"
+        }
+      }
+    }
+    ```
+ 5. Note the yarn commands. Set up scripts in `package.json` to this effect. e.g.
+    ```
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "test": "yarn mocha"
+    ```
+
 ## FAQ
 
 ### How do I update my major version?
@@ -236,3 +283,8 @@ Not yet, but this is planned.
 ### Does beehive-flow work with any types of package other than NPM?
 
 Not at this stage.
+
+### Why does the Jenkinsfile example above publish with NPM instead of Yarn?
+
+When `npm publish` is run from within yarn, yarn sets an environment variable to point to the yarn repo URL, not the NPM one. 
+This causes errors for beehive-flow's publishing phase.
