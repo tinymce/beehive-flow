@@ -229,7 +229,7 @@ These instructions assume Jenkins, yarn, TypeScript, mocha and eslint.
  1. Best to disable CI during the changeover.
  2. Ensure you have a "main" branch - e.g. change your "master" branch to "main"
  3. `yarn add -D @tinymce/beehive-flow`
- 4. Change your `Jenkinsfile` to something like below. Note the use of `npx` (see FAQ below).
+ 4. Change your `Jenkinsfile` to something like below. Note there are issues running `beehive-flow publish` from `yarn` (see FAQ below).
     ```
     node("primary") {
       checkout scm
@@ -255,7 +255,7 @@ These instructions assume Jenkins, yarn, TypeScript, mocha and eslint.
       }
     
       stage("publish") {
-        sh "npx --no-install beehive-flow publish"
+        sh "yarn beehive-flow publish"
         sshagent(credentials: ['jenkins2-github']) {
           sh "yarn beehive-flow advance-ci"
         }
@@ -284,7 +284,20 @@ Not yet, but this is planned.
 
 Not at this stage.
 
-### Why does the Jenkinsfile example above run `beehive-flow publish` via npx instead of yarn?
+### Are there issues running `beehive-flow publish` from yarn?
 
-When `npm publish` is run from within yarn, yarn sets an environment variable to point to the yarn repo URL, not the NPM one. 
+`beehive-flow publish` uses `npm publish` to publish. When running this via yarn, yarn sets the environment variable
+`npm_config_registry` to `https://registry.yarnpkg.com`. Depending on your CI config, this may cause you to get errors like this:
 
+```
+npm ERR! 404 Not Found - PUT https://registry.yarnpkg.com/@tinymce%2fbeehive-flow - Not found
+``` 
+
+To work around this, there are several options:
+1. Run `yarn config set registry https://registry.npmjs.org/ -g` on your CI nodes (sets the registry in `~/.yarnrc`)
+2. Run `yarn config set registry https://registry.npmjs.org/` in each project (sets the registry in the project's `.yarnrc`)
+3. Set the publishConfig in your package.json file.
+4. Instead of running from yarn, run `npx --no-install beehive-flow publish`. The `--no-install` forces npx to use your project's
+   pinned beehive-flow and if it's not there, it fails instead of downloading the latest beehive-flow.
+
+At Tiny, we're using option 1.
