@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node
+#!/usr/bin/env node
 
 import * as Parser from './args/Parser';
 import * as Dispatch from './args/Dispatch';

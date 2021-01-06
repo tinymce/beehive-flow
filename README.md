@@ -222,6 +222,53 @@ CI needs to check out a real branch, not just a detached head.
 
 At the start of the build, run `stamp`. If the build is successful, run `advance-ci`.
 
+## Adding beehive-flow to my project
+
+These instructions assume Jenkins, yarn, TypeScript, mocha and eslint. 
+
+ 1. Best to disable CI during the changeover.
+ 2. Ensure you have a "main" branch - e.g. change your "master" branch to "main"
+ 3. `yarn add -D @tinymce/beehive-flow`
+ 4. Change your `Jenkinsfile` to something like below. Note there are issues running `beehive-flow publish` from `yarn` (see FAQ below).
+    ```
+    node("primary") {
+      checkout scm
+    
+      stage("dependencies") {
+        sh "yarn install"
+      }
+    
+      stage("stamp") {
+        sh "yarn beehive-flow stamp"
+      }
+    
+      stage("build") {
+        sh "yarn build"
+      }
+    
+      stage("lint") {
+        sh "yarn lint"
+      }
+    
+      stage("test") {
+        sh "yarn test"
+      }
+    
+      stage("publish") {
+        sh "yarn beehive-flow publish"
+        sshagent(credentials: ['jenkins2-github']) {
+          sh "yarn beehive-flow advance-ci"
+        }
+      }
+    }
+    ```
+ 5. Note the yarn commands. Set up scripts in `package.json` to this effect. e.g.
+    ```
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "test": "yarn mocha"
+    ```
+
 ## FAQ
 
 ### How do I update my major version?
@@ -236,3 +283,21 @@ Not yet, but this is planned.
 ### Does beehive-flow work with any types of package other than NPM?
 
 Not at this stage.
+
+### Are there issues running `beehive-flow publish` from yarn?
+
+`beehive-flow publish` uses `npm publish` to publish. When running this via yarn, yarn sets the environment variable
+`npm_config_registry` to `https://registry.yarnpkg.com`. Depending on your CI config, this may cause you to get errors like this:
+
+```
+npm ERR! 404 Not Found - PUT https://registry.yarnpkg.com/@tinymce%2fbeehive-flow - Not found
+``` 
+
+To work around this, there are several options:
+1. Run `yarn config set registry https://registry.npmjs.org/ -g` on your CI nodes (sets the registry in `~/.yarnrc`)
+2. Run `yarn config set registry https://registry.npmjs.org/` in each project (sets the registry in the project's `.yarnrc`)
+3. Set the publishConfig in your package.json file.
+4. Instead of running from yarn, run `npx --no-install beehive-flow publish`. The `--no-install` forces npx to use your project's
+   pinned beehive-flow and if it's not there, it fails instead of downloading the latest beehive-flow.
+
+At Tiny, we're using option 1.
