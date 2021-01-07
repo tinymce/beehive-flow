@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cp from 'child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 import { describe, it } from 'mocha';
 import { assert } from 'chai';
 import * as getPort from 'get-port';
 import { ResetMode } from 'simple-git';
+import { SimpleGit } from 'simple-git/promise';
 import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
 import * as Parser from '../../../main/ts/args/Parser';
@@ -65,6 +68,10 @@ const publish = async (dryRun: boolean, dir: string): Promise<void> => {
   await beehiveFlow([ 'publish', '--working-dir', dir, ...dryRunArgs ]);
 };
 
+const assertGitTags = async (expectedTags: string[], git: SimpleGit): Promise<void> => {
+  assert.deepEqual((await git.tags()).all.sort(), expectedTags.sort());
+};
+
 describe('Publish', () => {
 
   let verdaccio: cp.ChildProcess;
@@ -112,10 +119,6 @@ describe('Publish', () => {
       return getTags(dir);
     };
 
-    const assertGitTags = async (expectedTags: string[]): Promise<void> => {
-      assert.deepEqual((await git.tags()).all.sort(), expectedTags.sort());
-    };
-
     const featureBranch = 'feature/TINY-BLAH';
     const featureBranchTag = 'feature-TINY-BLAH';
 
@@ -153,18 +156,76 @@ describe('Publish', () => {
     await Git.checkoutNewBranch(git, 'release/0.1');
     const tags4 = await go('0.1.0', false);
     assert.deepEqual(tags4, { 'latest': '0.1.0', 'main': ver0, [ featureBranchTag ]: '0.2.0-alpha', 'release-0.1': '0.1.0' });
-    await assertGitTags([ '@beehive-test/beehive-test@0.1.0' ]);
+    await assertGitTags([ '@beehive-test/beehive-test@0.1.0' ], git);
 
     // PUBLISH 5 - next release
     await Git.checkoutNewBranch(git, 'release/0.2');
     const tags5 = await go('0.2.0', false);
     assert.deepEqual(tags5, { 'latest': '0.2.0', 'main': ver0, [ featureBranchTag ]: '0.2.0-alpha', 'release-0.1': '0.1.0', 'release-0.2': '0.2.0' });
-    await assertGitTags([ '@beehive-test/beehive-test@0.1.0', '@beehive-test/beehive-test@0.2.0' ]);
+    await assertGitTags([ '@beehive-test/beehive-test@0.1.0', '@beehive-test/beehive-test@0.2.0' ], git);
 
     // PUBLISH 6 - re-release 0.1
     await git.checkout('release/0.1');
     const tags6 = await go('0.1.1', false);
     assert.deepEqual(tags6, { 'latest': '0.2.0', 'main': ver0, [ featureBranchTag ]: '0.2.0-alpha', 'release-0.1': '0.1.1', 'release-0.2': '0.2.0' });
-    await assertGitTags([ '@beehive-test/beehive-test@0.1.0', '@beehive-test/beehive-test@0.2.0', '@beehive-test/beehive-test@0.1.1' ]);
-  });
-}).timeout(120000); // Verdaccio runs pretty slowly on the build servers;
+    await assertGitTags([ '@beehive-test/beehive-test@0.1.0', '@beehive-test/beehive-test@0.2.0', '@beehive-test/beehive-test@0.1.1' ], git);
+  }).timeout(120000); // Verdaccio runs pretty slowly on the build servers;;
+
+  it('publishes from dist-dir', async () => {
+
+    const hub = await Git.initInTempFolder(true);
+
+    const { dir, git } = await Git.cloneInTempFolder(hub.dir);
+
+    await Git.checkoutNewBranch(git, 'release/1.1');
+
+    const npmrcFile = await writeNpmrc(address, dir);
+
+    const pjFile = path.join(dir, 'package.json');
+
+    const pjContents = `
+      {
+        "name": "@beehive-test/beehive-test-dist-dir",
+        "version": "1.1.3",
+        "publishConfig": {
+          "@beehive-test:registry": "${address}"
+        },
+        "dependencies": {
+          "@tinymce/tinymce-react": "3.8.4"
+        }
+      }`;
+    await Files.writeFile(pjFile, pjContents);
+
+    // sanity check that reading the dependencies works
+    const readPj = await PackageJson.parsePackageJsonFile(pjFile);
+    assert.deepEqual((readPj.other as any).dependencies, { '@tinymce/tinymce-react': '3.8.4' });
+
+    fs.mkdirSync(path.join(dir, 'mydist'));
+
+    const pjDistFile = path.join(dir, 'mydist', 'package.json');
+    const pjDistContents = `
+      {
+        "name": "@beehive-test/beehive-test-dist-dir",
+        "version": "1.1.3",
+        "publishConfig": {
+          "@beehive-test:registry": "${address}"
+        },
+        "dependencies": {}
+      }`;
+    await Files.writeFile(pjDistFile, pjDistContents);
+
+    await git.add([ npmrcFile, pjFile, pjDistFile ]);
+    await git.commit('blah');
+    await Git.push(git);
+
+    await beehiveFlow([ 'publish', '--working-dir', dir, '--dist-dir', 'mydist' ]);
+
+    const downstream = await Files.tempFolder();
+    await writeNpmrc(address, downstream);
+    cp.execSync('npm add @beehive-test/beehive-test-dist-dir@1.1.3', { cwd: downstream });
+
+    const depPj = await PackageJson.parsePackageJsonFileInFolder(path.join(downstream, 'node_modules', '@beehive-test', 'beehive-test-dist-dir'));
+
+    assert.deepEqual((depPj.other as any).dependencies, {});
+  }).timeout(120000); // Verdaccio runs pretty slowly on the build servers;;
+});

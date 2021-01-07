@@ -39,7 +39,8 @@ const tempOptions: yargs.Options = {
 const distDirOptions: yargs.Options = {
   type: 'string',
   default: '.',
-  description: 'Dir to use to run "npm publish" and "npm dist-tag". Relative to the working-dir.'
+  description: 'Dir to use to run "npm publish". Relative to the working-dir. ' +
+    'The package.json file in this dir must have the same name and version as the one in the working-dir.'
 };
 
 const getColumns = (): number =>

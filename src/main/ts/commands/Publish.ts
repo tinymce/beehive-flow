@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as cs from 'cross-spawn-promise';
 import * as gitP from 'simple-git/promise';
 import { PublishArgs } from '../args/BeehiveArgs';
@@ -10,7 +9,6 @@ import * as Git from '../utils/Git';
 
 export const publish = async (args: PublishArgs): Promise<void> => {
   const dir = args.workingDir;
-  const distDir = path.relative(dir, args.distDir);
   const git = gitP(dir);
   const r = await getBranchDetails(dir);
 
@@ -18,13 +16,13 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
-  await npmPublish(mainTag, dryRunArgs, distDir);
-  await npmTag(args, tags, r, distDir);
+  await npmPublish(mainTag, dryRunArgs, args.workingDir, args.distDir);
+  await npmTag(args, tags, r, args.workingDir);
   await gitTag(r, git, args);
 };
 
-const npmPublish = async (mainTag: string, dryRunArgs: string[], dir: string): Promise<void> => {
-  const publishCmd = [ 'publish', '--tag', mainTag, ...dryRunArgs ];
+const npmPublish = async (mainTag: string, dryRunArgs: string[], dir: string, distDir: string): Promise<void> => {
+  const publishCmd = [ 'publish', distDir, '--tag', mainTag, ...dryRunArgs ];
   console.log([ 'npm', ...publishCmd ].join(' '));
   await cs('npm', publishCmd, { stdio: 'inherit', cwd: dir });
 };
