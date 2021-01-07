@@ -38,7 +38,7 @@ const tempOptions: yargs.Options = {
 
 const distDirOptions: yargs.Options = {
   type: 'string',
-  default: null,
+  default: '.',
   description: 'Dir to use to run "npm publish" and "npm dist-tag". Relative to the working-dir.'
 };
 
@@ -130,8 +130,6 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
   const temp = () => O.fromNullable(a.temp as string | null);
   const gitUrl = () => O.fromNullable(a['git-url'] as string | null);
   const majorDotMinor = () => parseMajorMinorVersion(a.majorDotMinor as string);
-  const distDir = () => O.fromNullable(a['dist-dir'] as string | null);
-
   if (cmd === 'prepare') {
     return O.some(BeehiveArgs.prepareArgs(dryRun, workingDir, temp(), gitUrl()));
 
@@ -148,7 +146,7 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
     return O.some(BeehiveArgs.stampArgs(dryRun, workingDir));
 
   } else if (cmd === 'publish') {
-    return O.some(BeehiveArgs.publishArgs(dryRun, workingDir, distDir));
+    return O.some(BeehiveArgs.publishArgs(dryRun, workingDir, a['dist-dir'] as string));
 
   } else {
     return PromiseUtils.fail(`Unknown command: ${cmd}`);
