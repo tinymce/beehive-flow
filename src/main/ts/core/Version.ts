@@ -22,7 +22,7 @@ export const parseVersion = async (input: string): Promise<Version> => {
   const r = regexp.exec(input);
 
   if (r === null || r.groups === undefined) {
-    return PromiseUtils.fail('Could not parse version string');
+    return PromiseUtils.fail('Could not parse version string: ' + input);
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
