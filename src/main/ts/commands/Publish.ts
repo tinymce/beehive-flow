@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as cs from 'cross-spawn-promise';
 import * as gitP from 'simple-git/promise';
 import { PublishArgs } from '../args/BeehiveArgs';
@@ -9,6 +10,7 @@ import * as Git from '../utils/Git';
 
 export const publish = async (args: PublishArgs): Promise<void> => {
   const dir = args.workingDir;
+  const distDir = path.relative(dir, args.distDir);
   const git = gitP(dir);
   const r = await getBranchDetails(dir);
 
@@ -16,8 +18,8 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
-  await npmPublish(mainTag, dryRunArgs, dir);
-  await npmTag(args, tags, r, dir);
+  await npmPublish(mainTag, dryRunArgs, distDir);
+  await npmTag(args, tags, r, distDir);
   await gitTag(r, git, args);
 };
 
