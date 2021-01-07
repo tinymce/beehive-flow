@@ -47,6 +47,9 @@ export const push = async (git: SimpleGit): Promise<PushResult> => {
   return git.push(ASSUMED_REMOTE, cur, { '--set-upstream': null });
 };
 
+export const pushOneTag = async (git: SimpleGit, tagName: string): Promise<PushResult> =>
+  git.push(ASSUMED_REMOTE, tagName);
+
 export const currentRevisionShortSha = (git: SimpleGit): Promise<string> =>
   git.revparse([ '--short', 'HEAD' ]);
 

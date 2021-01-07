@@ -100,6 +100,10 @@ describe('Publish', () => {
         return getTags(dir);
       };
 
+      const assertGitTags = async (expectedTags: string[]): Promise<void> => {
+        assert.deepEqual((await git.tags()).all.sort(), expectedTags.sort());
+      };
+
       const featureBranch = 'feature/TINY-BLAH';
       const featureBranchTag = 'feature-TINY-BLAH';
 
@@ -137,16 +141,19 @@ describe('Publish', () => {
       await Git.checkoutNewBranch(git, 'release/0.1');
       const tags4 = await go('0.1.0', false);
       assert.deepEqual(tags4, { 'latest': '0.1.0', 'main': ver0, [ featureBranchTag ]: '0.2.0-alpha', 'release-0.1': '0.1.0' });
+      await assertGitTags([ '@beehive-test/beehive-test@0.1.0' ]);
 
       // PUBLISH 5 - next release
       await Git.checkoutNewBranch(git, 'release/0.2');
       const tags5 = await go('0.2.0', false);
       assert.deepEqual(tags5, { 'latest': '0.2.0', 'main': ver0, [ featureBranchTag ]: '0.2.0-alpha', 'release-0.1': '0.1.0', 'release-0.2': '0.2.0' });
+      await assertGitTags([ '@beehive-test/beehive-test@0.1.0', '@beehive-test/beehive-test@0.2.0' ]);
 
       // PUBLISH 6 - re-release 0.1
       await git.checkout('release/0.1');
       const tags6 = await go('0.1.1', false);
       assert.deepEqual(tags6, { 'latest': '0.2.0', 'main': ver0, [ featureBranchTag ]: '0.2.0-alpha', 'release-0.1': '0.1.1', 'release-0.2': '0.2.0' });
+      await assertGitTags([ '@beehive-test/beehive-test@0.1.0', '@beehive-test/beehive-test@0.2.0', '@beehive-test/beehive-test@0.1.1' ]);
 
     } finally {
       verdaccio.kill();
