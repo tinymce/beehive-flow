@@ -255,8 +255,8 @@ These instructions assume Jenkins, yarn, TypeScript, mocha and eslint.
       }
     
       stage("publish") {
-        sh "yarn beehive-flow publish"
-        sshagent(credentials: ['jenkins2-github']) {
+        sshagent(credentials: ['my-git-credentials']) {
+          sh "yarn beehive-flow publish"        
           sh "yarn beehive-flow advance-ci"
         }
       }
