@@ -1,10 +1,11 @@
 import * as cs from 'cross-spawn-promise';
-import { gitP } from 'simple-git';
+import * as gitP from 'simple-git/promise';
 import { PublishArgs } from '../args/BeehiveArgs';
-import { getBranchDetails } from '../core/BranchLogic';
+import { BranchDetails, BranchState, getBranchDetails } from '../core/BranchLogic';
 import * as NpmTags from '../core/NpmTags';
 import * as Version from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
+import * as Git from '../utils/Git';
 
 export const publish = async (args: PublishArgs): Promise<void> => {
   const dir = args.workingDir;
@@ -15,13 +16,18 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
+  await npmPublish(mainTag, dryRunArgs, dir);
+  await npmTag(args, tags, r, dir);
+  await gitTag(r, git, args);
+};
 
+const npmPublish = async (mainTag: string, dryRunArgs: string[], dir: string): Promise<void> => {
   const publishCmd = [ 'publish', '--tag', mainTag, ...dryRunArgs ];
-
   console.log([ 'npm', ...publishCmd ].join(' '));
-
   await cs('npm', publishCmd, { stdio: 'inherit', cwd: dir });
+};
 
+const npmTag = async (args: PublishArgs, tags: string[], r: BranchDetails, dir: string): Promise<void> => {
   /*
     Yes, we're setting the mainTag again in this loop.
     If this is the very first publish of a package, the --tag above is ignored
@@ -48,5 +54,21 @@ export const publish = async (args: PublishArgs): Promise<void> => {
       */
       await PromiseUtils.poll(() => cs('npm', tagCmd, { stdio: 'inherit', cwd: dir }), 30000, 3000);
     }
+  }
+};
+
+const gitTag = async (r: BranchDetails, git: gitP.SimpleGit, args: PublishArgs): Promise<void> => {
+  if (r.branchState === BranchState.ReleaseReady) {
+    const tagName = r.packageJson.name + '@' + Version.versionToString(r.version);
+    console.log(`Tagging as ${tagName}`);
+    await git.addTag(tagName);
+
+    if (args.dryRun) {
+      console.log('Dry run - not pushing tags');
+    } else {
+      await Git.pushOneTag(git, tagName);
+    }
+  } else {
+    console.log('Not release ready - not git tagging.');
   }
 };
