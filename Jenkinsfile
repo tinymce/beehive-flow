@@ -27,8 +27,8 @@ node("primary") {
   }
 
   stage("publish") {
-    sh "yarn beehive-flow publish"
     sshagent(credentials: ['jenkins2-github']) {
+      sh "yarn beehive-flow publish"
       sh "yarn beehive-flow advance-ci"
     }
   }
