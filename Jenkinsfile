@@ -4,7 +4,9 @@
 standardProperties()
 
 node("primary") {
-  checkout scm
+  stage("checkout") {
+    checkout scm
+  }
 
   stage("deps") {
     sh "yarn install"

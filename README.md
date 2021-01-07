@@ -232,7 +232,9 @@ These instructions assume Jenkins, yarn, TypeScript, mocha and eslint.
  4. Change your `Jenkinsfile` to something like below. Note there are issues running `beehive-flow publish` from `yarn` (see FAQ below).
     ```
     node("primary") {
-      checkout scm
+      stage ("checkout") {
+        checkout scm
+      }
     
       stage("dependencies") {
         sh "yarn install"
