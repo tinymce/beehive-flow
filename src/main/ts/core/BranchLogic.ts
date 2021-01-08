@@ -18,12 +18,21 @@ export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): strin
 
 // eslint-disable-next-line no-shadow
 export const enum BranchType {
-  main, feature, hotfix, spike, release
+  main = 'main',
+  feature = 'feature',
+  hotfix = 'hotfix',
+  spike = 'spike',
+  release = 'release'
 }
 
 // eslint-disable-next-line no-shadow
 export const enum BranchState {
-  main, feature, hotfix, spike, releaseReady, releaseCandidate
+  main = 'main',
+  feature = 'feature',
+  hotfix = 'hotfix',
+  spike = 'spike',
+  releaseReady = 'releaseReady',
+  releaseCandidate = 'releaseCandidate'
 }
 
 export interface BranchDetails {
