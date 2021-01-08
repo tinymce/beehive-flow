@@ -1,18 +1,7 @@
 import { SimpleGit } from 'simple-git/promise';
 import * as Git from '../utils/Git';
-import * as PromiseUtils from '../utils/PromiseUtils';
-import * as ArrayUtils from '../utils/ArrayUtils';
-import { BranchState, getReleaseBranchName, versionFromReleaseBranch } from './BranchLogic';
-import { compareMajorMinorVersions, majorMinorVersionToString, Version } from './Version';
-
-const isLatestReleaseBranch = async (getBranches: () => Promise<string[]>, branchName: string): Promise<boolean> => {
-  const branches = await getBranches();
-  const versions = await PromiseUtils.filterMap(branches, versionFromReleaseBranch);
-  const greatestOpt = ArrayUtils.greatest(versions, compareMajorMinorVersions);
-  const greatest = await PromiseUtils.optionToPromise(greatestOpt, 'Could not find any release branches with valid names.');
-  const releaseBranchName = getReleaseBranchName(greatest);
-  return branchName === releaseBranchName;
-};
+import { BranchState, isLatestReleaseBranch } from './BranchLogic';
+import { majorMinorVersionToString, Version } from './Version';
 
 export const pickTags = async (branchName: string, branchState: BranchState, version: Version, getBranches: () => Promise<string[]>): Promise<string[]> => {
 
