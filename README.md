@@ -216,6 +216,32 @@ This command does an `npm publish` and sets npm tags based on the repository sta
 
 Note: it appears that npm also tags the very first published build of each repo with "latest". 
 
+### status
+
+This command prints out beehive-flow's interpretation the current status of the repo, in JSON format.
+This is useful for integrating with other CI tools.
+
+Run this as `yarn run --silent beehive-flow status` otherwise yarn's output will make stdout invalid JSON.
+
+If you want to read this from a Jenkinsfile:
+
+```
+def shJson(String script) {
+    def s = sh(script: script, returnStdout: true);
+    return readJSON(text: s);
+}
+
+def beehiveFlowStatus = shJson("yarn run --silent beehive-flow status");
+```
+
+Then, if you want to run something when beehive-flow would publish a new release build of the latest release:
+
+```
+if (beehiveFlowStatus.branchState == 'releaseReady' && beehiveFlowStatus.isLatestReleaseBranch) {
+
+}
+```
+
 ## CI Instructions
 
 CI needs to check out a real branch, not just a detached head.
