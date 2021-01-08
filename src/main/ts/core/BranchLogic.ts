@@ -4,11 +4,10 @@ import { CheckRepoActions } from 'simple-git';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
+import * as ArrayUtils from '../utils/ArrayUtils';
 import * as Version from './Version';
-import { compareMajorMinorVersions } from './Version';
 import * as PreRelease from './PreRelease';
 import * as PackageJson from './PackageJson';
-import * as ArrayUtils from '../utils/ArrayUtils';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
 type Version = Version.Version;
@@ -170,7 +169,7 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 export const isLatestReleaseBranch = async (getBranches: () => Promise<string[]>, branchName: string): Promise<boolean> => {
   const branches = await getBranches();
   const versions = await PromiseUtils.filterMap(branches, versionFromReleaseBranch);
-  const greatestOpt = ArrayUtils.greatest(versions, compareMajorMinorVersions);
+  const greatestOpt = ArrayUtils.greatest(versions, Version.compareMajorMinorVersions);
   const greatest = await PromiseUtils.optionToPromise(greatestOpt, 'Could not find any release branches with valid names.');
   const releaseBranchName = getReleaseBranchName(greatest);
   return branchName === releaseBranchName;
