@@ -33,7 +33,8 @@
     "no-fallthrough": "error",
     "no-invalid-this": "error",
     "no-multiple-empty-lines": ["error", { "max": 1 }],
-    "prefer-promise-reject-errors": "error"
+    "prefer-promise-reject-errors": "error",
+    "@tinymce/prefer-fun": "off"
   },
   "settings": {
     "import/internal-regex": "^(ephox|tinymce)/.*"
