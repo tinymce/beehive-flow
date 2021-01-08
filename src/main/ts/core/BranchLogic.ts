@@ -18,12 +18,12 @@ export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): strin
 
 // eslint-disable-next-line no-shadow
 export const enum BranchType {
-  Main, Feature, Hotfix, Spike, Release
+  main, feature, hotfix, spike, release
 }
 
 // eslint-disable-next-line no-shadow
 export const enum BranchState {
-  Main, Feature, Hotfix, Spike, ReleaseReady, ReleaseCandidate
+  main, feature, hotfix, spike, releaseReady, releaseCandidate
 }
 
 export interface BranchDetails {
@@ -52,18 +52,18 @@ export const mainBranchName = 'main';
 
 export const getBranchType = (branchName: string): Option<BranchType> => {
   if (branchName === mainBranchName) {
-    return O.some(BranchType.Main);
+    return O.some(BranchType.main);
   } else {
     const parts = branchName.split('/');
     switch (parts[0]) {
       case 'feature':
-        return O.some(BranchType.Feature);
+        return O.some(BranchType.feature);
       case 'hotfix':
-        return O.some(BranchType.Hotfix);
+        return O.some(BranchType.hotfix);
       case 'spike':
-        return O.some(BranchType.Spike);
+        return O.some(BranchType.spike);
       case 'release':
-        return O.some(BranchType.Release);
+        return O.some(BranchType.release);
       default:
         return O.none;
     }
@@ -97,26 +97,26 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const sPackageVersion = Version.versionToString(version);
   const sPre = showStringOrUndefined(version.preRelease);
 
-  const validateMainBranch = async (): Promise<BranchState.Main> => {
+  const validateMainBranch = async (): Promise<BranchState.main> => {
     if (version.patch !== 0) {
       return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
     } else if (!isValidPrerelease(version.preRelease, PreRelease.mainBranch)) {
       return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}" or start with "${PreRelease.mainBranch}.", but is ${sPre}`);
     } else {
-      return BranchState.Main;
+      return BranchState.main;
     }
   };
 
-  const validateReleaseBranch = async (): Promise<BranchState.ReleaseCandidate | BranchState.ReleaseReady> => {
+  const validateReleaseBranch = async (): Promise<BranchState.releaseCandidate | BranchState.releaseReady> => {
     const branchVersion = await versionFromReleaseBranch(currentBranch);
     const sBranchVersion = Version.majorMinorVersionToString(branchVersion);
 
     if (version.major !== branchVersion.major || version.minor !== branchVersion.minor) {
       return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
     } else if (version.preRelease === undefined) {
-      return BranchState.ReleaseReady;
+      return BranchState.releaseReady;
     } else if (isValidPrerelease(version.preRelease, PreRelease.releaseCandidate)) {
-      return BranchState.ReleaseCandidate;
+      return BranchState.releaseCandidate;
     } else {
       const rc = PreRelease.releaseCandidate;
       return fail(`${loc}: prerelease version part should be either "${rc}" or start with "${rc}." or not be set, but it is "${sPre}"`);
@@ -125,15 +125,15 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 
   const detect = async (branchType: BranchType): Promise<BranchState> => {
     switch (branchType) {
-      case BranchType.Main:
+      case BranchType.main:
         return validateMainBranch();
-      case BranchType.Feature:
-        return BranchState.Feature;
-      case BranchType.Hotfix:
-        return BranchState.Hotfix;
-      case BranchType.Spike:
-        return BranchState.Spike;
-      case BranchType.Release:
+      case BranchType.feature:
+        return BranchState.feature;
+      case BranchType.hotfix:
+        return BranchState.hotfix;
+      case BranchType.spike:
+        return BranchState.spike;
+      case BranchType.release:
         return validateReleaseBranch();
     }
   };

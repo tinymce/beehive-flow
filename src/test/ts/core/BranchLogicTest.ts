@@ -92,11 +92,11 @@ describe('BranchLogic', () => {
     };
 
     it('detects valid main branch', () =>
-      check('main', '0.6.0-alpha', BranchType.Main, BranchState.Main)
+      check('main', '0.6.0-alpha', BranchType.main, BranchState.main)
     );
 
     it('passes for timestamped version on main branch', () =>
-      check('main', '0.6.0-alpha.20020202020202.293la9', BranchType.Main, BranchState.Main)
+      check('main', '0.6.0-alpha.20020202020202.293la9', BranchType.main, BranchState.main)
     );
 
     it('fails for main branch with wrong minor version', async () => {
@@ -120,31 +120,31 @@ describe('BranchLogic', () => {
     });
 
     it('detects valid feature branch', () =>
-      check('feature/BLAH-1234', '0.6.0-alpha', BranchType.Feature, BranchState.Feature)
+      check('feature/BLAH-1234', '0.6.0-alpha', BranchType.feature, BranchState.feature)
     );
 
     it('detects valid spike branch', () =>
-      check('spike/BLAH-1234', '0.6.0-alpha', BranchType.Spike, BranchState.Spike)
+      check('spike/BLAH-1234', '0.6.0-alpha', BranchType.spike, BranchState.spike)
     );
 
     it('detects valid feature branch', () =>
-      check('feature/BLAH-ab3', '0.6.0-alpha', BranchType.Feature, BranchState.Feature)
+      check('feature/BLAH-ab3', '0.6.0-alpha', BranchType.feature, BranchState.feature)
     );
 
     it('passes for timestamped version on feature branch', () =>
-      check('feature/98qenaoects', '0.6.0-alpha.20020202020202.293la9', BranchType.Feature, BranchState.Feature)
+      check('feature/98qenaoects', '0.6.0-alpha.20020202020202.293la9', BranchType.feature, BranchState.feature)
     );
 
     it('detects valid rc state', () =>
-      check('release/8.1298', '8.1298.7-rc', BranchType.Release, BranchState.ReleaseCandidate)
+      check('release/8.1298', '8.1298.7-rc', BranchType.release, BranchState.releaseCandidate)
     );
 
     it('passes for timestamped version in rc state', () =>
-      check('release/9189382.88', '9189382.88.12-rc.20020202020202.293la9', BranchType.Release, BranchState.ReleaseCandidate)
+      check('release/9189382.88', '9189382.88.12-rc.20020202020202.293la9', BranchType.release, BranchState.releaseCandidate)
     );
 
     it('detects valid release state', () =>
-      check('release/8.1298', '8.1298.7', BranchType.Release, BranchState.ReleaseReady)
+      check('release/8.1298', '8.1298.7', BranchType.release, BranchState.releaseReady)
     );
   });
 });

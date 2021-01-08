@@ -18,11 +18,11 @@ export const pickTags = async (branchName: string, branchState: BranchState, ver
 
   const mainTag = branchName.replace(/[^\w.]+/g, '-');
 
-  if (branchState === BranchState.ReleaseCandidate) {
+  if (branchState === BranchState.releaseCandidate) {
     const vs = majorMinorVersionToString(version);
     return [ `rc-${vs}` ];
 
-  } else if (branchState === BranchState.ReleaseReady) {
+  } else if (branchState === BranchState.releaseReady) {
     const isLatest = await isLatestReleaseBranch(getBranches, branchName);
     return isLatest ? [ mainTag, 'latest' ] : [ mainTag ];
 

@@ -58,7 +58,7 @@ const npmTag = async (args: PublishArgs, tags: string[], r: BranchDetails, dir: 
 };
 
 const gitTag = async (r: BranchDetails, git: gitP.SimpleGit, args: PublishArgs): Promise<void> => {
-  if (r.branchState === BranchState.ReleaseReady) {
+  if (r.branchState === BranchState.releaseReady) {
     const tagName = r.packageJson.name + '@' + Version.versionToString(r.version);
     console.log(`Tagging as ${tagName}`);
     await git.addTag(tagName);
