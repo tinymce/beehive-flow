@@ -10,6 +10,7 @@ import { PrepareArgs } from '../args/BeehiveArgs';
 import { Version } from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Prerelease from '../core/PreRelease';
+import { printHeaderMessage } from '../core/Messages';
 
 type PackageJson = PackageJson.PackageJson;
 
@@ -74,6 +75,7 @@ const updateMainBranch = async (mainBranch: string, git: SimpleGit, branchDetail
 };
 
 export const prepare = async (args: PrepareArgs): Promise<void> => {
+  printHeaderMessage(args);
   const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);

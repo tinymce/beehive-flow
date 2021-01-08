@@ -4,6 +4,7 @@ import * as Git from '../utils/Git';
 import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { BranchState, getBranchDetails, getReleaseBranchName } from '../core/BranchLogic';
+import { printHeaderMessage } from '../core/Messages';
 
 type Version = Version.Version;
 const { versionToString } = Version;
@@ -15,6 +16,7 @@ export const updateVersion = (version: Version): Version => ({
 });
 
 export const release = async (args: ReleaseArgs): Promise<void> => {
+  printHeaderMessage(args);
   const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
