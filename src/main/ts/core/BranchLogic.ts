@@ -1,6 +1,7 @@
 import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
 import { CheckRepoActions } from 'simple-git';
+import { pipe } from 'fp-ts/pipeable';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
@@ -166,11 +167,11 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   }
 };
 
-export const isLatestReleaseBranch = async (getBranches: () => Promise<string[]>, branchName: string): Promise<boolean> => {
-  const branches = await getBranches();
+export const isLatestReleaseBranch = async (branchName: string, branches: string[]): Promise<boolean> => {
   const versions = await PromiseUtils.filterMap(branches, versionFromReleaseBranch);
-  const greatestOpt = ArrayUtils.greatest(versions, Version.compareMajorMinorVersions);
-  const greatest = await PromiseUtils.optionToPromise(greatestOpt, 'Could not find any release branches with valid names.');
-  const releaseBranchName = getReleaseBranchName(greatest);
-  return branchName === releaseBranchName;
+  return pipe(
+    ArrayUtils.greatest(versions, Version.compareMajorMinorVersions),
+    O.map(getReleaseBranchName),
+    O.exists((greatest) => branchName === greatest)
+  );
 };

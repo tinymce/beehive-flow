@@ -12,7 +12,7 @@ export const pickTags = async (branchName: string, branchState: BranchState, ver
     return [ `rc-${vs}` ];
 
   } else if (branchState === BranchState.releaseReady) {
-    const isLatest = await isLatestReleaseBranch(getBranches, branchName);
+    const isLatest = await isLatestReleaseBranch(branchName, await getBranches());
     return isLatest ? [ mainTag, 'latest' ] : [ mainTag ];
 
   } else {
