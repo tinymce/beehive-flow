@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -198,7 +197,7 @@ describe('Publish', () => {
 
     // sanity check that reading the dependencies works
     const readPj = await PackageJson.parsePackageJsonFile(pjFile);
-    assert.deepEqual((readPj.other as any).dependencies, { '@tinymce/tinymce-react': '3.8.4' });
+    assert.deepEqual(readPj.other.dependencies, { '@tinymce/tinymce-react': '3.8.4' });
 
     fs.mkdirSync(path.join(dir, 'mydist'));
 
@@ -226,6 +225,6 @@ describe('Publish', () => {
 
     const depPj = await PackageJson.parsePackageJsonFileInFolder(path.join(downstream, 'node_modules', '@beehive-test', 'beehive-test-dist-dir'));
 
-    assert.deepEqual((depPj.other as any).dependencies, {});
+    assert.deepEqual(depPj.other.dependencies, {});
   }).timeout(120000); // Verdaccio runs pretty slowly on the build servers;;
 });
