@@ -236,11 +236,21 @@ $ yarn --silent beehive-flow status
     "preRelease": "alpha"
   },
   "versionString": "0.11.0-alpha",
-  "branchState": "feature",
   "branchType": "feature",
+  "branchState": "feature",
   "isLatestReleaseBranch": false
 }
 ```
+
+Fields:
+
+ - currentBranch - the current git branch
+ - version - parsed version in `package.json`. Has `major`, `minor` and `patch` fields and may have `preRelease` and `buildMetadata` fields if present.
+ - versionString - raw version string
+ - branchType - one of: `main`, `feature`, `hotfix`, `spike`, `release`
+ - branchState - state of the branch - similar to branchType, but splits release branches into 2 separate states. 
+   May be one of: `main`, `feature`, `hotfix`, `spike`, `releaseCandidate`, `releaseReady`
+ - isLatestReleaseBranch - Is this a release branch, and is it the _latest_ release branch? If `true`, this is the state where beehive-flow would npm tag the build as `latest`.
 
 If you want to read this from a Jenkinsfile:
 
