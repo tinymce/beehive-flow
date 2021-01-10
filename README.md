@@ -242,6 +242,8 @@ $ yarn --silent beehive-flow status
 }
 ```
 
+Note: this command will fail if the repo is in an invalid state.
+
 Fields:
 
  - currentBranch - the current git branch
