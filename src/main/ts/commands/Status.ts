@@ -9,12 +9,12 @@ type BranchType = BranchLogic.BranchType;
 type Version = Version.Version;
 
 export interface Status {
-  branchState: BranchState;
-  isLatestReleaseBranch: boolean;
   currentBranch: string;
-  branchType: BranchType;
   version: Version;
   versionString: string;
+  branchType: BranchType;
+  branchState: BranchState;
+  isLatestReleaseBranch: boolean;
 }
 
 export const status = async (args: StatusArgs): Promise<void> => {
@@ -40,8 +40,8 @@ export const getStatus = async (args: StatusArgs): Promise<Status> => {
     currentBranch,
     version,
     versionString: Version.versionToString(version),
-    branchState,
     branchType,
+    branchState,
     isLatestReleaseBranch
   };
 };
