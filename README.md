@@ -223,6 +223,25 @@ This is useful for integrating with other CI tools.
 
 Run this as `yarn run --silent beehive-flow status` otherwise yarn's output will make stdout invalid JSON.
 
+Example:
+
+```
+$ yarn --silent beehive-flow status
+{
+  "currentBranch": "feature/TINY-6867",
+  "version": {
+    "major": 0,
+    "minor": 11,
+    "patch": 0,
+    "preRelease": "alpha"
+  },
+  "versionString": "0.11.0-alpha",
+  "branchState": "feature",
+  "branchType": "feature",
+  "isLatestReleaseBranch": false
+}
+```
+
 If you want to read this from a Jenkinsfile:
 
 ```
