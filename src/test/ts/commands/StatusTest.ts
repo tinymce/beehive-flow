@@ -21,7 +21,7 @@ const branchWithPj = async ({ dir, git }: Git.TempGit, versionString: string, br
       "name": "@beehive-test/lifecycle-test",
       "version": "${versionString}"
     }
-    `);
+  `);
   await git.add(pjFile);
   await git.commit('pj');
   await Git.push(git);
