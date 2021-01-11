@@ -74,8 +74,11 @@ describe('NpmTags', () => {
       );
     });
 
-    it('fails if no release branches can be found', async () => {
-      await assert.isRejected(NpmTags.pickTags('release/8.1', BranchState.ReleaseReady, await parseVersion('8.1.11'), () => succeed([])));
+    it('does not tag latest if no release branches can be found', async () => {
+      await assert.becomes(
+        NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, await parseVersion('8.1.11'), () => succeed([])),
+        [ 'release-1.2' ]
+      );
     });
   });
 });

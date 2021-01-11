@@ -6,6 +6,7 @@ import * as Version from '../core/Version';
 import { writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PreRelease from '../core/PreRelease';
 import { BranchState, getBranchDetails } from '../core/BranchLogic';
+import { printHeaderMessage } from '../core/Messages';
 
 type Version = Version.Version;
 
@@ -48,6 +49,7 @@ export const chooseNewVersion = (branchState: BranchState, version: Version, git
 };
 
 export const stamp = async (args: StampArgs): Promise<void> => {
+  printHeaderMessage(args);
   const dir = args.workingDir;
   const git = gitP(dir);
   const gitSha = await Git.currentRevisionShortSha(git);

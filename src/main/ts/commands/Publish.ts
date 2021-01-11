@@ -6,8 +6,10 @@ import * as NpmTags from '../core/NpmTags';
 import * as Version from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Git from '../utils/Git';
+import { printHeaderMessage } from '../core/Messages';
 
 export const publish = async (args: PublishArgs): Promise<void> => {
+  printHeaderMessage(args);
   const dir = args.workingDir;
   const git = gitP(dir);
   const r = await getBranchDetails(dir);

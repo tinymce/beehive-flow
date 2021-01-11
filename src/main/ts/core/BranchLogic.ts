@@ -1,9 +1,11 @@
 import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
 import { CheckRepoActions } from 'simple-git';
+import { pipe } from 'fp-ts/pipeable';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
+import * as ArrayUtils from '../utils/ArrayUtils';
 import * as Version from './Version';
 import * as PreRelease from './PreRelease';
 import * as PackageJson from './PackageJson';
@@ -18,12 +20,21 @@ export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): strin
 
 // eslint-disable-next-line no-shadow
 export const enum BranchType {
-  Main, Feature, Hotfix, Spike, Release
+  Main = 'main',
+  Feature = 'feature',
+  Hotfix = 'hotfix',
+  Spike = 'spike',
+  Release = 'release'
 }
 
 // eslint-disable-next-line no-shadow
 export const enum BranchState {
-  Main, Feature, Hotfix, Spike, ReleaseReady, ReleaseCandidate
+  Main = 'main',
+  Feature = 'feature',
+  Hotfix = 'hotfix',
+  Spike = 'spike',
+  ReleaseReady = 'releaseReady',
+  ReleaseCandidate = 'releaseCandidate'
 }
 
 export interface BranchDetails {
@@ -154,4 +165,13 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
       };
     }
   }
+};
+
+export const isLatestReleaseBranch = async (branchName: string, branches: string[]): Promise<boolean> => {
+  const versions = await PromiseUtils.filterMap(branches, versionFromReleaseBranch);
+  return pipe(
+    ArrayUtils.greatest(versions, Version.compareMajorMinorVersions),
+    O.map(getReleaseBranchName),
+    O.exists((greatest) => branchName === greatest)
+  );
 };

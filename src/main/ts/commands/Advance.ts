@@ -7,6 +7,7 @@ import { BranchState, getReleaseBranchName, getBranchDetails } from '../core/Bra
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { releaseCandidate } from '../core/PreRelease';
+import { printHeaderMessage } from '../core/Messages';
 
 export const updateVersion = (version: Version): Version => ({
   major: version.major,
@@ -27,6 +28,7 @@ const go = async (version: Version, pj: PackageJson, pjFile: string, git: Simple
 };
 
 export const advance = async (args: AdvanceArgs): Promise<void> => {
+  printHeaderMessage(args);
   const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
@@ -42,6 +44,7 @@ export const advance = async (args: AdvanceArgs): Promise<void> => {
 };
 
 export const advanceCi = async (args: AdvanceCiArgs): Promise<void> => {
+  printHeaderMessage(args);
   const dir = args.workingDir;
 
   const branchDetails = await getBranchDetails(dir);
