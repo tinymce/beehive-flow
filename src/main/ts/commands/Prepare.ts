@@ -83,7 +83,7 @@ export const prepare = async (args: PrepareArgs): Promise<void> => {
   const mainBranch = await Git.checkoutMainBranch(git);
 
   const branchDetails = await getBranchDetails(dir);
-  if (branchDetails.branchState !== BranchState.main) {
+  if (branchDetails.branchState !== BranchState.Main) {
     return PromiseUtils.fail('main branch not in correct state.');
   }
 

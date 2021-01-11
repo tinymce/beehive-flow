@@ -25,7 +25,7 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   await Git.checkout(git, rbn);
 
   const branchDetails = await getBranchDetails(dir);
-  if (branchDetails.branchState !== BranchState.releaseCandidate) {
+  if (branchDetails.branchState !== BranchState.ReleaseCandidate) {
     return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
   }
 

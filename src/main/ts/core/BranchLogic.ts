@@ -20,21 +20,21 @@ export const getReleaseBranchName = ({ major, minor }: MajorMinorVersion): strin
 
 // eslint-disable-next-line no-shadow
 export const enum BranchType {
-  main = 'main',
-  feature = 'feature',
-  hotfix = 'hotfix',
-  spike = 'spike',
-  release = 'release'
+  Main = 'main',
+  Feature = 'feature',
+  Hotfix = 'hotfix',
+  Spike = 'spike',
+  Release = 'release'
 }
 
 // eslint-disable-next-line no-shadow
 export const enum BranchState {
-  main = 'main',
-  feature = 'feature',
-  hotfix = 'hotfix',
-  spike = 'spike',
-  releaseReady = 'releaseReady',
-  releaseCandidate = 'releaseCandidate'
+  Main = 'main',
+  Feature = 'feature',
+  Hotfix = 'hotfix',
+  Spike = 'spike',
+  ReleaseReady = 'releaseReady',
+  ReleaseCandidate = 'releaseCandidate'
 }
 
 export interface BranchDetails {
@@ -63,18 +63,18 @@ export const mainBranchName = 'main';
 
 export const getBranchType = (branchName: string): Option<BranchType> => {
   if (branchName === mainBranchName) {
-    return O.some(BranchType.main);
+    return O.some(BranchType.Main);
   } else {
     const parts = branchName.split('/');
     switch (parts[0]) {
       case 'feature':
-        return O.some(BranchType.feature);
+        return O.some(BranchType.Feature);
       case 'hotfix':
-        return O.some(BranchType.hotfix);
+        return O.some(BranchType.Hotfix);
       case 'spike':
-        return O.some(BranchType.spike);
+        return O.some(BranchType.Spike);
       case 'release':
-        return O.some(BranchType.release);
+        return O.some(BranchType.Release);
       default:
         return O.none;
     }
@@ -108,26 +108,26 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const sPackageVersion = Version.versionToString(version);
   const sPre = showStringOrUndefined(version.preRelease);
 
-  const validateMainBranch = async (): Promise<BranchState.main> => {
+  const validateMainBranch = async (): Promise<BranchState.Main> => {
     if (version.patch !== 0) {
       return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
     } else if (!isValidPrerelease(version.preRelease, PreRelease.mainBranch)) {
       return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}" or start with "${PreRelease.mainBranch}.", but is ${sPre}`);
     } else {
-      return BranchState.main;
+      return BranchState.Main;
     }
   };
 
-  const validateReleaseBranch = async (): Promise<BranchState.releaseCandidate | BranchState.releaseReady> => {
+  const validateReleaseBranch = async (): Promise<BranchState.ReleaseCandidate | BranchState.ReleaseReady> => {
     const branchVersion = await versionFromReleaseBranch(currentBranch);
     const sBranchVersion = Version.majorMinorVersionToString(branchVersion);
 
     if (version.major !== branchVersion.major || version.minor !== branchVersion.minor) {
       return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
     } else if (version.preRelease === undefined) {
-      return BranchState.releaseReady;
+      return BranchState.ReleaseReady;
     } else if (isValidPrerelease(version.preRelease, PreRelease.releaseCandidate)) {
-      return BranchState.releaseCandidate;
+      return BranchState.ReleaseCandidate;
     } else {
       const rc = PreRelease.releaseCandidate;
       return fail(`${loc}: prerelease version part should be either "${rc}" or start with "${rc}." or not be set, but it is "${sPre}"`);
@@ -136,15 +136,15 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 
   const detect = async (branchType: BranchType): Promise<BranchState> => {
     switch (branchType) {
-      case BranchType.main:
+      case BranchType.Main:
         return validateMainBranch();
-      case BranchType.feature:
-        return BranchState.feature;
-      case BranchType.hotfix:
-        return BranchState.hotfix;
-      case BranchType.spike:
-        return BranchState.spike;
-      case BranchType.release:
+      case BranchType.Feature:
+        return BranchState.Feature;
+      case BranchType.Hotfix:
+        return BranchState.Hotfix;
+      case BranchType.Spike:
+        return BranchState.Spike;
+      case BranchType.Release:
         return validateReleaseBranch();
     }
   };

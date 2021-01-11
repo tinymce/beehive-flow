@@ -16,21 +16,21 @@ export const formatDate = (timeMillis: number): string =>
   DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat, { timeZone: 'utc' });
 
 export const chooseNewVersion = (branchState: BranchState, version: Version, gitSha: string, timeMillis: number): Version => {
-  if (branchState === BranchState.releaseReady) {
+  if (branchState === BranchState.ReleaseReady) {
     return version;
   } else {
 
     const prePre = (() => {
       switch (branchState) {
-        case BranchState.main:
+        case BranchState.Main:
           return PreRelease.mainBranch;
-        case BranchState.releaseCandidate:
+        case BranchState.ReleaseCandidate:
           return PreRelease.releaseCandidate;
-        case BranchState.feature:
+        case BranchState.Feature:
           return PreRelease.featureBranch;
-        case BranchState.hotfix:
+        case BranchState.Hotfix:
           return PreRelease.hotfixBranch;
-        case BranchState.spike:
+        case BranchState.Spike:
           return PreRelease.spikeBranch;
       }
     })();

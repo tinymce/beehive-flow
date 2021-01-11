@@ -37,7 +37,7 @@ export const advance = async (args: AdvanceArgs): Promise<void> => {
   await Git.checkout(git, rbn);
 
   const branchDetails = await getBranchDetails(dir);
-  if (branchDetails.branchState !== BranchState.releaseReady) {
+  if (branchDetails.branchState !== BranchState.ReleaseReady) {
     return PromiseUtils.fail('Branch is not in release ready state - can\'t advance. Check that the version is x.y.z with no suffix.');
   }
   await go(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile, git, args, dir);
@@ -48,7 +48,7 @@ export const advanceCi = async (args: AdvanceCiArgs): Promise<void> => {
   const dir = args.workingDir;
 
   const branchDetails = await getBranchDetails(dir);
-  if (branchDetails.branchState !== BranchState.releaseReady) {
+  if (branchDetails.branchState !== BranchState.ReleaseReady) {
     console.log('Not in release ready state - not advancing version.');
   } else {
     const git = gitP(dir);
