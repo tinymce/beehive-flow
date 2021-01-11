@@ -18,13 +18,13 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
-  await npmPublish(mainTag, dryRunArgs, dir);
-  await npmTag(args, tags, r, dir);
+  await npmPublish(mainTag, dryRunArgs, args.workingDir, args.distDir);
+  await npmTag(args, tags, r, args.workingDir);
   await gitTag(r, git, args);
 };
 
-const npmPublish = async (mainTag: string, dryRunArgs: string[], dir: string): Promise<void> => {
-  const publishCmd = [ 'publish', '--tag', mainTag, ...dryRunArgs ];
+const npmPublish = async (mainTag: string, dryRunArgs: string[], dir: string, distDir: string): Promise<void> => {
+  const publishCmd = [ 'publish', distDir, '--tag', mainTag, ...dryRunArgs ];
   console.log([ 'npm', ...publishCmd ].join(' '));
   await cs('npm', publishCmd, { stdio: 'inherit', cwd: dir });
 };

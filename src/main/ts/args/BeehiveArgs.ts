@@ -36,6 +36,7 @@ export interface StampArgs extends BaseArgs {
 
 export interface PublishArgs extends BaseArgs {
   readonly kind: 'PublishArgs';
+  readonly distDir: string;
 }
 
 export interface StatusArgs extends BaseArgs {
@@ -84,10 +85,11 @@ export const advanceCiArgs = (dryRun: boolean, workingDir: string): AdvanceCiArg
   workingDir
 });
 
-export const publishArgs = (dryRun: boolean, workingDir: string): PublishArgs => ({
+export const publishArgs = (dryRun: boolean, workingDir: string, distDir: string): PublishArgs => ({
   kind: 'PublishArgs',
   dryRun,
-  workingDir
+  workingDir,
+  distDir
 });
 
 export const statusArgs = (dryRun: boolean, workingDir: string): StatusArgs => ({
