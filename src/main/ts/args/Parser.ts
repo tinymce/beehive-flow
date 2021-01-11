@@ -36,6 +36,13 @@ const tempOptions: yargs.Options = {
   description: 'Temp folder for git checkout. If not specified, a system temp folder is used.'
 };
 
+const distDirOptions: yargs.Options = {
+  type: 'string',
+  default: '.',
+  description: 'Dir to use to run "npm publish". Relative to the working-dir. ' +
+    'The package.json file in this dir must have the same name and version as the one in the working-dir.'
+};
+
 const getColumns = (): number =>
   Math.min(120, yargs.terminalWidth());
 
@@ -85,7 +92,9 @@ const argParser =
     )
     .command(
       'publish',
-      publishDescription
+      publishDescription,
+      (y) => y
+        .option('dist-dir', distDirOptions)
     )
     .demandCommand(1)
     .wrap(getColumns())
@@ -122,7 +131,6 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
   const temp = () => O.fromNullable(a.temp as string | null);
   const gitUrl = () => O.fromNullable(a['git-url'] as string | null);
   const majorDotMinor = () => parseMajorMinorVersion(a.majorDotMinor as string);
-
   if (cmd === 'prepare') {
     return O.some(BeehiveArgs.prepareArgs(dryRun, workingDir, temp(), gitUrl()));
 
@@ -139,7 +147,7 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
     return O.some(BeehiveArgs.stampArgs(dryRun, workingDir));
 
   } else if (cmd === 'publish') {
-    return O.some(BeehiveArgs.publishArgs(dryRun, workingDir));
+    return O.some(BeehiveArgs.publishArgs(dryRun, workingDir, a['dist-dir'] as string));
 
   } else {
     return PromiseUtils.fail(`Unknown command: ${cmd}`);

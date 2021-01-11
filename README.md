@@ -149,6 +149,8 @@ Note that feature/spike/hotfix branch versions are not validated by beehive-flow
 Note: the `stamp`, `advance-ci` and `publish` commands operate on a checkout in the current working directory,
 whereas the other commands make their own checkout.
 
+For a detailed description about command-line usage and arguments, run `yarn beehive-flow --help` or `yarn beehive-flow --help COMMAND`.
+
 ### prepare
 
 This signifies that the mainline is ready for stabilization.

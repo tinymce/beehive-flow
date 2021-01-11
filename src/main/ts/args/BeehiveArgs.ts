@@ -36,6 +36,7 @@ export interface StampArgs extends BaseArgs {
 
 export interface PublishArgs extends BaseArgs {
   readonly kind: 'PublishArgs';
+  readonly distDir: string;
 }
 
 export const prepareArgs = (dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>): PrepareArgs => ({
@@ -80,10 +81,11 @@ export const advanceCiArgs = (dryRun: boolean, workingDir: string): AdvanceCiArg
   workingDir
 });
 
-export const publishArgs = (dryRun: boolean, workingDir: string): PublishArgs => ({
+export const publishArgs = (dryRun: boolean, workingDir: string, distDir: string): PublishArgs => ({
   kind: 'PublishArgs',
   dryRun,
-  workingDir
+  workingDir,
+  distDir
 });
 
 export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | AdvanceCiArgs | StampArgs | PublishArgs;
