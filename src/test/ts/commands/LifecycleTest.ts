@@ -27,7 +27,7 @@ describe('Lifecycle', () => {
     await Files.writeFile(path.join(dir, 'package.json'), `
     {
       "name": "@beehive-test/lifecycle-test",
-      "version": "0.1.0-alpha"
+      "version": "0.1.0-rc"
     }
     `);
 
@@ -42,7 +42,7 @@ describe('Lifecycle', () => {
 
     await beehiveFlow([ 'prepare', '--git-url', hub.dir ]);
     await git.pull();
-    await assertPjVersion('0.2.0-alpha');
+    await assertPjVersion('0.2.0-rc');
 
     await git.checkout('release/0.1');
     await assertPjVersion('0.1.0-rc');

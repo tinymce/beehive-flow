@@ -22,10 +22,8 @@ export const chooseNewVersion = (branchState: BranchState, version: Version, git
 
     const prePre = (() => {
       switch (branchState) {
-        case BranchState.Main:
-          return PreRelease.mainBranch;
         case BranchState.ReleaseCandidate:
-          return PreRelease.releaseCandidate;
+          return version.preRelease;
         case BranchState.Feature:
           return PreRelease.featureBranch;
         case BranchState.Hotfix:

@@ -9,7 +9,7 @@ import * as Files from '../utils/Files';
 import { PrepareArgs } from '../args/BeehiveArgs';
 import { Version } from '../core/Version';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import * as Prerelease from '../core/PreRelease';
+import * as PreRelease from '../core/PreRelease';
 import { printHeaderMessage } from '../core/Messages';
 
 type PackageJson = PackageJson.PackageJson;
@@ -32,14 +32,14 @@ export const newMainBranchVersion = (oldMainBranchVersion: Version): Version => 
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor + 1,
   patch: 0,
-  preRelease: Prerelease.mainBranch
+  preRelease: PreRelease.releaseCandidate
 });
 
 export const releaseBranchVersion = (oldMainBranchVersion: Version): Version => ({
   major: oldMainBranchVersion.major,
   minor: oldMainBranchVersion.minor,
   patch: 0,
-  preRelease: Prerelease.releaseCandidate
+  preRelease: PreRelease.releaseCandidate
 });
 
 const updatePackageJsonFileForReleaseBranch = async (version: Version, pj: PackageJson, pjFile: string): Promise<void> => {
@@ -83,8 +83,8 @@ export const prepare = async (args: PrepareArgs): Promise<void> => {
   const mainBranch = await Git.checkoutMainBranch(git);
 
   const branchDetails = await getBranchDetails(dir);
-  if (branchDetails.branchState !== BranchState.Main) {
-    return PromiseUtils.fail('main branch not in correct state.');
+  if (branchDetails.branchState !== BranchState.ReleaseCandidate) {
+    return PromiseUtils.fail('main branch should have a prerelease version when running this command');
   }
 
   const releaseBranchName = getReleaseBranchName(branchDetails.version);

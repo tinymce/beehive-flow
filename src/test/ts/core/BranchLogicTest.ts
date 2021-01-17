@@ -91,12 +91,12 @@ describe('BranchLogic', () => {
       await assert.becomes(getBranchDetails(dir), expected);
     };
 
-    it('detects valid main branch', () =>
-      check('main', '0.6.0-alpha', BranchType.Main, BranchState.Main)
+    it('passes for main branch with rc version', () =>
+      check('main', '0.6.0-rc', BranchType.Main, BranchState.ReleaseCandidate)
     );
 
     it('passes for timestamped version on main branch', () =>
-      check('main', '0.6.0-alpha.20020202020202.293la9', BranchType.Main, BranchState.Main)
+      check('main', '0.6.0-rc.20020202020202.293la9', BranchType.Main, BranchState.ReleaseCandidate)
     );
 
     it('fails for main branch with wrong minor version', async () => {
@@ -104,17 +104,16 @@ describe('BranchLogic', () => {
       await assert.isRejected(getBranchDetails(dir));
     });
 
-    it('fails for main branch with rc version', async () => {
-      const { dir } = await setup('main', '0.6.0-rc');
+    it('fails for main branch with alpha version', async () => {
+      const { dir } = await setup('main', '0.6.0-alpha');
       await assert.isRejected(getBranchDetails(dir));
     });
 
-    it('fails for main branch with release version', async () => {
-      const { dir } = await setup('main', '0.6.0');
-      await assert.isRejected(getBranchDetails(dir));
+    it('passes for main branch with release version', async () => {
+      check('main', '0.6.0', BranchType.Main, BranchState.ReleaseReady)
     });
 
-    it('passes for main branch with prerelease version', async () => {
+    it('fails for main branch with non-rc prerelease version', async () => {
       const { dir } = await setup('main', '0.6.0+9nesste123.frog');
       await assert.isRejected(getBranchDetails(dir));
     });

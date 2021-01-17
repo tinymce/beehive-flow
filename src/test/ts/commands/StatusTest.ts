@@ -33,12 +33,12 @@ const check = async (dir: string, expected: Object) => {
 };
 
 describe('Status', () => {
-  it('shows status for main', async () => {
+  it('shows status for main branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await branchWithPj({ dir, git }, '0.1.0-alpha', 'main');
+    await branchWithPj({ dir, git }, '0.1.0-rc', 'main');
 
     await check(dir, {
-      branchState: 'main',
+      branchState: 'releaseCandidate',
       isLatestReleaseBranch: false,
       currentBranch: 'main',
       branchType: 'main',
@@ -46,13 +46,31 @@ describe('Status', () => {
         major: 0,
         minor: 1,
         patch: 0,
-        preRelease: 'alpha'
+        preRelease: 'rc'
       },
-      versionString: '0.1.0-alpha'
+      versionString: '0.1.0-rc'
     });
   });
 
-  it('shows status for rc', async () => {
+  it('shows status for main branch in releaseReady state', async () => {
+    const { dir, git } = await newGit();
+    await branchWithPj({ dir, git }, '0.7.0', 'main');
+
+    await check(dir, {
+      branchState: 'releaseReady',
+      isLatestReleaseBranch: false,
+      currentBranch: 'main',
+      branchType: 'main',
+      version: {
+        major: 0,
+        minor: 7,
+        patch: 0
+      },
+      versionString: '0.7.0'
+    });
+  });
+
+  it('shows status for release branch in preRelease state', async () => {
     const { dir, git } = await newGit();
     await branchWithPj({ dir, git }, '1.98.2-rc', 'release/1.98');
 
@@ -71,7 +89,7 @@ describe('Status', () => {
     });
   });
 
-  it('shows status for releaseReady', async () => {
+  it('shows status for release branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
     await branchWithPj({ dir, git }, '1.98.7', 'release/1.98');
 
