@@ -17,9 +17,13 @@ Support for monorepos using yarn workspaces is planned.
 ## Key concepts
 
 - All new work happens in `feature/*` branches which are merged to the `main` branch.
-- The `main` branch is branched to `release/x.y` branches to produce release candidates and releases.
+- The `main` branch is branched to `release/x.y` branches to stabilise a minor version. This can be done either before or after the minor version is released.
+- Release can be done from `main` or `release/x.y`.
+- `main` and `release/x.y` branches can be in "release candidate" or "release ready" state.
 - `hotfix/*` branches are used to make updates to `release/x.y` branches.
 - The `beehive-flow` CLI tool defines several commands, used to perform key actions involved in branching and releasing.
+- As above, publishing can happen from any branch.
+- Branch naming and versioning is strict and enforced.
 
 ## Branches
 
