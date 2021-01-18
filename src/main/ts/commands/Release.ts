@@ -3,7 +3,7 @@ import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { BranchState, getBranchDetails, getReleaseBranchName } from '../core/BranchLogic';
+import { BranchState, getBranchDetails } from '../core/BranchLogic';
 import { printHeaderMessage } from '../core/Messages';
 
 type Version = Version.Version;
@@ -21,8 +21,7 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
-  const rbn = getReleaseBranchName(args.majorMinorVersion);
-  await Git.checkout(git, rbn);
+  await Git.checkout(git, args.branchName);
 
   const branchDetails = await getBranchDetails(dir);
   if (branchDetails.branchState !== BranchState.ReleaseCandidate) {

@@ -3,7 +3,7 @@ import { SimpleGit } from 'simple-git';
 import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
 import { Version, versionToString } from '../core/Version';
 import * as Git from '../utils/Git';
-import { BranchState, getReleaseBranchName, getBranchDetails } from '../core/BranchLogic';
+import { BranchState, getBranchDetails } from '../core/BranchLogic';
 import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { releaseCandidate } from '../core/PreRelease';
@@ -33,8 +33,7 @@ export const advance = async (args: AdvanceArgs): Promise<void> => {
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
-  const rbn = getReleaseBranchName(args.majorMinorVersion);
-  await Git.checkout(git, rbn);
+  await Git.checkout(git, args.branchName);
 
   const branchDetails = await getBranchDetails(dir);
   if (branchDetails.branchState !== BranchState.ReleaseReady) {

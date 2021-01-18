@@ -3,6 +3,7 @@ import * as O from 'fp-ts/Option';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { parseMajorMinorVersion } from '../core/Version';
 import * as BeehiveArgs from './BeehiveArgs';
+import * as BranchLogic from '../core/BranchLogic';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 type Option<A> = O.Option<A>;
@@ -27,8 +28,8 @@ const gitUrlOptions: yargs.Options = {
   description: 'URL of git repo to operate on. Defaults to the git repo in the current directory.'
 };
 
-const majorDotMinorOptions: yargs.PositionalOptions = {
-  describe: 'major.minor version',
+const majorMinorOrMainOptions: yargs.PositionalOptions = {
+  describe: 'major.minor version or "main"',
   type: 'string'
 };
 
@@ -69,18 +70,18 @@ const argParser =
         .option('temp', tempOptions)
     )
     .command(
-      'release <majorDotMinor>',
+      'release <majorMinorOrMain>',
       releaseDescription,
       (y) => y
-        .positional('majorDotMinor', majorDotMinorOptions)
+        .positional('majorMinorOrMain', majorMinorOrMainOptions)
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
     )
     .command(
-      'advance <majorDotMinor>',
+      'advance <majorMinorOrMain>',
       advanceDescription,
       (y) => y
-        .positional('majorDotMinor', majorDotMinorOptions)
+        .positional('majorMinorOrMain', majorMinorOrMainOptions)
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
     )
@@ -136,15 +137,25 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
 
   const temp = () => O.fromNullable(a.temp as string | null);
   const gitUrl = () => O.fromNullable(a['git-url'] as string | null);
-  const majorDotMinor = () => parseMajorMinorVersion(a.majorDotMinor as string);
+
+  const majorMinorOrMain = async (): Promise<string> => {
+    const mmm = a.majorMinorOrMain as string;
+    if (mmm === 'main') {
+      return 'main';
+    } else {
+      const mm = await parseMajorMinorVersion(mmm);
+      return BranchLogic.getReleaseBranchName(mm);
+    }
+  }
+
   if (cmd === 'prepare') {
     return O.some(BeehiveArgs.prepareArgs(dryRun, workingDir, temp(), gitUrl()));
 
   } else if (cmd === 'release') {
-    return O.some(BeehiveArgs.releaseArgs(dryRun, workingDir, temp(), gitUrl(), await majorDotMinor()));
+    return O.some(BeehiveArgs.releaseArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain()));
 
   } else if (cmd === 'advance') {
-    return O.some(BeehiveArgs.advanceArgs(dryRun, workingDir, temp(), gitUrl(), await majorDotMinor()));
+    return O.some(BeehiveArgs.advanceArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain()));
 
   } else if (cmd === 'advance-ci') {
     return O.some(BeehiveArgs.advanceCiArgs(dryRun, workingDir));
