@@ -84,7 +84,7 @@ export const prepare = async (args: PrepareArgs): Promise<void> => {
 
   const branchDetails = await getBranchDetails(dir);
   if (branchDetails.branchState !== BranchState.ReleaseCandidate) {
-    return PromiseUtils.fail('main branch should have a prerelease version when running this command');
+    return PromiseUtils.fail('main branch should have an rc version when running this command');
   }
 
   const releaseBranchName = getReleaseBranchName(branchDetails.version);
