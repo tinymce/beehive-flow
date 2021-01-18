@@ -5,18 +5,11 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
 import * as Git from '../../../main/ts/utils/Git';
 import * as Files from '../../../main/ts/utils/Files';
-import * as Parser from '../../../main/ts/args/Parser';
-import * as Dispatch from '../../../main/ts/args/Dispatch';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
-import { eachAsync } from '../../../main/ts/utils/OptionUtils';
+import { beehiveFlow } from './TestUtils';
 
 const assert = chai.use(chaiAsPromised).assert;
-
-const beehiveFlow = async (args: string[]): Promise<void> => {
-  const a = await Parser.parseArgs(args);
-  await eachAsync(a, Dispatch.dispatch);
-};
 
 describe('Lifecycle', () => {
   it('cycles', async () => {

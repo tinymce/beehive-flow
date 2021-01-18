@@ -4,32 +4,10 @@ import * as fs from 'fs';
 import { describe, it } from 'mocha';
 import { assert } from 'chai';
 import * as getPort from 'get-port';
-import { SimpleGit } from 'simple-git/promise';
 import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
-import * as Parser from '../../../main/ts/args/Parser';
-import * as Dispatch from '../../../main/ts/args/Dispatch';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
-import { versionToString } from '../../../main/ts/core/Version';
-
-const beehiveFlow = async (args: string[]): Promise<void> => {
-  const a = await Parser.parseArgs(args);
-  if (a._tag === 'Some') {
-    await Dispatch.dispatch(a.value);
-  }
-};
-
-const getTags = (cwd: string, packageName: string): Record<string, string> => {
-  const output = cp.execSync(`npm dist-tag ls @beehive-test/${packageName}`, { cwd }).toString();
-  const lines = output.split('\n').filter((x) => x.length > 0);
-  const r: Record<string, string> = {};
-
-  for (const line of lines) {
-    const [ tag, version ] = line.split(': ');
-    r[tag] = version;
-  }
-  return r;
-};
+import { beehiveFlow, getTags, makeBranchWithPj, readPjVersion, writeNpmrc } from './TestUtils';
 
 const startVerdaccio = async () => {
   const configDir = await Files.tempFolder();
@@ -54,40 +32,15 @@ web:
   return { port, verdaccio, address };
 };
 
-const writeNpmrc = async (address: string, dir: string): Promise<string> => {
-  const npmrc = `@beehive-test:registry=${address}`;
-  const npmrcFile = path.join(dir, '.npmrc');
-  await Files.writeFile(npmrcFile, npmrc);
-  return npmrcFile;
-};
-
 const publish = async (dryRun: boolean, dir: string): Promise<void> => {
   const dryRunArgs = dryRun ? [ '--dry-run' ] : [];
   await beehiveFlow([ 'publish', '--working-dir', dir, ...dryRunArgs ]);
 };
 
+
 // const assertGitTags = async (expectedTags: string[], git: SimpleGit): Promise<void> => {
 //   assert.deepEqual((await git.tags()).all.sort(), expectedTags.sort());
 // };
-
-const makeBranchWithPj = async (git: SimpleGit, branchName: string, address: string, dir: string, packageName: string, version: string) => {
-  await Git.checkoutNewBranch(git, branchName);
-  const npmrcFile = await writeNpmrc(address, dir);
-  const pjFile = path.join(dir, 'package.json');
-  const pjContents = `
-      {
-        "name": "@beehive-test/${packageName}",
-        "version": "${version}",
-        "publishConfig": {
-          "@beehive-test:registry": "${address}"
-        }
-      }`;
-  await Files.writeFile(pjFile, pjContents);
-  await git.add([ npmrcFile, pjFile ]);
-  await git.commit('commit');
-  await Git.push(git);
-  return pjFile;
-};
 
 describe('Publish', () => {
 
@@ -109,15 +62,6 @@ describe('Publish', () => {
   async function stamp(dir: string) {
     await beehiveFlow([ 'stamp', '--working-dir', dir ]);
   }
-
-  const readPjVersion = async (pjFile: string): Promise<string> => {
-    const pj = await PackageJson.parsePackageJsonFile(pjFile);
-    const v = pj.version;
-    if (v._tag !== 'Some') {
-      throw new Error('Version should be some');
-    }
-    return versionToString(v.value);
-  };
 
   const runScenario = async (branchName: string, version: string, dryRun: boolean) => {
     scenario++;
