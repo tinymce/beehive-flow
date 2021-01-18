@@ -1,10 +1,10 @@
+import * as path from 'path';
+import * as cp from 'child_process';
 import { SimpleGit } from 'simple-git/promise';
 import * as Git from '../../../main/ts/utils/Git';
-import * as path from "path";
 import * as Files from '../../../main/ts/utils/Files';
 import * as Parser from '../../../main/ts/args/Parser';
 import * as Dispatch from '../../../main/ts/args/Dispatch';
-import * as cp from "child_process";
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import { versionToString } from '../../../main/ts/core/Version';
 

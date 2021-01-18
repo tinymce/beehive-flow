@@ -109,9 +109,9 @@ describe('BranchLogic', () => {
       await assert.isRejected(getBranchDetails(dir));
     });
 
-    it('passes for main branch with release version', async () => {
+    it('passes for main branch with release version', async () =>
       check('main', '0.6.0', BranchType.Main, BranchState.ReleaseReady)
-    });
+    );
 
     it('fails for main branch with non-rc prerelease version', async () => {
       const { dir } = await setup('main', '0.6.0+9nesste123.frog');

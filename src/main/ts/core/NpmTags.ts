@@ -1,10 +1,12 @@
 import { SimpleGit } from 'simple-git/promise';
 import * as Git from '../utils/Git';
+import * as PreRelease from '../core/PreRelease';
 import { BranchState, isLatestReleaseBranch } from './BranchLogic';
 import { majorMinorVersionToString, Version } from './Version';
-import * as PreRelease from '../core/PreRelease';
 
-export const pickTags = async (branchName: string, branchState: BranchState, version: Version, getBranches: () => Promise<string[]>): Promise<[string, ...string[]]> => {
+export const pickTags = async (
+  branchName: string, branchState: BranchState, version: Version, getBranches: () => Promise<string[]>
+): Promise<[string, ...string[]]> => {
 
   const branchTag = branchName.replace(/[^\w.]+/g, '-');
 

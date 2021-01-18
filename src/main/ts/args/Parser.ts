@@ -2,8 +2,8 @@ import * as yargs from 'yargs';
 import * as O from 'fp-ts/Option';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { parseMajorMinorVersion } from '../core/Version';
-import * as BeehiveArgs from './BeehiveArgs';
 import * as BranchLogic from '../core/BranchLogic';
+import * as BeehiveArgs from './BeehiveArgs';
 
 type BeehiveArgs = BeehiveArgs.BeehiveArgs;
 type Option<A> = O.Option<A>;
@@ -146,7 +146,7 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
       const mm = await parseMajorMinorVersion(mmm);
       return BranchLogic.getReleaseBranchName(mm);
     }
-  }
+  };
 
   if (cmd === 'prepare') {
     return O.some(BeehiveArgs.prepareArgs(dryRun, workingDir, temp(), gitUrl()));

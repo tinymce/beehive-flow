@@ -19,15 +19,15 @@ const checkSimple = async (branchName: string, branchState: BranchState, version
 
 describe('NpmTags', () => {
   describe('pickTags', () => {
-    it('uses the branch name for feature branches', () => checkSimple('feature/BLAH-123', BranchState.Feature, '0.1.0', ['feature-BLAH-123']));
-    it('uses the branch name for spike branches', () => checkSimple('spike/BLAH-123', BranchState.Spike, '0.1.7', ['spike-BLAH-123']));
-    it('uses the branch name for hotfix branches', () => checkSimple('hotfix/BLAH-123', BranchState.Hotfix, '0.1.9', ['hotfix-BLAH-123']));
+    it('uses the branch name for feature branches', () => checkSimple('feature/BLAH-123', BranchState.Feature, '0.1.0', [ 'feature-BLAH-123' ]));
+    it('uses the branch name for spike branches', () => checkSimple('spike/BLAH-123', BranchState.Spike, '0.1.7', [ 'spike-BLAH-123' ]));
+    it('uses the branch name for hotfix branches', () => checkSimple('hotfix/BLAH-123', BranchState.Hotfix, '0.1.9', [ 'hotfix-BLAH-123' ]));
 
     it('uses the branch name and rc-version for main branch in releaseCandidate state', () =>
-      checkSimple('main', BranchState.ReleaseCandidate, '0.1.2-frog', ['main', 'rc-0.1'])
+      checkSimple('main', BranchState.ReleaseCandidate, '0.1.2-frog', [ 'main', 'rc-0.1' ])
     );
     it('uses the branch name, latest and release version for releaseReady main branch', () =>
-      checkSimple('main', BranchState.ReleaseReady, '0.1.2', ['main', 'latest', 'release-0.1'])
+      checkSimple('main', BranchState.ReleaseReady, '0.1.2', [ 'main', 'latest', 'release-0.1' ])
     );
 
     it('uses the branch name and rc-version for rc state', async () => {
@@ -38,11 +38,11 @@ describe('NpmTags', () => {
     });
 
     it('replaces sequences of characters other than alphanumeric/dot/underscore with dashes', () =>
-      checkSimple('hotfix/blah_32.7/b**@', BranchState.Hotfix, '0.1.2', ['hotfix-blah_32.7-b-'])
+      checkSimple('hotfix/blah_32.7/b**@', BranchState.Hotfix, '0.1.2', [ 'hotfix-blah_32.7-b-' ])
     );
 
     it('uses the branch name (replacing multiple slashes) for feature branches',
-      () => checkSimple('feature/BLAH/12/3', BranchState.Feature, '100.7.22', ['feature-BLAH-12-3'])
+      () => checkSimple('feature/BLAH/12/3', BranchState.Feature, '100.7.22', [ 'feature-BLAH-12-3' ])
     );
 
     it('uses no tags for release ready state if not the latest release branch', async () => {
