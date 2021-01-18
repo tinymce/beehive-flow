@@ -7,7 +7,7 @@ import * as getPort from 'get-port';
 import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
-import { beehiveFlow, getTags, makeBranchWithPj, readPjVersion, writeNpmrc } from './TestUtils';
+import { beehiveFlow, getNpmTags, makeBranchWithPj, readPjVersion, writeNpmrc } from './TestUtils';
 
 const startVerdaccio = async () => {
   const configDir = await Files.tempFolder();
@@ -36,11 +36,6 @@ const publish = async (dryRun: boolean, dir: string): Promise<void> => {
   const dryRunArgs = dryRun ? [ '--dry-run' ] : [];
   await beehiveFlow([ 'publish', '--working-dir', dir, ...dryRunArgs ]);
 };
-
-
-// const assertGitTags = async (expectedTags: string[], git: SimpleGit): Promise<void> => {
-//   assert.deepEqual((await git.tags()).all.sort(), expectedTags.sort());
-// };
 
 describe('Publish', () => {
 
@@ -78,75 +73,83 @@ describe('Publish', () => {
     await stamp(dir);
     const stampedVersion = await readPjVersion(pjFile);
     await publish(dryRun, dir);
-    const tags = getTags(dir, packageName);
-    return { stampedVersion, tags, dir, git };
+    const npmTags = getNpmTags(dir, packageName);
+    const gitTags = (await git.tags()).all.sort();
+    return { stampedVersion, npmTags, dir, git, gitTags, packageName };
   };
 
   const TIMEOUT = 120000;
 
   it('publishes rc from main branch', async () => {
-    const { stampedVersion, tags } = await runScenario('main', '0.1.0-rc', false);
-    assert.deepEqual(tags, {
+    const { stampedVersion, npmTags, gitTags } = await runScenario('main', '0.1.0-rc', false);
+    assert.deepEqual(npmTags, {
       latest: '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
       main: stampedVersion,
       'rc-0.1': stampedVersion
     });
+    assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
   it('publishes release from main branch', async () => {
-    const { tags } = await runScenario('main', '0.1.0', false);
-    assert.deepEqual(tags, {
+    const { npmTags, gitTags, packageName } = await runScenario('main', '0.1.0', false);
+    assert.deepEqual(npmTags, {
       'feature-dummy': '0.0.1-rc',
       main: '0.1.0',
       latest: '0.1.0',
       'release-0.1': '0.1.0'
     });
+    assert.deepEqual(gitTags, [ `@beehive-test/${packageName}@0.1.0` ]);
   }).timeout(TIMEOUT);
 
   it('publishes rc from release branch', async () => {
-    const { stampedVersion, tags } = await runScenario('release/0.5', '0.5.6-rc', false);
-    assert.deepEqual(tags, {
+    const { stampedVersion, npmTags, gitTags } = await runScenario('release/0.5', '0.5.6-rc', false);
+    assert.deepEqual(npmTags, {
       latest: '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
       'rc-0.5': stampedVersion
     });
+    assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
   it('publishes release from release branch', async () => {
-    const { tags } = await runScenario('release/0.5', '0.5.444', false);
-    assert.deepEqual(tags, {
+    const { npmTags, gitTags, packageName } = await runScenario('release/0.5', '0.5.444', false);
+    assert.deepEqual(npmTags, {
       'feature-dummy': '0.0.1-rc',
       latest: '0.5.444',
       'release-0.5': '0.5.444'
     });
+    assert.deepEqual(gitTags, [ `@beehive-test/${packageName}@0.5.444` ]);
   }).timeout(TIMEOUT);
 
   it('publishes from from feature branch', async () => {
-    const { stampedVersion, tags } = await runScenario('feature/blah', '0.5.444-frog', false);
-    assert.deepEqual(tags, {
+    const { stampedVersion, npmTags, gitTags } = await runScenario('feature/blah', '0.5.444-frog', false);
+    assert.deepEqual(npmTags, {
       latest: '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
       'feature-blah' : stampedVersion
     });
+    assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
   it('publishes from from hotfix branch', async () => {
-    const { stampedVersion, tags } = await runScenario('hotfix/blah', '0.5.444-frog', false);
-    assert.deepEqual(tags, {
+    const { stampedVersion, npmTags, gitTags } = await runScenario('hotfix/blah', '0.5.444-frog', false);
+    assert.deepEqual(npmTags, {
       latest: '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
       'hotfix-blah' : stampedVersion
     });
+    assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
   it('publishes from from spike branch', async () => {
-    const { stampedVersion, tags } = await runScenario('spike/blah', '0.5.11-frog', false);
-    assert.deepEqual(tags, {
+    const { stampedVersion, npmTags, gitTags } = await runScenario('spike/blah', '0.5.11-frog', false);
+    assert.deepEqual(npmTags, {
       latest: '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
       'spike-blah' : stampedVersion
     });
+    assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
   it('publishes from dist-dir', async () => {
@@ -205,5 +208,8 @@ describe('Publish', () => {
     const depPj = await PackageJson.parsePackageJsonFileInFolder(path.join(downstream, 'node_modules', '@beehive-test', 'beehive-test-dist-dir'));
 
     assert.deepEqual(depPj.other.dependencies, {});
+
+    const gitTags = (await git.tags()).all.sort();
+    assert.deepEqual(gitTags, [ '@beehive-test/beehive-test-dist-dir@1.1.3' ]);
   }).timeout(120000); // Verdaccio runs pretty slowly on the build servers
 });

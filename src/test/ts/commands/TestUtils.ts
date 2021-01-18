@@ -43,7 +43,7 @@ export const beehiveFlow = async (args: string[]): Promise<void> => {
   }
 };
 
-export const getTags = (cwd: string, packageName: string): Record<string, string> => {
+export const getNpmTags = (cwd: string, packageName: string): Record<string, string> => {
   const output = cp.execSync(`npm dist-tag ls @beehive-test/${packageName}`, { cwd }).toString();
   const lines = output.split('\n').filter((x) => x.length > 0);
   const r: Record<string, string> = {};
