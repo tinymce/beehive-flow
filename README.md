@@ -14,18 +14,7 @@ and is compatible with Semantic Versioning. It also takes inspiration from [git-
 This readme is the canonical definition of the branching process. This git repo implements the branch process for NPM projects. 
 Support for monorepos using yarn workspaces is planned.
 
-## Key concepts
-
-- All new work happens in `feature/*` branches which are merged to the `main` branch.
-- The `main` branch is branched to `release/x.y` branches to stabilise a minor version. This can be done either before or after the minor version is released.
-- Release can be done from `main` or `release/x.y`.
-- `main` and `release/x.y` branches can be in "release candidate" or "release ready" state.
-- `hotfix/*` branches are used to make updates to `release/x.y` branches.
-- The `beehive-flow` CLI tool defines several commands, used to perform key actions involved in branching and releasing.
-- As above, publishing can happen from any branch.
-- Branch naming and versioning is strict and enforced.
-
-## Branches
+## Process Overview
 
 beehive-flow uses the following branch names, each forming part of the process:
 
@@ -34,136 +23,150 @@ beehive-flow uses the following branch names, each forming part of the process:
  - feature/FEATURE_CODE
  - hotfix/FEATURE_CODE
  - spike/FEATURE_CODE
- 
-Note, there is no `develop` branch and `main` is used instead of `master` as it is GitHub's new default. 
 
-Branch names are enforced and beehive-flow will fail if it encounters other branch names. 
+Branch names and versioning is strict and enforced.
 
-### main branch
-
-A single mainline branch called `main` is used. All features and fixes are merged first to the main branch (via feature branches).
-
-If features need to be backported to older versions, commits should be cherry-picked to hotfix branches then merged to
-release branches - more on this below.
-
-```
-  main
- (x.y.0-alpha)
-  +---------+----------------------------------+------------------+
-            |                                  |
-            |                                  |
-            |                                  |
-            +-----------------+                +------------------+
-
-             release/1.2                         release/1.3
-             (1.2.x-rc / 1.2.x)                  (1.3.x-rc / 1.3.x)
-```
-
-### release branches
-
-Release branches are named `release/x.y` where `x.y` is the major.minor version. These are branched off the `main` branch at the beginning of
-*release preparation*. The release branch code is stabilised and then released. A release branch alternates between a "release candidate" state
-and a "release ready" state - more on this below.
-
-### feature branches
-
-Feature branches are branched off `main` and named `feature/*`. All new work is done here. It doesn't matter if it's a feature, improvement, task, 
-refactor, bugfix or any other type of change (except for spikes - see below).
+All new work happens in `feature/*` branches which are merged to the `main` branch:
 
 ```
                        feature/BLAH-123
   main                 +-----------
  (x.y.0-alpha)         |           \
-  +---------+----------+------------+-----
-            |                             
-            |                             
-            |                             
-            +-----------------+           
-
-             release/1.2                  
-             (1.2.x-rc / 1.2.x)           
+  +--------------------+------------+-----
 ```
 
-### spike branches
-
-Spike branches are also branched off main and named `spike/*`. These are treated similarly to feature branches, but are just intended to indicate that
-the work is experimental and not to be merged.
+The `main` branch is branched to `release/x.y` branches to stabilise a minor version. This is done with `beehive-flow prepare`:
 
 ```
-                       spike/BLAH-123
-  main                 +-----------
- (x.y.0-alpha)         |           
-  +---------+----------+-----------------
-            |                            
-            |                            
-            |                            
-            +-----------------+          
-
-             release/1.2                 
-             (1.2.x-rc / 1.2.x)          
+                       
+  main                 
+ (1.2.0-rc)           (1.3.0-rc)
+  +-----------------+--------------------                             
+         [prepare]: |                             
+                    +--------------------
+                    release/1.2                  
+                    (1.2.0-rc)        
 ```
 
-
-### hotfix branches
-
-Hotfix branches are branched off a release branch. These are used to add changes during release preparation. Similar to feature branches, it doesn't matter
-what type of change is being made, the key part is that these are branched from a release branch. 
+To make changes to a `release/x.y` branch, create a `hotfix/*` branch, cherry-pick from `main`, then merge:
 
 ```
   main
- (x.y.0-alpha)
-  +---------+--------------------------------+
+ (1.2.0-rc)
+  +---------+---------------------------------
             |              | |  cherry-pick and tweak
-            |              | |
             |              ↓ ↓
             |            +---------+  hotfix/BLAH-123
             |            |          \
-            +------------+-----------+---+
-
-                   release/1.3
-                   (1.3.x-rc / 1.3.x)
+            +------------+-----------+--------
+            release/1.3
+            (1.2.0-rc)
 ```
 
-## Versions
+The `main` and `release/x.y` branches can either be a "release candidate" state with a version like `x.y.z-rc`, or
+a "release ready" state with a version like `x.y.z-rc`. This affects what version is published from CI.
 
-Beehive Flow dictates a project's version scheme and how it changes through the branch process.   
+`beehive-flow release` changes a branch from an rc version to a release version e.g. `1.2.3-rc` -> `1.2.3`. 
+When CI encounters this, a release version is published. 
 
-The main branch should have a version `a.b.0-alpha`. As soon as a release branch is created, main's version should be incremented to `a.c.0-alpha`.  
+```
+                [release]:
++-------------------------+---------------
+release/1.2     
+(1.2.0-rc)                (1.2.0)
 
-The release branches start with a version `a.b.0-rc`. When stabilization is complete, the release branch version is changed to `a.b.0`. 
-This indicates to CI that this version can now be released. Once release is complete, the version is changed to `a.b.1-rc`.
+```
 
-As you can see, a release branch exists in one of two states:
+CI then runs `beehive-flow advance-ci`, which changes the branch to the next rc version e.g. `1.2.3` -> `1.2.4-rc`.
 
- - `a.b.c-rc` - release candidate state
- - `a.b.c` - release ready state
+```
+                [release]:           [advance-ci]: 
++-------------------------+------------------------+------------
+release/1.2     
+(1.2.0-rc)                (1.2.0)                  (1.2.1-rc)
 
-All patch releases for a major.minor release happen in the branch for the release/major.minor branch.
+```
 
-Feature branches have a version `a.b.0-alpha`, just like the main branch. 
+At the start of any CI build, `beehive-flow stamp` is run, which adds a timestamp to the version (except if it's a release version).
+This enables us to publish release or prerelease packages for every build.
 
-Spike branches have a version `a.b.0-alpha`, just like the main branch. 
+## Process Variations
 
-Hotfix branches have a version `a.b.c-rc`, just like a release branch. 
+There are two main process variations, tailored to two different requirements.
 
-Note that feature/spike/hotfix branch versions are not validated by beehive-flow.
+1. Basic process (release from `main`)
+
+In this process a team works continuously on a minor version and its patches in the `main` branch. 
+Whenever `main` is ready for release, the team runs `beehive-flow release main`. 
+
+When the team is ready to work on the next minor release, they run `beehive-flow prepare`. 
+This creates the `release/x.y` branch that the team uses to backport fixes to old releases.
+
+Key aspects: 
+- releasing from main
+- stabilising *after* release
+
+This process is suitable for the following scenarios:
+- projects that mostly get bug fixes
+- projects that are more continuously delivered
+- no strict stabilisation or QA phase
+
+2. Advanced process (release from `release/x.y` branches)
+
+In this process, a team is focused on developing the next minor release. 
+When they are ready to stabilise this version for testing, they run `beehive-flow prepare`. 
+The testers can then test the new version, while other developers begin work on the next minor version.
+
+Key aspects:
+- releasing only from `release/x.y`
+- stabilising *before* release 
+
+This process is suitable for the following scenarios:
+- projects focused on new feature releases
+- projects that have a strict stabilisation or QA phase
+
+### Feature vs Spike branches
+
+Feature branches are branched off `main` and are named `feature/*`. Most new work is done here. It doesn't matter if it's a feature, improvement, task, 
+refactor, bugfix or any other type of change... except for spikes.
+
+Spike branches are branched off `main` and are named `spike/*`. These are treated similarly to feature branches, but are just intended to indicate that
+the work is experimental and not to be merged.
+
+## About rc and prerelease versions
+
+The only allowed prerelease version is "rc". 
+
+`main` and `release/x.y` alternate between rc and release versions. Any other prerelease version will error.
+
+Other branches should always have "rc" versions, though this is not enforced.
+
+When stamping, different prerelease versions are chosen based on the branch type (see below).
 
 ## Commands
 
 Note: the `stamp`, `advance-ci` and `publish` commands operate on a checkout in the current working directory,
-whereas the other commands make their own checkout.
+whereas the other commands make a fresh clone in a temp directory.
 
 For a detailed description about command-line usage and arguments, run `yarn beehive-flow --help` or `yarn beehive-flow --help COMMAND`.
 
 ### prepare
 
-This signifies that the mainline is ready for stabilization.
+This signifies that `main` is ready for stabilization.
 `main` is branched as `release/a.b`, where `a.b` come from package.json
 
 Version changes
 
- - `main`: `a.b.0-alpha` -> `a.c.0-alpha`
- - `release/a.b`: `a.b.0-rc`
+ - `main`: `a.b.x-rc` -> `a.c.0-rc`
+ - `release/a.b`: `a.b.x-rc`
+
+### release main
+
+This signifies that branch `main` is ready for release. 
+
+Version changes:
+
+ - `main`: `a.b.c-rc` -> `a.b.c`
 
 ### release a.b
 
@@ -175,7 +178,8 @@ Version changes:
 
 ### advance a.b
 
-This signifies that branch `release/a.b` has been released and is ready to accept changes for the next patch release.
+This signifies that branch `release/a.b` has been released and is ready to accept changes for the next patch release. 
+This command is intended to be run manually. Usually, `advance-ci` should be used instead.
 
 Version changes:
 
@@ -239,9 +243,9 @@ $ yarn --silent beehive-flow status
     "major": 0,
     "minor": 11,
     "patch": 0,
-    "preRelease": "alpha"
+    "preRelease": "rc"
   },
-  "versionString": "0.11.0-alpha",
+  "versionString": "0.11.0-rc",
   "branchType": "feature",
   "branchState": "feature",
   "isLatestReleaseBranch": false
