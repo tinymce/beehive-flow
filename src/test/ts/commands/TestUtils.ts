@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as cp from 'child_process';
 import { SimpleGit } from 'simple-git/promise';
 import * as Git from '../../../main/ts/utils/Git';
 import * as Files from '../../../main/ts/utils/Files';
@@ -7,6 +6,8 @@ import * as Parser from '../../../main/ts/args/Parser';
 import * as Dispatch from '../../../main/ts/args/Dispatch';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import { versionToString } from '../../../main/ts/core/Version';
+import * as NpmTags from '../../../main/ts/core/NpmTags';
+import * as ObjUtils from '../../../main/ts/utils/ObjUtils';
 
 export const makeBranchWithPj = async (git: SimpleGit, branchName: string, address: string, dir: string, packageName: string, version: string) => {
   await Git.checkoutNewBranch(git, branchName);
@@ -43,16 +44,9 @@ export const beehiveFlow = async (args: string[]): Promise<void> => {
   }
 };
 
-export const getNpmTags = (cwd: string, packageName: string): Record<string, string> => {
-  const output = cp.execSync(`npm dist-tag ls @beehive-test/${packageName}`, { cwd }).toString();
-  const lines = output.split('\n').filter((x) => x.length > 0);
-  const r: Record<string, string> = {};
-
-  for (const line of lines) {
-    const [ tag, version ] = line.split(': ');
-    r[tag] = version;
-  }
-  return r;
+export const getNpmTags = async (cwd: string, packageName: string): Promise<Record<string, string>> => {
+  const tags = await NpmTags.getNpmTags(cwd, `@beehive-test/${packageName}`);
+  return ObjUtils.map(tags, versionToString);
 };
 
 export const readPjVersion = async (pjFile: string): Promise<string> => {

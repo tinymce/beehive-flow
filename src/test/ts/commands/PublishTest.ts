@@ -7,7 +7,7 @@ import * as getPort from 'get-port';
 import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
-import { beehiveFlow, getNpmTags, makeBranchWithPj, readPjVersion, writeNpmrc } from './TestUtils';
+import { beehiveFlow, makeBranchWithPj, readPjVersion, writeNpmrc, getNpmTags } from './TestUtils';
 
 const startVerdaccio = async () => {
   const configDir = await Files.tempFolder();
@@ -73,7 +73,7 @@ describe('Publish', () => {
     await stamp(dir);
     const stampedVersion = await readPjVersion(pjFile);
     await publish(dryRun, dir);
-    const npmTags = getNpmTags(dir, packageName);
+    const npmTags = await getNpmTags(dir, packageName);
     const gitTags = (await git.tags()).all.sort();
     return { stampedVersion, npmTags, dir, git, gitTags, packageName };
   };
@@ -83,7 +83,7 @@ describe('Publish', () => {
   it('publishes rc from main branch', async () => {
     const { stampedVersion, npmTags, gitTags } = await runScenario('main', '0.1.0-rc', false);
     assert.deepEqual(npmTags, {
-      'latest': '0.0.1-rc',
+      'latest': stampedVersion,
       'feature-dummy': '0.0.1-rc',
       'main': stampedVersion,
       'rc-0.1': stampedVersion
@@ -105,7 +105,7 @@ describe('Publish', () => {
   it('publishes rc from release branch', async () => {
     const { stampedVersion, npmTags, gitTags } = await runScenario('release/0.5', '0.5.6-rc', false);
     assert.deepEqual(npmTags, {
-      'latest': '0.0.1-rc',
+      'latest': stampedVersion,
       'feature-dummy': '0.0.1-rc',
       'rc-0.5': stampedVersion
     });
