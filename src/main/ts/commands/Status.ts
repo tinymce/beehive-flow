@@ -1,8 +1,7 @@
-import * as gitP from 'simple-git/promise';
 import { StatusArgs } from '../args/BeehiveArgs';
 import * as BranchLogic from '../core/BranchLogic';
-import * as Git from '../utils/Git';
 import * as Version from '../core/Version';
+import * as NpmTags from '../core/NpmTags';
 
 type BranchState = BranchLogic.BranchState;
 type BranchType = BranchLogic.BranchType;
@@ -14,7 +13,7 @@ export interface Status {
   versionString: string;
   branchType: BranchType;
   branchState: BranchState;
-  isLatestReleaseBranch: boolean;
+  isLatest: boolean;
 }
 
 export const status = async (args: StatusArgs): Promise<void> => {
@@ -29,12 +28,10 @@ export const getStatusJson = async (args: StatusArgs): Promise<string> => {
 
 export const getStatus = async (args: StatusArgs): Promise<Status> => {
   const dir = args.workingDir;
-  const git = gitP(dir);
 
-  const { currentBranch, version, branchState, branchType } = await BranchLogic.getBranchDetails(dir);
-  const branchNames = await Git.remoteBranchNames(git);
+  const { currentBranch, version, branchState, branchType, packageJson } = await BranchLogic.getBranchDetails(dir);
 
-  const isLatestReleaseBranch = await BranchLogic.isLatestReleaseBranch(currentBranch, branchNames);
+  const isLatest = await NpmTags.shouldTagLatestNpm(version, dir, packageJson.name);
 
   return {
     currentBranch,
@@ -42,6 +39,6 @@ export const getStatus = async (args: StatusArgs): Promise<Status> => {
     versionString: Version.versionToString(version),
     branchType,
     branchState,
-    isLatestReleaseBranch
+    isLatest
   };
 };

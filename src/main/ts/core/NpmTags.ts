@@ -81,6 +81,11 @@ export const getNpmTags = async (cwd: string, packageName: string): Promise<NpmT
   return r;
 };
 
+export const shouldTagLatestNpm = async (newVersion: Version, cwd: string, packageName: string): Promise<boolean> => {
+  const tags = await getNpmTagsOrNone(cwd, packageName);
+  return shouldTagLatest(newVersion, tags);
+};
+
 export const shouldTagLatest = (newVersion: Version, currentTags: NpmTags): boolean =>
   pipe(
     O.fromNullable(currentTags.latest),

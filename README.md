@@ -278,7 +278,7 @@ def beehiveFlowStatus = shJson("yarn run --silent beehive-flow status");
 Then, if you want to run something when beehive-flow would publish a new release build of the latest release:
 
 ```
-if (beehiveFlowStatus.branchState == 'releaseReady' && beehiveFlowStatus.isLatestReleaseBranch) {
+if (beehiveFlowStatus.branchState == 'releaseReady' && beehiveFlowStatus.isLatest) {
 
 }
 ```

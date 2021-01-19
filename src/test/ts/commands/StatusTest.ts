@@ -39,7 +39,7 @@ describe('Status', () => {
 
     await check(dir, {
       branchState: 'releaseCandidate',
-      isLatestReleaseBranch: false,
+      isLatest: true,
       currentBranch: 'main',
       branchType: 'main',
       version: {
@@ -50,7 +50,7 @@ describe('Status', () => {
       },
       versionString: '0.1.0-rc'
     });
-  });
+  }).timeout(20000);
 
   it('shows status for main branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
@@ -58,7 +58,7 @@ describe('Status', () => {
 
     await check(dir, {
       branchState: 'releaseReady',
-      isLatestReleaseBranch: false,
+      isLatest: true,
       currentBranch: 'main',
       branchType: 'main',
       version: {
@@ -68,7 +68,7 @@ describe('Status', () => {
       },
       versionString: '0.7.0'
     });
-  });
+  }).timeout(20000);
 
   it('shows status for release branch in preRelease state', async () => {
     const { dir, git } = await newGit();
@@ -76,7 +76,7 @@ describe('Status', () => {
 
     await check(dir, {
       branchState: 'releaseCandidate',
-      isLatestReleaseBranch: true,
+      isLatest: true,
       currentBranch: 'release/1.98',
       branchType: 'release',
       version: {
@@ -87,7 +87,7 @@ describe('Status', () => {
       },
       versionString: '1.98.2-rc'
     });
-  });
+  }).timeout(20000);
 
   it('shows status for release branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
@@ -95,7 +95,7 @@ describe('Status', () => {
 
     await check(dir, {
       branchState: 'releaseReady',
-      isLatestReleaseBranch: true,
+      isLatest: true,
       currentBranch: 'release/1.98',
       branchType: 'release',
       version: {
@@ -105,24 +105,7 @@ describe('Status', () => {
       },
       versionString: '1.98.7'
     });
-  });
+  }).timeout(20000);
 
-  it('shows status for releaseReady of "old" release', async () => {
-    const { dir, git } = await newGit();
-    await branchWithPj({ dir, git }, '41.98.7', 'release/41.98');
-    await branchWithPj({ dir, git }, '1.100.1', 'release/1.100');
-
-    await check(dir, {
-      branchState: 'releaseReady',
-      isLatestReleaseBranch: false,
-      currentBranch: 'release/1.100',
-      branchType: 'release',
-      version: {
-        major: 1,
-        minor: 100,
-        patch: 1
-      },
-      versionString: '1.100.1'
-    });
-  });
+  // TODO: Add test case where isLatest returns false. Will need to publish, or mock out listing tags.
 });
