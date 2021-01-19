@@ -118,7 +118,7 @@ The testers can then test the new version, while other developers begin work on 
 
 Key aspects:
 - releasing only from `release/x.y`
-- stabilising *before* release 
+- stabilising *before* release
 
 This process is suitable for the following scenarios:
 - projects focused on new feature releases
