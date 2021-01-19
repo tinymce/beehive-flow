@@ -64,7 +64,7 @@ export type NpmTags = Record<string, Version>;
 
 /**
  * If a package hasn't been published before, getNpmTags will fail. However, we need a list of tags for the first publish.
- * This function falls back to an empty list of tags if getNpmTags fails.
+ * This function falls back to an empty object of tags if getNpmTags fails.
  */
 export const getNpmTagsOrNone = (cwd: string, packageName: string): Promise<NpmTags> =>
   PromiseUtils.getOrElse(getNpmTags(cwd, packageName), {});
