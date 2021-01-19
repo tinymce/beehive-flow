@@ -24,7 +24,7 @@ beehive-flow uses the following branch names, each forming part of the process:
  - hotfix/FEATURE_CODE
  - spike/FEATURE_CODE
 
-Branch names and versioning is strict and enforced.
+Branch names and versions are strict and enforced.
 
 All new work happens in `feature/*` branches which are merged to the `main` branch:
 
@@ -38,7 +38,6 @@ All new work happens in `feature/*` branches which are merged to the `main` bran
 The `main` branch is branched to `release/x.y` branches to stabilise a minor version. This is done with `beehive-flow prepare`:
 
 ```
-                       
   main                 
  (1.2.0-rc)           (1.3.0-rc)
   +-----------------+--------------------                             
@@ -63,7 +62,7 @@ To make changes to a `release/x.y` branch, create a `hotfix/*` branch, cherry-pi
             (1.2.0-rc)
 ```
 
-The `main` and `release/x.y` branches can either be a "release candidate" state with a version like `x.y.z-rc`, or
+The `main` and `release/x.y` branches can either be in a "release candidate" state with a version like `x.y.z-rc`, or
 a "release ready" state with a version like `x.y.z-rc`. This affects what version is published from CI.
 
 `beehive-flow release` changes a branch from an rc version to a release version e.g. `1.2.3-rc` -> `1.2.3`. 
