@@ -3,11 +3,7 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import fc from 'fast-check';
 import * as Version from '../../../main/ts/core/Version';
-import * as PromiseUtils from '../../../main/ts/utils/PromiseUtils';
 import { Comparison } from '../../../main/ts/utils/Comparison';
-
-type Arbitrary<A> = fc.Arbitrary<A>;
-type MajorMinorVersion = Version.MajorMinorVersion;
 
 const assert = chai.use(chaiAsPromised).assert;
 
@@ -115,35 +111,6 @@ describe('Version', () => {
           assert.deepEqual(actual, input);
         }
       ));
-    });
-  });
-
-  describe('sortMajorMinorVersions', () => {
-    const arbmm = (): Arbitrary<MajorMinorVersion> => fc.tuple(fc.nat(300), fc.nat(300)).map(([ major, minor ]) => ({ major, minor }));
-
-    it('returns the same length array', () => {
-      fc.assert(fc.property(fc.array(arbmm()), (mms) => {
-        assert.equal(
-          Version.sortMajorMinorVersions(mms).length,
-          mms.length
-        );
-      }));
-    });
-
-    it('sorts', async () => {
-      const check = async (sInput: string[], sExpected: string[]): Promise<void> => {
-        const mmInput = await PromiseUtils.parMap(sInput, Version.parseMajorMinorVersion);
-        const mmOutput = Version.sortMajorMinorVersions(mmInput);
-        const sOutput = mmOutput.map(Version.majorMinorVersionToString);
-        assert.deepEqual(sOutput, sExpected);
-      };
-      await check([], []);
-      await check([ '3.4' ], [ '3.4' ]);
-      await check([ '1.0', '2.0' ], [ '1.0', '2.0' ]);
-      await check([ '2.0', '1.0' ], [ '1.0', '2.0' ]);
-      await check([ '1.100', '1.10' ], [ '1.10', '1.100' ]);
-      await check([ '1.2', '1.10' ], [ '1.2', '1.10' ]);
-      await check([ '1.10', '1.0' ], [ '1.0', '1.10' ]);
     });
   });
 

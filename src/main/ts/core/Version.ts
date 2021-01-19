@@ -1,5 +1,4 @@
 import * as PromiseUtils from '../utils/PromiseUtils';
-import * as ArrayUtils from '../utils/ArrayUtils';
 import { Comparison, fromNumber } from '../utils/Comparison';
 
 export interface Version {
@@ -67,9 +66,6 @@ export const versionToString = (v: Version): string => {
 
 export const compareMajorMinorVersions = (a: MajorMinorVersion, b: MajorMinorVersion): Comparison =>
   fromNumber(a.major !== b.major ? a.major - b.major : a.minor - b.minor);
-
-export const sortMajorMinorVersions = (vs: MajorMinorVersion[]): MajorMinorVersion[] =>
-  ArrayUtils.sort(vs, compareMajorMinorVersions);
 
 export const isPreRelease = (v: Version): boolean =>
   v.preRelease !== undefined;
