@@ -102,7 +102,7 @@ When the team is ready to work on the next minor release, they run `beehive-flow
 This creates the `release/x.y` branch that the team uses to backport fixes to old releases.
 
 Key aspects: 
-- releasing from main
+- releasing from `main` and `release/x.y` branches
 - stabilising *after* release
 
 This process is suitable for the following scenarios:
