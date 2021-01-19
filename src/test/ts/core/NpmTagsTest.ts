@@ -142,57 +142,95 @@ describe('NpmTags', () => {
       });
     });
 
-    describe('release branches', () => {
-      it('does not use "latest" for release ready state if not the latest release', async () => {
-        assertSorted(
-          await NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, await parseVersion('1.2.6'), async () => ({ latest: await parseVersion('1.3.8') })),
-          [ 'release-1.2' ]
-        );
-        assertSorted(
-          await NpmTags.pickTags('release/1.2', BranchState.ReleaseReady, await parseVersion('1.2.9'), async () => ({ latest: await parseVersion('2.4.0') })),
-          [ 'release-1.2' ]
-        );
+    describe('release branch', () => {
+      describe('release ready state', () => {
+        it('does not use "latest" if version less than current latest', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/6.7', BranchState.ReleaseReady, await parseVersion('6.7.23'),
+              async () => ({ latest: await parseVersion('6.7.24') })),
+            [ 'release-6.7' ]
+          );
+        });
+
+        it('uses "latest" if version equal to the current latest', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/6.7', BranchState.ReleaseReady, await parseVersion('6.7.22'),
+              async () => ({ latest: await parseVersion('6.7.22') })),
+            [ 'release-6.7', 'latest' ]
+          );
+        });
+
+        it('uses "latest" if version greater than the current latest', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseReady, await parseVersion('8.1.0'),
+              async () => ({ latest: await parseVersion('8.1.0-rc') })),
+            [ 'release-8.1', 'latest' ]
+          );
+        });
+
+        it('uses "latest" if current latest is any rc build', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/0.1', BranchState.ReleaseReady, await parseVersion('0.1.11'),
+              async () => ({ latest: await parseVersion('0.1.11-rc') })),
+            [ 'release-0.1', 'latest' ]
+          );
+
+          assertSorted(
+            await NpmTags.pickTags('release/0.1', BranchState.ReleaseReady, await parseVersion('0.1.11'),
+              async () => ({ latest: await parseVersion('400.1.11-rc') })),
+            [ 'release-0.1', 'latest' ]
+          );
+        });
+
+        it('uses "latest" if there is no existing "latest" tag', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseReady, await parseVersion('8.1.0'),
+              () => succeed({})),
+            [ 'release-8.1', 'latest' ]
+          );
+        });
       });
 
-      it('uses "latest" for release ready state if it version equal to the current latest', async () => {
-        assertSorted(
-          await NpmTags.pickTags('release/6.7', BranchState.ReleaseReady, await parseVersion('6.7.22'),
-            async () => ({ latest: await parseVersion('6.7.22') })),
-          [ 'release-6.7', 'latest' ]
-        );
-      });
+      describe('rc state', () => {
+        it('uses "latest" for rc state if there is no existing "latest" tag', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseCandidate, await parseVersion('8.1.0-rc'),
+              () => succeed({})),
+            [ 'rc-8.1', 'latest' ]
+          );
+        });
 
+        it('uses "latest" for rc state if equal to existing "latest" tag', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseCandidate, await parseVersion('8.1.0-rc'),
+              async () => ({ latest: await parseVersion('8.1.0-rc') })),
+            [ 'rc-8.1', 'latest' ]
+          );
+        });
 
-      it('uses "latest" for release ready state if version is a release, but current latest is an earlier rc', async () => {
-        assertSorted(
-          await NpmTags.pickTags('release/0.1', BranchState.ReleaseReady, await parseVersion('0.1.11'),
-            async () => ({ latest: await parseVersion('0.1.11-rc') })),
-          [ 'release-0.1', 'latest' ]
-        );
-      });
+        it('uses "latest" for rc state if greater to existing "latest" tag', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseCandidate, await parseVersion('8.1.0-rc'),
+              async () => ({ latest: await parseVersion('8.0.99-rc') })),
+            [ 'rc-8.1', 'latest' ]
+          );
+        });
 
-      it('uses "latest" for release ready state if it is greater than the current latest', async () => {
-        assertSorted(
-          await NpmTags.pickTags('release/8.1', BranchState.ReleaseReady, await parseVersion('8.1.0'),
-            async () => ({ latest: await parseVersion('8.1.0-rc') })),
-          [ 'release-8.1', 'latest' ]
-        );
-      });
+        it('does not use "latest" for rc state if less than existing "latest" tag', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseCandidate, await parseVersion('8.1.0-rc'),
+              async () => ({ latest: await parseVersion('8.1.1-rc') })),
+            [ 'rc-8.1' ]
+          );
+        });
 
-      it('uses "latest" for release ready state if there is no existing "latest" tag', async () => {
-        assertSorted(
-          await NpmTags.pickTags('release/8.1', BranchState.ReleaseReady, await parseVersion('8.1.0'),
-            () => succeed({})),
-          [ 'release-8.1', 'latest' ]
-        );
-      });
-
-      it('uses "latest" for rc state if there is no existing "latest" tag', async () => {
-        assertSorted(
-          await NpmTags.pickTags('release/8.1', BranchState.ReleaseCandidate, await parseVersion('8.1.0-rc'),
-            () => succeed({})),
-          [ 'rc-8.1', 'latest' ]
-        );
+        it('does not use "latest" for rc state if latest is a real release', async () => {
+          assertSorted(
+            await NpmTags.pickTags('release/8.1', BranchState.ReleaseCandidate, await parseVersion('8.1.0-rc'),
+              async () => ({ latest: await parseVersion('0.0.1') })),
+            [ 'rc-8.1' ]
+          );
+        });
       });
     });
   });
