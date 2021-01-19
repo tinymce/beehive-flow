@@ -35,9 +35,6 @@ export const compareNative = <A> (a: A, b: A): Comparison => {
   }
 };
 
-export const drill = (a: Comparison, b: () => Comparison): Comparison =>
-  a === Comparison.EQ ? b() : a;
-
 export const isGte = (c: Comparison): boolean =>
   c !== Comparison.LT;
 
