@@ -203,12 +203,11 @@ The timestamping changes the package.json file. The idea is to build and publish
 
 Versions are changed thus:
 
- - On the main branch, `a.b.0-alpha` becomes `a.b.0-alpha.TIMESTAMP.GITSHA`
  - On a feature branch, `a.b.0-*` becomes `a.b.0-feature.TIMESTAMP.GITSHA`
  - On a hotfix branch, `a.b.c-*` becomes `a.b.c-hotfix.TIMESTAMP.GITSHA`
  - On a spike branch, `a.b.c-*` becomes `a.b.c-spike.TIMESTAMP.GITSHA`
- - On a release branch in prerelease state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP.GITSHA`
- - On a release branch in release state, no changes are made.
+ - On a main or release branch in rc state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP.GITSHA`
+ - On a main or release branch in release state, no changes are made.
  
 Timestamp format is `yyyyMMddHHmmssSSS` in UTC. The short git sha format is used.
 
@@ -218,12 +217,22 @@ Note: this is the only command that operates on the checkout in the current work
 
 This command does an `npm publish` and sets npm tags based on the repository state.
 
- - main/feature/hotfix/spike branches are tagged with their branch name
- - release branches in prerelease state are tagged `rc-a.b`
- - release branches in release state are tagged `release-a.b`. 
- - release branches in release state are also tagged `latest` if this is the release with the highest version number.
+ - feature/hotfix/spike branches are tagged with their branch name
+ - main and release branches in rc state are tagged `rc-a.b`
+ - main and release branches in release state are tagged `release-a.b`. 
+ - main and release branches in rc or release state are also tagged `latest` if this is the release with the highest version number.
 
-Note: it appears that npm also tags the very first published build of each repo with "latest". 
+`beehive-flow publish` also git tags any release builds as `packagename@version`. 
+
+#### Determining the `latest` build
+
+When publishing, `beehive-flow` reads the existing NPM tags from the repo and uses those to determine whether or not
+to set `latest` on the new build. `latest` is set if the new build's number is "greater" than the existing build. 
+
+Note that all release builds are considered greater than all rc builds. So, for a new project, you may have a period
+where your `latest` tag only points to `rc` builds, but after your first release, `latest` will point to a release build.
+
+Note that the first publish of a build is always tagged `latest`.
 
 ### status
 
@@ -247,7 +256,7 @@ $ yarn --silent beehive-flow status
   "versionString": "0.11.0-rc",
   "branchType": "feature",
   "branchState": "feature",
-  "isLatestReleaseBranch": false
+  "isLatest": false
 }
 ```
 
@@ -261,7 +270,7 @@ Fields:
  - branchType - one of: `main`, `feature`, `hotfix`, `spike`, `release`
  - branchState - state of the branch - similar to branchType, but splits release branches into 2 separate states. 
    May be one of: `main`, `feature`, `hotfix`, `spike`, `releaseCandidate`, `releaseReady`
- - isLatestReleaseBranch - Is this a release branch, and is it the _latest_ release branch? If `true`, this is the state where beehive-flow would npm tag the build as `latest`.
+ - isLatest - If this version were to be published, would it be the `latest` build?
 
 If you want to read this from a Jenkinsfile:
 
