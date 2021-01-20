@@ -63,7 +63,7 @@ To make changes to a `release/x.y` branch, create a `hotfix/*` branch, cherry-pi
 ```
 
 The `main` and `release/x.y` branches can either be in a "release candidate" state with a version like `x.y.z-rc`, or
-a "release ready" state with a version like `x.y.z-rc`. This affects what version is published from CI.
+a "release ready" state with a version like `x.y.z`. This affects what version is published from CI.
 
 `beehive-flow release` changes a branch from an rc version to a release version e.g. `1.2.3-rc` -> `1.2.3`. 
 When CI encounters this, a release version is published. 
