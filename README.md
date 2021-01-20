@@ -197,7 +197,7 @@ This command is similar to `advance`, however:
 This command should be run at the start of a build. This command does the following:
 
  1. Checks that the package.json file has a valid version for the branch.
- 2. Changes the version to a "timestamped" version, so that each build can be published.
+ 2. Changes the version to a "timestamped" version, so that each build can be published (except for release versions).
  
 The timestamping changes the package.json file. The idea is to build and publish, but not to commit the changes.
 
@@ -211,7 +211,7 @@ Versions are changed thus:
  
 Timestamp format is `yyyyMMddHHmmssSSS` in UTC. The short git sha format is used.
 
-Note: this is the only command that operates on the checkout in the current working directory.
+Note: this command operates on the checkout in the current working directory.
 
 ### publish
 
