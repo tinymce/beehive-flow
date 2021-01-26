@@ -31,7 +31,7 @@ All new work happens in `feature/*` branches which are merged to the `main` bran
 ```
                        feature/BLAH-123
   main                 +-----------
- (x.y.0-alpha)         |           \
+ (x.y.0-rc)            |           \
   +--------------------+------------+-----
 ```
 
