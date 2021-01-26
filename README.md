@@ -230,7 +230,7 @@ When publishing, `beehive-flow` reads the existing NPM tags from the repo and us
 to set `latest` on the new build. `latest` is set if the new build's number is "greater" than the existing build. 
 
 Note that all release builds are considered greater than all rc builds. So, for a new project, you may have a period
-where your `latest` tag only points to `rc` builds, but after your first release, `latest` will point to a release build.
+where your `latest` tag only points to `rc` builds, but after your first release, `latest` will always point to a release build.
 
 Note that the first publish of a build is always tagged `latest`.
 
