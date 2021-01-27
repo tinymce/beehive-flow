@@ -31,6 +31,9 @@ const errorify = (error?: unknown): unknown =>
 export const tryPromise = <A> (p: Promise<A>): Promise<Either<unknown, A>> =>
   p.then(E.right, E.left);
 
+export const getOrElse = <A> (p: Promise<A>, other: A): Promise<A> =>
+  p.then((x) => x, () => other);
+
 export const parMap = <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
   Promise.all(input.map(p));
 

@@ -25,7 +25,7 @@ describe('Stamp', () => {
     const timeFormatted = '20201026065705074';
 
     it('makes a timestamped version on main branch', async () => {
-      const actual = Stamp.chooseNewVersion(BranchState.Main, await Version.parseVersion('1.2.0-alpha'), 'b0d52ad', timeMillis);
+      const actual = Stamp.chooseNewVersion(BranchState.ReleaseCandidate, await Version.parseVersion('1.2.0-alpha'), 'b0d52ad', timeMillis);
       assert.equal(Version.versionToString(actual), `1.2.0-alpha.${timeFormatted}.b0d52ad`);
     });
 

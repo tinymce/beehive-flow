@@ -1,11 +1,9 @@
 import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
 import { CheckRepoActions } from 'simple-git';
-import { pipe } from 'fp-ts/pipeable';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
-import * as ArrayUtils from '../utils/ArrayUtils';
 import * as Version from './Version';
 import * as PreRelease from './PreRelease';
 import * as PackageJson from './PackageJson';
@@ -29,7 +27,6 @@ export const enum BranchType {
 
 // eslint-disable-next-line no-shadow
 export const enum BranchState {
-  Main = 'main',
   Feature = 'feature',
   Hotfix = 'hotfix',
   Spike = 'spike',
@@ -108,15 +105,18 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const sPackageVersion = Version.versionToString(version);
   const sPre = showStringOrUndefined(version.preRelease);
 
-  const validateMainBranch = async (): Promise<BranchState.Main> => {
-    if (version.patch !== 0) {
-      return fail(`${loc}: patch part should be 0, but is "${version.patch}"`);
-    } else if (!isValidPrerelease(version.preRelease, PreRelease.mainBranch)) {
-      return fail(`${loc}: prerelease part should be "${PreRelease.mainBranch}" or start with "${PreRelease.mainBranch}.", but is ${sPre}`);
+  const rcOrReleaseReady = async (): Promise<BranchState.ReleaseCandidate | BranchState.ReleaseReady> => {
+    if (version.preRelease === undefined) {
+      return BranchState.ReleaseReady;
+    } else if (isValidPrerelease(version.preRelease, PreRelease.releaseCandidate)) {
+      return BranchState.ReleaseCandidate;
     } else {
-      return BranchState.Main;
+      const rc = PreRelease.releaseCandidate;
+      return fail(`${loc}: prerelease version part should be either "${rc}" or start with "${rc}." or not be set, but it is "${sPre}"`);
     }
   };
+
+  const validateMainBranch = rcOrReleaseReady;
 
   const validateReleaseBranch = async (): Promise<BranchState.ReleaseCandidate | BranchState.ReleaseReady> => {
     const branchVersion = await versionFromReleaseBranch(currentBranch);
@@ -124,13 +124,8 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 
     if (version.major !== branchVersion.major || version.minor !== branchVersion.minor) {
       return fail(`${loc}: major.minor of branch (${sBranchVersion}) is not consistent with package version (${sPackageVersion})`);
-    } else if (version.preRelease === undefined) {
-      return BranchState.ReleaseReady;
-    } else if (isValidPrerelease(version.preRelease, PreRelease.releaseCandidate)) {
-      return BranchState.ReleaseCandidate;
     } else {
-      const rc = PreRelease.releaseCandidate;
-      return fail(`${loc}: prerelease version part should be either "${rc}" or start with "${rc}." or not be set, but it is "${sPre}"`);
+      return rcOrReleaseReady();
     }
   };
 
@@ -167,11 +162,3 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   }
 };
 
-export const isLatestReleaseBranch = async (branchName: string, branches: string[]): Promise<boolean> => {
-  const versions = await PromiseUtils.filterMap(branches, versionFromReleaseBranch);
-  return pipe(
-    ArrayUtils.greatest(versions, Version.compareMajorMinorVersions),
-    O.map(getReleaseBranchName),
-    O.exists((greatest) => branchName === greatest)
-  );
-};

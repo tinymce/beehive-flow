@@ -1,5 +1,5 @@
 import * as PromiseUtils from '../utils/PromiseUtils';
-import * as ArrayUtils from '../utils/ArrayUtils';
+import { Comparison, chain, chainN, compareNative } from '../utils/Comparison';
 
 export interface Version {
   readonly major: number;
@@ -64,8 +64,42 @@ export const versionToString = (v: Version): string => {
   return [ v.major, v.minor, v.patch ].join('.') + preBit + metaBit;
 };
 
-export const compareMajorMinorVersions = (a: MajorMinorVersion, b: MajorMinorVersion): number =>
-  a.major !== b.major ? a.major - b.major : a.minor - b.minor;
+export const compareMajorMinorVersions = (a: MajorMinorVersion, b: MajorMinorVersion): Comparison =>
+  chain(
+    compareNative(a.major, b.major),
+    compareNative(a.minor, b.minor)
+  );
 
-export const sortMajorMinorVersions = (vs: MajorMinorVersion[]): MajorMinorVersion[] =>
-  ArrayUtils.sort(vs, compareMajorMinorVersions);
+export const isPreRelease = (v: Version): boolean =>
+  v.preRelease !== undefined;
+
+/**
+ * Compares two versions on their major, minor and prerelease versions.
+ * Per semver:
+ * - released versions beat prerelease versions for the same major.minor.patch
+ * - buildMeta is not considered
+ *
+ * Might not be suitable for sorting.
+ *
+ * @param a
+ * @param b
+ */
+export const compareVersions = (a: Version, b: Version): Comparison =>
+  chainN(
+    compareNative(a.major, b.major),
+    compareNative(a.minor, b.minor),
+    compareNative(a.patch, b.patch),
+    comparePreReleases(a, b)
+  );
+
+const comparePreReleases = (a: Version, b: Version): Comparison => {
+  if (a.preRelease === b.preRelease) {
+    return Comparison.EQ;
+  } else if (a.preRelease === undefined) {
+    // a is a release, b is a prerelease - a > b
+    return Comparison.GT;
+  } else {
+    // a is a prerelease, b is a release - a < b
+    return Comparison.LT;
+  }
+};

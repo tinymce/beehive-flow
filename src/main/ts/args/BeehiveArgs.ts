@@ -1,5 +1,4 @@
 import { Option } from 'fp-ts/Option';
-import { MajorMinorVersion } from '../core/Version';
 
 export interface BaseArgs {
   readonly dryRun: boolean;
@@ -15,14 +14,14 @@ export interface PrepareArgs extends BaseArgs {
 export interface ReleaseArgs extends BaseArgs {
   readonly kind: 'ReleaseArgs';
   readonly temp: Option<string>;
-  readonly majorMinorVersion: MajorMinorVersion;
+  readonly branchName: string;
   readonly gitUrl: Option<string>;
 }
 
 export interface AdvanceArgs extends BaseArgs {
   readonly kind: 'AdvanceArgs';
   readonly temp: Option<string>;
-  readonly majorMinorVersion: MajorMinorVersion;
+  readonly branchName: string;
   readonly gitUrl: Option<string>;
 }
 
@@ -52,25 +51,25 @@ export const prepareArgs = (dryRun: boolean, workingDir: string, temp: Option<st
 });
 
 export const releaseArgs = (
-  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion
+  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, branchName: string
 ): ReleaseArgs => ({
   kind: 'ReleaseArgs',
   dryRun,
   workingDir,
   temp,
   gitUrl,
-  majorMinorVersion
+  branchName
 });
 
 export const advanceArgs = (
-  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, majorMinorVersion: MajorMinorVersion
+  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, branchName: string
 ): AdvanceArgs => ({
   kind: 'AdvanceArgs',
   dryRun,
   workingDir,
   temp,
   gitUrl,
-  majorMinorVersion
+  branchName
 });
 
 export const stampArgs = (dryRun: boolean, workingDir: string): StampArgs => ({

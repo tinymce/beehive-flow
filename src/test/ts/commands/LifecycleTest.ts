@@ -5,18 +5,11 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
 import * as Git from '../../../main/ts/utils/Git';
 import * as Files from '../../../main/ts/utils/Files';
-import * as Parser from '../../../main/ts/args/Parser';
-import * as Dispatch from '../../../main/ts/args/Dispatch';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
-import { eachAsync } from '../../../main/ts/utils/OptionUtils';
+import { beehiveFlow } from './TestUtils';
 
 const assert = chai.use(chaiAsPromised).assert;
-
-const beehiveFlow = async (args: string[]): Promise<void> => {
-  const a = await Parser.parseArgs(args);
-  await eachAsync(a, Dispatch.dispatch);
-};
 
 describe('Lifecycle', () => {
   it('cycles', async () => {
@@ -27,7 +20,7 @@ describe('Lifecycle', () => {
     await Files.writeFile(path.join(dir, 'package.json'), `
     {
       "name": "@beehive-test/lifecycle-test",
-      "version": "0.1.0-alpha"
+      "version": "0.1.0-rc"
     }
     `);
 
@@ -42,7 +35,7 @@ describe('Lifecycle', () => {
 
     await beehiveFlow([ 'prepare', '--git-url', hub.dir ]);
     await git.pull();
-    await assertPjVersion('0.2.0-alpha');
+    await assertPjVersion('0.2.0-rc');
 
     await git.checkout('release/0.1');
     await assertPjVersion('0.1.0-rc');
