@@ -107,5 +107,5 @@ describe('Status', () => {
     });
   }).timeout(20000);
 
-  // TODO: Add test case where isLatest returns false. Will need to publish, or mock out listing tags.
+  // TODO TINY-6924: Add test case where isLatest returns false. Will need to publish, or mock out listing tags.
 });
