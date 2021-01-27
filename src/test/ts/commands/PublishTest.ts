@@ -122,7 +122,7 @@ describe('Publish', () => {
     assert.deepEqual(gitTags, [ `@beehive-test/${packageName}@0.5.444` ]);
   }).timeout(TIMEOUT);
 
-  it('publishes from from feature branch', async () => {
+  it('publishes from feature branch', async () => {
     const { stampedVersion, npmTags, gitTags } = await runScenario('feature/blah', '0.5.444-frog', false);
     assert.deepEqual(npmTags, {
       'latest': '0.0.1-rc',
@@ -132,7 +132,7 @@ describe('Publish', () => {
     assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
-  it('publishes from from hotfix branch', async () => {
+  it('publishes from hotfix branch', async () => {
     const { stampedVersion, npmTags, gitTags } = await runScenario('hotfix/blah', '0.5.444-frog', false);
     assert.deepEqual(npmTags, {
       'latest': '0.0.1-rc',
@@ -142,7 +142,7 @@ describe('Publish', () => {
     assert.deepEqual(gitTags, []);
   }).timeout(TIMEOUT);
 
-  it('publishes from from spike branch', async () => {
+  it('publishes from spike branch', async () => {
     const { stampedVersion, npmTags, gitTags } = await runScenario('spike/blah', '0.5.11-frog', false);
     assert.deepEqual(npmTags, {
       'latest': '0.0.1-rc',
