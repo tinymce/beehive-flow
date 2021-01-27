@@ -1,5 +1,5 @@
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { Comparison, fromNumber } from '../utils/Comparison';
+import { Comparison, chain, chainN, compareNative } from '../utils/Comparison';
 
 export interface Version {
   readonly major: number;
@@ -65,7 +65,10 @@ export const versionToString = (v: Version): string => {
 };
 
 export const compareMajorMinorVersions = (a: MajorMinorVersion, b: MajorMinorVersion): Comparison =>
-  fromNumber(a.major !== b.major ? a.major - b.major : a.minor - b.minor);
+  chain(
+    compareNative(a.major, b.major),
+    compareNative(a.minor, b.minor)
+  );
 
 export const isPreRelease = (v: Version): boolean =>
   v.preRelease !== undefined;
@@ -81,22 +84,22 @@ export const isPreRelease = (v: Version): boolean =>
  * @param a
  * @param b
  */
-export const compareVersions = (a: Version, b: Version): Comparison => {
-  if (a.major !== b.major) {
-    return fromNumber(a.major - b.major);
-  } else if (a.minor !== b.minor) {
-    return fromNumber(a.minor - b.minor);
-  } else if (a.patch !== b.patch) {
-    return fromNumber(a.patch - b.patch);
+export const compareVersions = (a: Version, b: Version): Comparison =>
+  chainN(
+    compareNative(a.major, b.major),
+    compareNative(a.minor, b.minor),
+    compareNative(a.patch, b.patch),
+    comparePreReleases(a, b)
+  );
+
+const comparePreReleases = (a: Version, b: Version): Comparison => {
+  if (a.preRelease === b.preRelease) {
+    return Comparison.EQ;
+  } else if (a.preRelease === undefined) {
+    // a is a release, b is a prerelease - a > b
+    return Comparison.GT;
   } else {
-    if (a.preRelease === b.preRelease) {
-      return Comparison.EQ;
-    } else if (a.preRelease === undefined) {
-      // a is a release, b is a prerelease - a > b
-      return Comparison.GT;
-    } else {
-      // a is a prerelease, b is a release - a < b
-      return Comparison.LT;
-    }
+    // a is a prerelease, b is a release - a < b
+    return Comparison.LT;
   }
 };

@@ -4,27 +4,6 @@ export const enum Comparison {
   GT = 1
 }
 
-export const toNumber = (c: Comparison): number => {
-  switch (c) {
-    case Comparison.LT:
-      return -1;
-    case Comparison.EQ:
-      return 0;
-    case Comparison.GT:
-      return 1;
-  }
-};
-
-export const fromNumber = (n: number): Comparison => {
-  if (n < 0) {
-    return Comparison.LT;
-  } else if (n === 0) {
-    return Comparison.EQ;
-  } else {
-    return Comparison.GT;
-  }
-};
-
 export const compareNative = <A> (a: A, b: A): Comparison => {
   if (a < b) {
     return Comparison.LT;
@@ -34,6 +13,12 @@ export const compareNative = <A> (a: A, b: A): Comparison => {
     return Comparison.GT;
   }
 };
+
+export const chain = (c1: Comparison, c2: Comparison): Comparison =>
+  c1 !== Comparison.EQ ? c1 : c2;
+
+export const chainN = (...cs: Comparison[]): Comparison =>
+  cs.reduce(chain, Comparison.EQ);
 
 export const isGte = (c: Comparison): boolean =>
   c !== Comparison.LT;
