@@ -55,6 +55,7 @@ describe('BranchLogic', () => {
       const packageJson: PackageJson = {
         name: '@beehive-test/dummypackage',
         version: O.some(version),
+        workspaces: O.none,
         other: {}
       };
 

@@ -11,6 +11,7 @@ type JsonRecord = E.JsonRecord;
 export interface PackageJson {
   readonly name: string;
   readonly version: Option<Version>;
+  readonly workspaces: Option<string[]>;
   readonly other: Omit<JsonRecord, 'version'>;
 }
 
@@ -21,18 +22,23 @@ const parsePackageJsonVersion = (pj: JsonRecord): Promise<Option<Version>> =>
 const parsePackageJsonName = (pj: JsonRecord): Promise<string> =>
   JsonUtils.stringField(pj, 'name');
 
+const parsePackageJsonWorkspaces = (pj: JsonRecord): Promise<Option<string[]>> =>
+  JsonUtils.optionalArrayStringField(pj, 'workspaces');
+
 export const pjInFolder = (folder: string): string =>
   path.join(folder, 'package.json');
 
 const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
   const parsedVersion = await parsePackageJsonVersion(j);
   const parsedName = await parsePackageJsonName(j);
+  const parsedPackageWorkspaces = await parsePackageJsonWorkspaces(j);
 
-  const { version, name, ...other } = j;
+  const { version, name, workspaces, ...other } = j;
 
   return {
     name: parsedName,
     version: parsedVersion,
+    workspaces: parsedPackageWorkspaces,
     other
   };
 };
@@ -46,6 +52,7 @@ export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJso
 export const toJson = (pj: PackageJson): JsonRecord => ({
   ...pj.other,
   ...JsonUtils.optionalToJsonRecord('version', pj.version, Version.versionToString),
+  ...JsonUtils.optionalToJsonRecord('workspaces', pj.workspaces, (a) => a),
   name: pj.name
 });
 
@@ -63,3 +70,6 @@ export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVer
   await writePackageJsonFile(pjFile, newPj);
   return newPj;
 };
+
+export const hasWorkspacesSetting = (pj: PackageJson): boolean =>
+  O.isSome(pj.workspaces);
