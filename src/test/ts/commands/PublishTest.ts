@@ -179,7 +179,7 @@ describe('Publish', () => {
 
     // sanity check that reading the dependencies works
     const readPj = await PackageJson.parsePackageJsonFile(pjFile);
-    assert.deepEqual(readPj.other.dependencies, { '@tinymce/tinymce-react': '3.8.4' });
+    assert.deepEqual(readPj.dependencies, { '@tinymce/tinymce-react': '3.8.4' });
 
     fs.mkdirSync(path.join(dir, 'mydist'));
 
@@ -207,7 +207,7 @@ describe('Publish', () => {
 
     const depPj = await PackageJson.parsePackageJsonFileInFolder(path.join(downstream, 'node_modules', '@beehive-test', 'beehive-test-dist-dir'));
 
-    assert.deepEqual(depPj.other.dependencies, {});
+    assert.deepEqual(depPj.dependencies, {});
 
     const gitTags = (await git.tags()).all.sort();
     assert.deepEqual(gitTags, [ '@beehive-test/beehive-test-dist-dir@1.1.3' ]);

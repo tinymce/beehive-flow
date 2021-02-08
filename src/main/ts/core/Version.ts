@@ -1,5 +1,6 @@
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { Comparison, chain, chainN, compareNative } from '../utils/Comparison';
+import * as E from 'fp-ts/Either';
 
 export interface Version {
   readonly major: number;
@@ -14,7 +15,7 @@ export interface MajorMinorVersion {
   readonly minor: number;
 }
 
-export const parseVersion = async (input: string): Promise<Version> => {
+export const parseVersionE = (input: string): E.Either<string, Version> => {
   // based on https://semver.org/
   // eslint-disable-next-line max-len
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
@@ -22,7 +23,7 @@ export const parseVersion = async (input: string): Promise<Version> => {
   const r = regexp.exec(input);
 
   if (r === null || r.groups === undefined) {
-    return PromiseUtils.fail('Could not parse version string: ' + input);
+    return E.left('Could not parse version string: ' + input);
   } else {
     const g = r.groups;
     // The regexp should guarantee that these are positive integers
@@ -32,15 +33,18 @@ export const parseVersion = async (input: string): Promise<Version> => {
     const preRelease = r.groups.prerelease;
     const buildMetaData = r.groups.buildmetadata;
 
-    return {
+    return E.right({
       major,
       minor,
       patch,
       preRelease,
       buildMetaData
-    };
+    });
   }
 };
+
+export const parseVersion = async (input: string): Promise<Version> =>
+  PromiseUtils.eitherToPromise(parseVersionE(input));
 
 export const parseMajorMinorVersion = async (input: string): Promise<MajorMinorVersion> => {
   const regexp = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$/;

@@ -92,7 +92,11 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const packageJsonFile = PackageJson.pjInFolder(dir);
   const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
 
-  const version = await PromiseUtils.optionToPromise(packageJson.version, 'Version missing in package.json file');
+  const version = packageJson.version;
+
+  if (version === undefined) {
+    throw new Error('Version missing in package.json file');
+  }
 
   const baseState = {
     currentBranch,

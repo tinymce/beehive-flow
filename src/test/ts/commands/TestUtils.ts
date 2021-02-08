@@ -52,10 +52,10 @@ export const getNpmTags = async (cwd: string, packageName: string): Promise<Reco
 export const readPjVersion = async (pjFile: string): Promise<string> => {
   const pj = await PackageJson.parsePackageJsonFile(pjFile);
   const v = pj.version;
-  if (v._tag !== 'Some') {
-    throw new Error('Version should be some');
+  if (v === undefined) {
+    throw new Error('Version was undefined');
   }
-  return versionToString(v.value);
+  return versionToString(v);
 };
 
 export const readPjVersionInDir = async (dir: string): Promise<string> =>
