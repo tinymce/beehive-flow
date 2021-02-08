@@ -82,8 +82,10 @@ export const optionalArrayField = async <A> (o: JsonRecord, k: string, f: (v: Js
     return arrayOf(a, f);
   });
 
-export const optionalArrayStringField = async (o: JsonRecord, k: string): Promise<O.Option<string[]>> =>
-  optionalArrayField(o, k, mustBeString);
+export const optionalArrayStringField = (o: JsonRecord, k: string): Promise<O.Option<string[]>> => {
+  const p = optionalArrayField(o, k, mustBeString);
+  return PromiseUtils.setError(p, `Expected value for key "${k}" to be a string array or not present`);
+};
 
 export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Promise<A>): Promise<O.Option<A>> => {
   const os = await optionalStringField(o, k);
