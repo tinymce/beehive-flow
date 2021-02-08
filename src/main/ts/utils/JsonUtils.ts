@@ -8,6 +8,7 @@ import { mapAsync } from './OptionUtils';
 
 type Json = E.Json;
 type JsonRecord = E.JsonRecord;
+type JsonArray = E.JsonArray;
 
 export const parse = (s: string): Promise<Json> => {
   const result = E.parseJSON(s, String);
@@ -41,12 +42,27 @@ export const writeJsonFile = async (path: string, j: Json): Promise<void> =>
 export const field = async (o: JsonRecord, k: string): Promise<Json> =>
   PromiseUtils.optionToPromise(ObjUtils.lookup(o, k));
 
-const mustBeString = (k: string) => async (j: Json): Promise<string> =>
+export const arrayOf = <A> (o: JsonArray, f: (v: Json) => Promise<A>): Promise<A[]> =>
+  PromiseUtils.parMap(o, f);
+
+const mustBeString = async (j: Json): Promise<string> =>
+  Type.isString(j) ? j : PromiseUtils.fail(`Expected value to be a string`);
+
+const fieldMustBeString = (k: string) => async (j: Json): Promise<string> =>
   Type.isString(j) ? j : PromiseUtils.fail(`Expected value for key "${k}" to be a string`);
+
+const fieldMustBeArray = (k: string) => async (j: Json): Promise<JsonArray> =>
+  Type.isArray(j) ? j as JsonArray : PromiseUtils.fail(`Expected value for key "${k}" to be an array`);
 
 export const stringField = async (o: JsonRecord, k: string): Promise<string> => {
   const f = await field(o, k);
-  return mustBeString(k)(f);
+  return fieldMustBeString(k)(f);
+};
+
+export const arrayField = async <A> (o: JsonRecord, k: string, f: (v: Json) => Promise<A>): Promise<A[]> => {
+  const v = await field(o, k);
+  const a = await fieldMustBeArray(k)(v);
+  return arrayOf(a, f);
 };
 
 export const optionalField = async (o: JsonRecord, k: string): Promise<O.Option<Json>> =>
@@ -58,7 +74,16 @@ export const optionalFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: 
 };
 
 export const optionalStringField = async (o: JsonRecord, k: string): Promise<O.Option<string>> =>
-  optionalFieldSuchThat(o, k, mustBeString(k));
+  optionalFieldSuchThat(o, k, fieldMustBeString(k));
+
+export const optionalArrayField = async <A> (o: JsonRecord, k: string, f: (v: Json) => Promise<A>): Promise<O.Option<A[]>> =>
+  optionalFieldSuchThat(o, k, async (json) => {
+    const a = await fieldMustBeArray(k)(json);
+    return arrayOf(a, f);
+  });
+
+export const optionalArrayStringField = async (o: JsonRecord, k: string): Promise<O.Option<string[]>> =>
+  optionalArrayField(o, k, mustBeString);
 
 export const optionalStringFieldSuchThat = async <A>(o: JsonRecord, k: string, f: (v: string) => Promise<A>): Promise<O.Option<A>> => {
   const os = await optionalStringField(o, k);

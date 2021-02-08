@@ -34,7 +34,7 @@ export const tryPromise = <A> (p: Promise<A>): Promise<Either<unknown, A>> =>
 export const getOrElse = <A> (p: Promise<A>, other: A): Promise<A> =>
   p.then((x) => x, () => other);
 
-export const parMap = <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
+export const parMap = <A, B> (input: readonly A[], p: (a: A) => Promise<B>): Promise<B[]> =>
   Promise.all(input.map(p));
 
 export const filterMap = async <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
