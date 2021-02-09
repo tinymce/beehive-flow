@@ -1,13 +1,11 @@
 import * as path from 'path';
 import * as O from 'fp-ts/Option';
-import * as E from 'fp-ts/Either';
 import * as t from 'io-ts';
-import { pipe } from 'fp-ts/pipeable';
 import * as JsonUtils from '../utils/JsonUtils';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Version from './Version';
+import * as IotsUtils from '../utils/IotsUtils';
 
-type Either<R, A> = E.Either<R, A>;
 type Option<A> = O.Option<A>;
 type Version = Version.Version;
 
@@ -18,17 +16,11 @@ export interface PackageJson {
   [k: string]: unknown;
 }
 
-export const validateEither = <I, O> (f: (i: I) => Either<string, O>): t.Validate<I, O> =>
-  (value, context) =>
-    pipe(
-      f(value),
-      E.mapLeft((message: string) => [{ value, context, message }])
-    );
-
 export const versionCodec = new t.Type<Version, string, string>(
   'versionCodec',
+  // We don't need a type guard function, so just provide a dummy one that always fails
   (input: unknown): input is Version => false,
-  validateEither(Version.parseVersionE),
+  IotsUtils.validateEither(Version.parseVersionE),
   Version.versionToString
 );
 
