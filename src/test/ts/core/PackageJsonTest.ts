@@ -7,7 +7,7 @@ import * as PackageJson from '../../../main/ts/core/PackageJson';
 describe('PackageJson', () => {
   describe('parse', () => {
     it('parses package with name', () => {
-      const actual = PackageJson.parseE({
+      const actual = PackageJson.decodeE({
         name: 'blah'
       });
       assert.deepEqual(actual, E.right({
@@ -16,7 +16,7 @@ describe('PackageJson', () => {
     });
 
     it('parses package with name and version', () => {
-      const actual = PackageJson.parseE({
+      const actual = PackageJson.decodeE({
         name: 'blah',
         version: '1.2.3-rc'
       });
@@ -27,7 +27,7 @@ describe('PackageJson', () => {
     });
 
     it('parses package with name, version and workspaces', () => {
-      const actual = PackageJson.parseE({
+      const actual = PackageJson.decodeE({
         name: 'blah',
         version: '1.2.3-rc',
         workspaces: [ 'cat', 'dog*' ]
@@ -40,7 +40,7 @@ describe('PackageJson', () => {
     });
 
     it('allows extraneous properties', () => {
-      const actual = PackageJson.parseE({
+      const actual = PackageJson.decodeE({
         name: 'blah',
         version: '1.2.3-rc',
         workspaces: [ 'cat', 'dog*' ],
@@ -62,7 +62,7 @@ describe('PackageJson', () => {
         workspaces: [ 'cat', 'dog*' ],
         fridge: 'donkey'
       };
-      const parsed = await PackageJson.parse(input);
+      const parsed = await PackageJson.decode(input);
       const output = PackageJson.toJson(parsed);
       assert.deepEqual(output, input);
     });

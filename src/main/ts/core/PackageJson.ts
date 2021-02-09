@@ -48,14 +48,14 @@ export const packageJsonCodec = (): t.Type<PackageJson, unknown> => {
 export const pjInFolder = (folder: string): string =>
   path.join(folder, 'package.json');
 
-export const parseE = (j: unknown): t.Validation<PackageJson> =>
+export const decodeE = (j: unknown): t.Validation<PackageJson> =>
   packageJsonCodec().decode(j);
 
-export const parse = async (j: unknown): Promise<PackageJson> =>
-  PromiseUtils.eitherToPromise(parseE(j));
+export const decode = async (j: unknown): Promise<PackageJson> =>
+  PromiseUtils.eitherToPromise(decodeE(j));
 
 export const parsePackageJsonFile = (file: string): Promise<PackageJson> =>
-  JsonUtils.parseJsonFile(file).then(parse);
+  JsonUtils.parseJsonFile(file).then(decode);
 
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
   parsePackageJsonFile(pjInFolder(folder));
