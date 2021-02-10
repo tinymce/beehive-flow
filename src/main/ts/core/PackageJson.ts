@@ -3,8 +3,8 @@ import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import * as JsonUtils from '../utils/JsonUtils';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import * as Version from './Version';
 import * as IotsUtils from '../utils/IotsUtils';
+import * as Version from './Version';
 
 type Option<A> = O.Option<A>;
 type Version = Version.Version;

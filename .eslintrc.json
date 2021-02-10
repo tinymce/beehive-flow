@@ -38,7 +38,12 @@
     "no-invalid-this": "error",
     "no-multiple-empty-lines": ["error", { "max": 1 }],
     "prefer-promise-reject-errors": "error",
-    "@tinymce/prefer-fun": "off"
+    "@tinymce/prefer-fun": "off",
+    "quote-props": [
+      2,
+      "as-needed",
+      { "keywords": true }
+    ]
   },
   "settings": {
     "import/internal-regex": "^(ephox|tinymce)/.*"
