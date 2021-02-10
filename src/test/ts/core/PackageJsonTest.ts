@@ -54,6 +54,7 @@ describe('PackageJson', () => {
       }));
     });
   });
+
   describe('round-trip', () => {
     it('round-trips extraneous properties', async () => {
       const input = {
