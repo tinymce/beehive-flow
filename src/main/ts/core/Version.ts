@@ -1,6 +1,6 @@
+import * as E from 'fp-ts/Either';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { Comparison, chain, chainN, compareNative } from '../utils/Comparison';
-import * as E from 'fp-ts/Either';
 
 export interface Version {
   readonly major: number;
