@@ -16,7 +16,7 @@ export interface PackageJson {
   readonly 'beehive-flow'?: {
     'primary-workspace'?: string;
   };
-  [k: string]: unknown;
+  readonly [k: string]: unknown;
 }
 
 export const versionCodec = new t.Type<Version, string, string>(
