@@ -1,6 +1,8 @@
 import * as E from 'fp-ts/Either';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { Comparison, chain, chainN, compareNative } from '../utils/Comparison';
+import { showStringOrUndefined } from '../utils/StringUtils';
+import * as PreRelease from './PreRelease';
 
 export interface Version {
   readonly major: number;
@@ -105,5 +107,25 @@ const comparePreReleases = (a: Version, b: Version): Comparison => {
   } else {
     // a is a prerelease, b is a release - a < b
     return Comparison.LT;
+  }
+};
+
+export const enum VersionType {
+  ReleaseReady = 'releaseReady',
+  ReleaseCandidate = 'releaseCandidate'
+}
+
+const isValidPrerelease = (actual: string | undefined): boolean =>
+  actual !== undefined && (actual === PreRelease.releaseCandidate || actual.startsWith(`${PreRelease.releaseCandidate}.`));
+
+export const versionType = async (version: Version): Promise<VersionType> => {
+  const sPre = showStringOrUndefined(version.preRelease);
+  if (version.preRelease === undefined) {
+    return VersionType.ReleaseReady;
+  } else if (isValidPrerelease(version.preRelease)) {
+    return VersionType.ReleaseCandidate;
+  } else {
+    const rc = PreRelease.releaseCandidate;
+    return PromiseUtils.fail(`prerelease version part should be either "${rc}" or start with "${rc}." or not be set, but it is "${sPre}"`);
   }
 };

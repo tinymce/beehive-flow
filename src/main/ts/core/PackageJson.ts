@@ -4,17 +4,19 @@ import * as t from 'io-ts';
 import * as JsonUtils from '../utils/JsonUtils';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as IotsUtils from '../utils/IotsUtils';
+import * as OptionUtils from '../utils/OptionUtils';
 import * as Version from './Version';
 
 type Option<A> = O.Option<A>;
 type Version = Version.Version;
+type VersionType = Version.VersionType;
 
 export interface PackageJson {
   readonly name: string;
   readonly version?: Version;
   readonly workspaces?: string[];
   readonly 'beehive-flow'?: {
-    'primary-workspace'?: string;
+    readonly 'primary-workspace'?: string;
   };
   readonly [k: string]: unknown;
 }
@@ -75,4 +77,7 @@ export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVer
   await writePackageJsonFile(pjFile, newPj);
   return newPj;
 };
+
+export const versionType = async (pj: PackageJson): Promise<Option<VersionType>> =>
+  OptionUtils.mapAsync(O.fromNullable(pj.version), Version.versionType)
 
