@@ -6,8 +6,8 @@ import * as YarnWorkspaces from '../../../main/ts/core/YarnWorkspaces';
 const assert = chai.use(chaiAsPromised).assert;
 
 describe('info', () => {
-  it('reads a test scenario with 2 modules', () => {
-    void assert.becomes(
+  it('reads a test scenario with 2 modules', async () => {
+    await assert.becomes(
       YarnWorkspaces.info('src/test/data/yarninfo1'),
       {
         foo: {
