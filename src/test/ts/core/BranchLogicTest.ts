@@ -4,7 +4,6 @@ import { describe, it } from 'mocha';
 import fc from 'fast-check';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import * as O from 'fp-ts/Option';
 import {
   BranchDetails, BranchState, BranchType, getBranchDetails, getReleaseBranchName, versionFromReleaseBranch
 } from '../../../main/ts/core/BranchLogic';
@@ -54,7 +53,7 @@ describe('BranchLogic', () => {
 
       const packageJson: PackageJson = {
         name: '@beehive-test/dummypackage',
-        version: O.some(version),
+        version,
         other: {}
       };
 

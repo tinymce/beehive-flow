@@ -1,60 +1,66 @@
 import * as path from 'path';
 import * as O from 'fp-ts/Option';
-import * as E from 'fp-ts/Either';
+import * as t from 'io-ts';
 import * as JsonUtils from '../utils/JsonUtils';
+import * as PromiseUtils from '../utils/PromiseUtils';
+import * as IotsUtils from '../utils/IotsUtils';
 import * as Version from './Version';
 
 type Option<A> = O.Option<A>;
 type Version = Version.Version;
-type JsonRecord = E.JsonRecord;
 
 export interface PackageJson {
   readonly name: string;
-  readonly version: Option<Version>;
-  readonly other: Omit<JsonRecord, 'version'>;
+  readonly version?: Version;
+  readonly workspaces?: string[];
+  [k: string]: unknown;
 }
 
-const parsePackageJsonVersion = (pj: JsonRecord): Promise<Option<Version>> =>
-  JsonUtils.optionalStringFieldSuchThat(pj, 'version', Version.parseVersion);
+export const versionCodec = new t.Type<Version, string, string>(
+  'versionCodec',
+  // We don't need a type guard function, so just provide a dummy one that always fails
+  (input: unknown): input is Version => false,
+  IotsUtils.validateEither(Version.parseVersionE),
+  Version.versionToString
+);
 
-// TODO: make sure name is valid (inc no spaces)
-const parsePackageJsonName = (pj: JsonRecord): Promise<string> =>
-  JsonUtils.stringField(pj, 'name');
+export const packageJsonCodec = (): t.Type<PackageJson, unknown> => {
+  const mandatory = t.type({
+    name: t.string
+  });
+
+  const partial = t.partial({
+    version: t.string.pipe(versionCodec),
+    workspaces: t.array(t.string)
+  });
+
+  return t.intersection([ mandatory, partial ]);
+};
 
 export const pjInFolder = (folder: string): string =>
   path.join(folder, 'package.json');
 
-const fromJson = async (j: JsonRecord): Promise<PackageJson> => {
-  const parsedVersion = await parsePackageJsonVersion(j);
-  const parsedName = await parsePackageJsonName(j);
+export const decodeE = (j: unknown): t.Validation<PackageJson> =>
+  packageJsonCodec().decode(j);
 
-  const { version, name, ...other } = j;
-
-  return {
-    name: parsedName,
-    version: parsedVersion,
-    other
-  };
-};
+export const decode = async (j: unknown): Promise<PackageJson> =>
+  PromiseUtils.eitherToPromise(decodeE(j));
 
 export const parsePackageJsonFile = (file: string): Promise<PackageJson> =>
-  JsonUtils.parseJsonRecordFile(file).then(fromJson);
+  JsonUtils.parseJsonFile(file).then(decode);
 
 export const parsePackageJsonFileInFolder = (folder: string): Promise<PackageJson> =>
   parsePackageJsonFile(pjInFolder(folder));
 
-export const toJson = (pj: PackageJson): JsonRecord => ({
-  ...pj.other,
-  ...JsonUtils.optionalToJsonRecord('version', pj.version, Version.versionToString),
-  name: pj.name
-});
+export const toJson = (pj: PackageJson): unknown =>
+  packageJsonCodec().encode(pj);
 
 export const writePackageJsonFile = (file: string, pj: PackageJson): Promise<void> =>
   JsonUtils.writeJsonFile(file, toJson(pj));
 
 export const setVersion = (pj: PackageJson, version: Option<Version>): PackageJson => ({
   ...pj,
-  version
+  version: O.toUndefined(version)
 });
 
 export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVersion: Version, pjFile: string): Promise<PackageJson> => {
@@ -63,3 +69,4 @@ export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVer
   await writePackageJsonFile(pjFile, newPj);
   return newPj;
 };
+

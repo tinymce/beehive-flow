@@ -30,7 +30,7 @@ describe('Lifecycle', () => {
 
     const assertPjVersion = async (expected: string) => {
       const pj = await PackageJson.parsePackageJsonFileInFolder(dir);
-      assert.deepEqual(pj.version, O.some(await Version.parseVersion(expected)));
+      assert.deepEqual(pj.version, await Version.parseVersion(expected));
     };
 
     await beehiveFlow([ 'prepare', '--git-url', hub.dir ]);
