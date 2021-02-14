@@ -33,8 +33,8 @@ export const packageJsonCodec = (): t.Type<PackageJson, unknown> => {
   });
 
   const partial = t.partial({
-    version: t.string.pipe(versionCodec),
-    workspaces: t.array(t.string),
+    'version': t.string.pipe(versionCodec),
+    'workspaces': t.array(t.string),
     'beehive-flow': t.partial({
       'primary-workspace': t.string
     })

@@ -24,7 +24,7 @@ const statusDescription = 'Prints out status of current directory.';
 
 const gitUrlOptions: yargs.Options = {
   type: 'string',
-  'default': null,
+  default: null,
   description: 'URL of git repo to operate on. Defaults to the git repo in the current directory.'
 };
 
@@ -35,13 +35,13 @@ const majorMinorOrMainOptions: yargs.PositionalOptions = {
 
 const tempOptions: yargs.Options = {
   type: 'string',
-  'default': null,
+  default: null,
   description: 'Temp folder for git checkout. If not specified, a system temp folder is used.'
 };
 
 const distDirOptions: yargs.Options = {
   type: 'string',
-  'default': '.',
+  default: '.',
   description: 'Dir to use to run "npm publish". Relative to the working-dir. ' +
     'The package.json file in this dir must have the same name and version as the one in the working-dir.'
 };
@@ -54,12 +54,12 @@ const argParser =
     .scriptName('beehive-flow')
     .option('dry-run', {
       type: 'boolean',
-      'default': false,
+      default: false,
       description: 'Don\'t push changes to remote systems.'
     })
     .option('working-dir', {
       type: 'string',
-      'default': process.cwd(),
+      default: process.cwd(),
       description: 'working directory - defaults to current directory'
     })
     .command(
