@@ -5,8 +5,8 @@ import * as E from 'fp-ts/Either';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 
 describe('PackageJson', () => {
-  describe('parse', () => {
-    it('parses package with name', () => {
+  describe('decodeE', () => {
+    it('decodes package with name', () => {
       const actual = PackageJson.decodeE({
         name: 'blah'
       });
@@ -15,7 +15,7 @@ describe('PackageJson', () => {
       }));
     });
 
-    it('parses package with name and version', () => {
+    it('decodes package with name and version', () => {
       const actual = PackageJson.decodeE({
         name: 'blah',
         version: '1.2.3-rc'
@@ -26,7 +26,7 @@ describe('PackageJson', () => {
       }));
     });
 
-    it('parses package with name, version and workspaces', () => {
+    it('decodes package with name, version and workspaces', () => {
       const actual = PackageJson.decodeE({
         name: 'blah',
         version: '1.2.3-rc',
@@ -51,6 +51,23 @@ describe('PackageJson', () => {
         version: { major: 1, minor: 2, patch: 3, preRelease: 'rc', buildMetaData: undefined },
         workspaces: [ 'cat', 'dog*' ],
         fridge: 'donkey'
+      }));
+    });
+
+    it('decodes beehive-flow custom properies', () => {
+      const actual = PackageJson.decodeE({
+        name: 'blah',
+        version: '1.2.3-rc',
+        beehiveFlow: {
+          primaryWorkspace: 'blah'
+        }
+      });
+      assert.deepEqual(actual, E.right({
+        name: 'blah',
+        version: { major: 1, minor: 2, patch: 3, preRelease: 'rc', buildMetaData: undefined },
+        beehiveFlow: {
+          primaryWorkspace: 'blah'
+        }
       }));
     });
   });
