@@ -13,8 +13,8 @@ export interface PackageJson {
   readonly name: string;
   readonly version?: Version;
   readonly workspaces?: string[];
-  readonly 'beehive-flow'?: {
-    'primary-workspace'?: string;
+  readonly beehiveFlow?: {
+    readonly primaryWorkspace?: string;
   };
   readonly [k: string]: unknown;
 }
@@ -33,10 +33,10 @@ export const packageJsonCodec = (): t.Type<PackageJson, unknown> => {
   });
 
   const partial = t.partial({
-    'version': t.string.pipe(versionCodec),
-    'workspaces': t.array(t.string),
-    'beehive-flow': t.partial({
-      'primary-workspace': t.string
+    version: t.string.pipe(versionCodec),
+    workspaces: t.array(t.string),
+    beehiveFlow: t.partial({
+      primaryWorkspace: t.string
     })
   });
 

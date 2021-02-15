@@ -56,17 +56,17 @@ describe('PackageJson', () => {
 
     it('decodes beehive-flow custom properies', () => {
       const actual = PackageJson.decodeE({
-        'name': 'blah',
-        'version': '1.2.3-rc',
-        'beehive-flow': {
-          'primary-workspace': 'blah'
+        name: 'blah',
+        version: '1.2.3-rc',
+        beehiveFlow: {
+          primaryWorkspace: 'blah'
         }
       });
       assert.deepEqual(actual, E.right({
-        'name': 'blah',
-        'version': { major: 1, minor: 2, patch: 3, preRelease: 'rc', buildMetaData: undefined },
-        'beehive-flow': {
-          'primary-workspace': 'blah'
+        name: 'blah',
+        version: { major: 1, minor: 2, patch: 3, preRelease: 'rc', buildMetaData: undefined },
+        beehiveFlow: {
+          primaryWorkspace: 'blah'
         }
       }));
     });
