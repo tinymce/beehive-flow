@@ -8,11 +8,29 @@ const assert = chai.use(chaiAsPromised).assert;
 describe('info', () => {
   it('reads a test scenario with 2 modules', async () => {
     await assert.becomes(
-      YarnWorkspaces.info('src/test/data/yarninfo1'),
+      YarnWorkspaces.info('src/test/data/yarnInfo1'),
       {
         foo: {
           location: 'foo',
           workspaceDependencies: [],
+          mismatchedWorkspaceDependencies: []
+        },
+        bar: {
+          location: 'bar',
+          workspaceDependencies: [],
+          mismatchedWorkspaceDependencies: []
+        }
+      }
+    );
+  });
+
+  it('reads a test scenario with 2 dependent modules', async () => {
+    await assert.becomes(
+      YarnWorkspaces.info('src/test/data/yarnInfo2'),
+      {
+        foo: {
+          location: 'foo',
+          workspaceDependencies: [ 'bar' ],
           mismatchedWorkspaceDependencies: []
         },
         bar: {
