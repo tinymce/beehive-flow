@@ -61,7 +61,17 @@ const npmTag = async (args: PublishArgs, tags: string[], r: BranchDetails, dir: 
 
 const gitTag = async (r: BranchDetails, git: gitP.SimpleGit, args: PublishArgs): Promise<void> => {
   if (r.branchState === BranchState.ReleaseReady) {
-    const tagName = r.packageJson.name + '@' + Version.versionToString(r.version);
+
+    // TODO TINY-6994: Implement tagging logic:
+    /*
+      Tag X.Y.Z for the primary module in a repo.
+      In a single-module repo this will be the one and only module.
+      For a multi-project repos this might be the root module (which might not be published) or a special project.
+      Tag package@X.Y.Z for all modules other than the primary.
+     */
+    // const tagName = r.packageJson.name + '@' + Version.versionToString(r.version);
+    const tagName = Version.versionToString(r.version);
+
     console.log(`Tagging as ${tagName}`);
     await git.addTag(tagName);
 
