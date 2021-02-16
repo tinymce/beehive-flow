@@ -92,14 +92,14 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes release from main branch', async () => {
-    const { npmTags, gitTags, packageName } = await runScenario('main', '0.1.0', false);
+    const { npmTags, gitTags } = await runScenario('main', '0.1.0', false);
     assert.deepEqual(npmTags, {
       'feature-dummy': '0.0.1-rc',
       'main': '0.1.0',
       'latest': '0.1.0',
       'release-0.1': '0.1.0'
     });
-    assert.deepEqual(gitTags, [ `@beehive-test/${packageName}@0.1.0` ]);
+    assert.deepEqual(gitTags, [ '0.1.0' ]);
   }).timeout(TIMEOUT);
 
   it('publishes rc from release branch', async () => {
@@ -113,13 +113,13 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes release from release branch', async () => {
-    const { npmTags, gitTags, packageName } = await runScenario('release/0.5', '0.5.444', false);
+    const { npmTags, gitTags } = await runScenario('release/0.5', '0.5.444', false);
     assert.deepEqual(npmTags, {
       'feature-dummy': '0.0.1-rc',
       'latest': '0.5.444',
       'release-0.5': '0.5.444'
     });
-    assert.deepEqual(gitTags, [ `@beehive-test/${packageName}@0.5.444` ]);
+    assert.deepEqual(gitTags, [ '0.5.444' ]);
   }).timeout(TIMEOUT);
 
   it('publishes from feature branch', async () => {
@@ -210,6 +210,6 @@ describe('Publish', () => {
     assert.deepEqual(depPj.dependencies, {});
 
     const gitTags = (await git.tags()).all.sort();
-    assert.deepEqual(gitTags, [ '@beehive-test/beehive-test-dist-dir@1.1.3' ]);
+    assert.deepEqual(gitTags, [ '1.1.3' ]);
   }).timeout(120000); // Verdaccio runs pretty slowly on the build servers
 });
