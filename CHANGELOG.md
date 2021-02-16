@@ -3,7 +3,7 @@
  - Prep work for monorepo support. #TINY-6986, #TINY-6987
 
 ### Changed
- - Now tags as `vX.Y.Z` instead of `module@vX.Y.Z`. The latter form will be used for non-primary modules of monorepos. #TINY-7026
+ - Now tags as `X.Y.Z` instead of `module@X.Y.Z`. The latter form will be used for non-primary modules of monorepos. #TINY-7026
 
 ## [0.13.0] - 2021-02-02
 ### Changed
