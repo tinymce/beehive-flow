@@ -84,7 +84,9 @@ describe('BranchLogic', () => {
         version,
         currentBranch,
         branchType,
-        branchState
+        branchState,
+        workspacesEnabled: false,
+        modules: {}
       };
 
       await assert.becomes(getBranchDetails(dir), expected);
