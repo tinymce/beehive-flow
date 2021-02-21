@@ -38,6 +38,7 @@ export const enum BranchState {
 
 export interface Module {
   readonly packageJson: PackageJson;
+  readonly packageJsonFile: string;
 }
 
 export interface BranchDetails {
@@ -92,10 +93,11 @@ export const isValidPrerelease = (actual: string | undefined, expected: string):
 export const readWorkspaces = async (dir: string): Promise<Record<string, Module>> => {
   const ws = await YarnWorkspaces.info(dir);
   return PromiseUtils.parMapRecord(ws, async (w) => {
-    const workspaceDir = path.join(dir, w.location);
-    const packageJson = await PackageJson.parsePackageJsonFileInFolder(workspaceDir);
+    const packageJsonFile = path.join(dir, w.location, 'package.json');
+    const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
     return {
-      packageJson
+      packageJson,
+      packageJsonFile
     };
   });
 };
