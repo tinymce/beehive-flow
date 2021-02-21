@@ -14,7 +14,7 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const git = gitP(dir);
   const r = await getBranchDetails(dir);
 
-  const tags = await NpmTags.pickTagsNpm(r.currentBranch, r.branchState, r.version, dir, r.packageJson.name);
+  const tags = await NpmTags.pickTagsNpm(r.currentBranch, r.branchState, r.version, dir, r.rootModule.packageJson.name);
   const [ mainTag ] = tags;
 
   const dryRunArgs = args.dryRun ? [ '--dry-run' ] : [];
@@ -43,7 +43,7 @@ const npmTag = async (args: PublishArgs, tags: string[], r: BranchDetails, dir: 
     console.log('Setting NPM tags.');
     console.log('This will likely fail a few times, until the package is available in the registry - this is normal.');
     for (const t of tags) {
-      const fullPackageName = r.packageJson.name + '@' + Version.versionToString(r.version);
+      const fullPackageName = r.rootModule.packageJson.name + '@' + Version.versionToString(r.version);
       const tagCmd = [ 'dist-tag', 'add', fullPackageName, t ];
       console.log([ 'npm', ...tagCmd ].join(' '));
       /*

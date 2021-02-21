@@ -79,8 +79,10 @@ describe('BranchLogic', () => {
       const { dir, packageJsonFile, version, packageJson } = await setup(currentBranch, sVersion);
 
       const expected: BranchDetails = {
-        packageJsonFile,
-        packageJson,
+        rootModule: {
+          packageJsonFile,
+          packageJson,
+        },
         version,
         currentBranch,
         branchType,

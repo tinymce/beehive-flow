@@ -44,8 +44,7 @@ export interface Module {
 export interface BranchDetails {
   readonly currentBranch: string;
   readonly version: Version;
-  readonly packageJson: PackageJson;
-  readonly packageJsonFile: string;
+  readonly rootModule: Module;
   readonly branchType: BranchType;
   readonly branchState: BranchState;
   readonly workspacesEnabled: boolean;
@@ -90,16 +89,18 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
 export const isValidPrerelease = (actual: string | undefined, expected: string): boolean =>
   actual !== undefined && (actual === expected || actual.startsWith(`${expected}.`));
 
+const readModule = async (dir: string): Promise<Module> => {
+  const packageJsonFile = path.join(dir, 'package.json');
+  const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
+  return {
+    packageJson,
+    packageJsonFile
+  };
+};
+
 export const readWorkspaces = async (dir: string): Promise<Record<string, Module>> => {
   const ws = await YarnWorkspaces.info(dir);
-  return PromiseUtils.parMapRecord(ws, async (w) => {
-    const packageJsonFile = path.join(dir, w.location, 'package.json');
-    const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
-    return {
-      packageJson,
-      packageJsonFile
-    };
-  });
+  return PromiseUtils.parMapRecord(ws, (w) => readModule(path.join(dir, w.location)));
 };
 
 export const readWorkspacesIfEnabled = async (
@@ -121,12 +122,11 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 
   const currentBranch = await Git.currentBranch(git);
 
-  const packageJsonFile = PackageJson.pjInFolder(dir);
-  const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
+  const rootModule = await readModule(dir);
 
-  const { workspacesEnabled, modules } = await readWorkspacesIfEnabled(dir, packageJson);
+  const { workspacesEnabled, modules } = await readWorkspacesIfEnabled(dir, rootModule.packageJson);
 
-  const version = packageJson.version;
+  const version = rootModule.packageJson.version;
 
   if (version === undefined) {
     throw new Error('Version missing in package.json file');
@@ -135,8 +135,7 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const baseState = {
     currentBranch,
     version,
-    packageJson,
-    packageJsonFile
+    rootModule
   };
 
   const loc = `${currentBranch} branch: package.json version`;
