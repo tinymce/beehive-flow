@@ -98,17 +98,17 @@ const readModule = async (dir: string): Promise<Module> => {
   };
 };
 
-export const readWorkspaces = async (dir: string): Promise<Record<string, Module>> => {
+export const readModules = async (dir: string): Promise<Record<string, Module>> => {
   const ws = await YarnWorkspaces.info(dir);
   return PromiseUtils.parMapRecord(ws, (w) => readModule(path.join(dir, w.location)));
 };
 
-export const readWorkspacesIfEnabled = async (
+export const readModulesIfEnabled = async (
   dir: string, packageJson: { workspaces?: string[] }
 ): Promise<{ workspacesEnabled: boolean; modules: Record<string, Module>}> => {
   const workspacesEnabled = packageJson.workspaces !== undefined;
   if (workspacesEnabled) {
-    return { workspacesEnabled, modules: await readWorkspaces(dir) };
+    return { workspacesEnabled, modules: await readModules(dir) };
   } else {
     return { workspacesEnabled, modules: {}};
   }
@@ -124,7 +124,7 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 
   const rootModule = await readModule(dir);
 
-  const { workspacesEnabled, modules } = await readWorkspacesIfEnabled(dir, rootModule.packageJson);
+  const { workspacesEnabled, modules } = await readModulesIfEnabled(dir, rootModule.packageJson);
 
   const version = rootModule.packageJson.version;
 
