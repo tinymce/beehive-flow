@@ -1,8 +1,7 @@
 import { describe, it } from 'mocha';
 import { assert } from 'chai';
-import * as ObjUtils from '../../../main/ts/utils/ObjUtils';
-
 import fc from 'fast-check';
+import * as ObjUtils from '../../../main/ts/utils/ObjUtils';
 
 describe('ObjUtils', () => {
   describe('fromPairs', () => {
@@ -12,14 +11,14 @@ describe('ObjUtils', () => {
 
     it('returns single-key object for single-element array', () => {
       fc.assert(fc.property(fc.string(), fc.nat(), (k, v) => {
-        assert.deepEqual(ObjUtils.fromPairs([ [ k, v ] ]), { [k]: v });
+        assert.deepEqual(ObjUtils.fromPairs([[ k, v ]]), { [k]: v });
       }));
     });
 
     it('returns correct objects for larger arrays', () => {
       assert.deepEqual(
-        ObjUtils.fromPairs([ [ 'a', 'zingo' ], [ 'hasOwnProperty', '*' ] ]),
-        { 'a': 'zingo', 'hasOwnProperty': '*' }
+        ObjUtils.fromPairs([[ 'a', 'zingo' ], [ 'hasOwnProperty', '*' ]]),
+        { a: 'zingo', hasOwnProperty: '*' }
       );
     });
   });

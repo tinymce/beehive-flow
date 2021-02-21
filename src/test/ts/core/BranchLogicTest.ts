@@ -90,7 +90,7 @@ describe('BranchLogic', () => {
       const expected: BranchDetails = {
         rootModule: {
           packageJsonFile,
-          packageJson,
+          packageJson
         },
         version,
         currentBranch,
