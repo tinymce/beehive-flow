@@ -103,7 +103,7 @@ export const readModules = async (dir: string): Promise<Record<string, Module>> 
   return PromiseUtils.parMapRecord(ws, (w) => readModule(path.join(dir, w.location)));
 };
 
-export const readModuleskIfEnabled = async (
+export const readModulesIfEnabled = async (
   dir: string, packageJson: { workspaces?: string[] }
 ): Promise<{ workspacesEnabled: boolean; modules: Record<string, Module>}> => {
   const workspacesEnabled = packageJson.workspaces !== undefined;
