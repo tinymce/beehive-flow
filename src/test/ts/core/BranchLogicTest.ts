@@ -5,7 +5,12 @@ import fc from 'fast-check';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import {
-  BranchDetails, BranchState, BranchType, getBranchDetails, getReleaseBranchName, versionFromReleaseBranch
+  BranchDetails,
+  BranchState,
+  BranchType,
+  getBranchDetails,
+  getReleaseBranchName,
+  versionFromReleaseBranch
 } from '../../../main/ts/core/BranchLogic';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
@@ -15,6 +20,14 @@ import * as Files from '../../../main/ts/utils/Files';
 type PackageJson = PackageJson.PackageJson;
 
 const assert = chai.use(chaiAsPromised).assert;
+
+const newRepo = async (branchName: string) => {
+  const hub = await Git.initInTempFolder(true);
+  const gitUrl = hub.dir;
+  const { dir, git } = await Git.cloneInTempFolder(gitUrl);
+  await Git.checkoutNewBranch(git, branchName);
+  return { gitUrl, dir, git };
+};
 
 describe('BranchLogic', () => {
   describe('releaseBranchName', () => {
@@ -44,11 +57,7 @@ describe('BranchLogic', () => {
 
     const setup = async (branchName: string, sVersion: string) => {
       const version = await Version.parseVersion(sVersion);
-
-      const hub = await Git.initInTempFolder(true);
-      const gitUrl = hub.dir;
-      const { dir, git } = await Git.cloneInTempFolder(gitUrl);
-      await Git.checkoutNewBranch(git, branchName);
+      const { gitUrl, dir, git } = await newRepo(branchName);
       const packageJsonFile = path.join(dir, 'package.json');
 
       const packageJson: PackageJson = {
@@ -148,5 +157,62 @@ describe('BranchLogic', () => {
     it('detects valid release state', () =>
       check('release/8.1298', '8.1298.7', BranchType.Release, BranchState.ReleaseReady)
     );
+
+    context('workspaces', () => {
+      it('reads modules', async () => {
+        const { dir, git } = await newRepo('main');
+        const rootPj = await PackageJson.decode({
+          name: 'rootPackage',
+          version: '1.2.3',
+          private: true,
+          workspaces: [ 'modules/*' ]
+        });
+        const rootPjFile = path.join(dir, 'package.json');
+        await PackageJson.writePackageJsonFile(rootPjFile, rootPj);
+
+        const makeModule = async (name: string) => {
+          const module1Dir = path.join(dir, 'modules', name);
+          fs.mkdirSync(module1Dir, { recursive: true });
+
+          const pj = await PackageJson.decode({
+            name,
+            version: '2.71.1'
+          });
+          const pjFile = path.join(module1Dir, 'package.json');
+          await PackageJson.writePackageJsonFile(pjFile, pj);
+          return { pj, pjFile };
+        };
+
+        const m1 = await makeModule('module1');
+        const m2 = await makeModule('module2');
+
+        await git.add([ rootPjFile, m1.pjFile, m2.pjFile ]);
+        await git.commit('initial');
+        await Git.push(git);
+
+        const actual = await getBranchDetails(dir);
+        assert.deepEqual(actual, {
+          currentBranch: 'main',
+          branchState: BranchState.ReleaseReady,
+          branchType: BranchType.Main,
+          version: await Version.parseVersion('1.2.3'),
+          workspacesEnabled: true,
+          rootModule: {
+            packageJson: rootPj,
+            packageJsonFile: rootPjFile
+          },
+          modules: {
+            module1: {
+              packageJson: m1.pj,
+              packageJsonFile: m1.pjFile
+            },
+            module2: {
+              packageJson: m2.pj,
+              packageJsonFile: m2.pjFile
+            }
+          }
+        });
+      });
+    });
   });
 });
