@@ -9,7 +9,7 @@ export const lookup = <T>(o: T, k: keyof T): Option<T[keyof T]> =>
   hasKey(o, k) ? O.some(o[k]) : O.none;
 
 export const map = <A, B>(o: Record<string, A>, f: (a: A) => B): Record<string, B> => {
-  const r = {} as Record<string, B>;
+  const r: Record<string, B> = {};
   for (const k of Object.keys(o)) {
     r[k] = f(o[k]);
   }
