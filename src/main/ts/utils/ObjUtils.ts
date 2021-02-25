@@ -16,9 +16,8 @@ export const map = <A, B>(o: Record<string, A>, f: (a: A) => B): Record<string, 
   return r;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const fromPairs = <K extends keyof any, V> (pairs: Array<[K, V]>): Record<K, V> => {
-  const r = {} as Record<K, V>;
+export const fromPairs = <A> (pairs: Array<[string, A]>): Record<string, A> => {
+  const r: Record<string, A> = {};
   pairs.forEach(([ k, v ]) => {
     r[k] = v;
   });
