@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-for-of */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable arrow-body-style */
-
 import * as commonmark from 'commonmark';
 import { DateTime } from 'luxon';
 import * as E from 'fp-ts/Either';
@@ -300,9 +296,8 @@ const parseRelease = (source: TextLines, release: Heading, first: boolean): E.Ei
   );
 };
 
-const parseReleases = (source: TextLines, releases: Heading[]): E.Either<string[], Release[]> => {
-  return EitherUtils.combine(releases.map((release, i) => parseRelease(source, release, i === 0)));
-};
+const parseReleases = (source: TextLines, releases: Heading[]): E.Either<string[], Release[]> =>
+  EitherUtils.combine(releases.map((release, i) => parseRelease(source, release, i === 0)));
 
 const parseTop = (source: TextLines, top: Top): E.Either<string[], Changelog> => {
   const errors: string[] = [];
@@ -348,6 +343,5 @@ const parseTop = (source: TextLines, top: Top): E.Either<string[], Changelog> =>
  * Attempt to parse a changelog.
  * @param text the changelog to parse.
  */
-export const parseChangelog = (text: string) => {
-  return parseTop(findLineStarts(text), parseHeadings(text));
-};
+export const parseChangelog = (text: string) =>
+  parseTop(findLineStarts(text), parseHeadings(text));
