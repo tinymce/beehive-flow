@@ -435,6 +435,14 @@ describe('Changelog', () => {
         end: 5448
       });
     });
+  });
+  describe('parseChangelogFragment', () => {
+    it('parses an empty changelog fragment', () => {
+      const data = '';
+      const changelogFragmentE = parseChangelogFragment(data);
+      const changelogFragment = E.isRight(changelogFragmentE) ? changelogFragmentE.right : assert.fail('Expected the changelog fragment to parse successfully');
+      assert.deepEqual(changelogFragment, { sections: [] });
+    });
     it('parses a changelog fragment', async () => {
       const data = await Files.readFileAsString('src/test/data/changelogs/test_ok_fragment.md');
       const changelogFragmentE = parseChangelogFragment(data);
