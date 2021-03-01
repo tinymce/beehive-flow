@@ -4,7 +4,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/pipeable';
 import * as Files from '../../../main/ts/utils/Files';
-import { Changelog, parseChangelog } from '../../../main/ts/core/Changelog';
+import { Changelog, parseChangelog, parseChangelogFragment } from '../../../main/ts/core/Changelog';
 
 const assert = chai.use(chaiAsPromised).assert;
 
@@ -434,7 +434,60 @@ describe('Changelog', () => {
         start: 1006,
         end: 5448
       });
-
+    });
+    it('parses a changelog fragment', async () => {
+      const data = await Files.readFileAsString('src/test/data/changelogs/test_ok_fragment.md');
+      const changelogFragmentE = parseChangelogFragment(data);
+      const changelogFragment = E.isRight(changelogFragmentE) ? changelogFragmentE.right : assert.fail('Expected the changelog fragment to parse successfully');
+      assert.deepEqual(changelogFragment, {
+        sections: [
+          'Added',
+          'Deprecated'
+        ],
+        Added: {
+          end: 73,
+          header: {
+            end: 9,
+            start: 0
+          },
+          items: [
+            {
+              end: 52,
+              jira: 'BLAH-101',
+              start: 10
+            },
+            {
+              end: 73,
+              jira: undefined,
+              start: 53
+            }
+          ],
+          list: {
+            end: 73,
+            start: 10
+          },
+          start: 0
+        },
+        Deprecated: {
+          end: 137,
+          header: {
+            end: 88,
+            start: 74
+          },
+          items: [
+            {
+              end: 137,
+              jira: 'BLAH-49',
+              start: 89
+            }
+          ],
+          list: {
+            end: 137,
+            start: 89
+          },
+          start: 74
+        }
+      });
     });
   });
 });

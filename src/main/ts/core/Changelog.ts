@@ -340,6 +340,20 @@ const parseTop = (source: TextLines, top: Top): E.Either<string[], Changelog> =>
 };
 
 /**
+ * Attempt to parse a changelog fragment.
+ * @param text the changelog fragment to parse.
+ */
+export const parseChangelogFragment = (text: string) => {
+  const source = findLineStarts(text);
+  const headings = parseHeadings(text);
+  if (headings.preamble.length > 0) {
+    return E.left([ 'Expected a level 3 heading' + pos(headings.preamble[0]) ]);
+  } else {
+    return parseFragment(source, headings.subheadings);
+  }
+};
+
+/**
  * Attempt to parse a changelog.
  * @param text the changelog to parse.
  */
