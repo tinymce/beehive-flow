@@ -43,11 +43,20 @@ export const parseHeadingLevel = (level: number): Parser<Token, Heading> =>
     `Expected heading ${level}`
   );
 
+export const parseChangelogHeader = (): Parser<Token, Heading> =>
+  P.expected(
+    pipe(
+      parseHeadingLevel(1),
+      P.filter((token) => token.text === 'Changelog')
+    ),
+    'Changelog must start with: "# Changelog"'
+  );
+
 type Changelog = string | null;
 
 export const parseChangelog = (): Parser<Token, Changelog> =>
   pipe(
-    parseHeadingLevel(1),
+    parseChangelogHeader(),
     P.map((token) => token.text)
   );
 
@@ -58,10 +67,8 @@ export const doParse = (input: string) => {
 
   const options: marked.MarkedOptions = { gfm: true };
   const tokens = marked.lexer(input, options);
-  console.log('yo', tokens);
 
 
-  const result = parseChangelog()(S.stream(tokens));
 
-  console.log(result);
+  return parseChangelog()(S.stream(tokens));
 };
