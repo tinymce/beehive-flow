@@ -1,6 +1,7 @@
 import * as commonmark from 'commonmark';
 import { DateTime } from 'luxon';
 import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 import { pipe } from 'fp-ts/pipeable';
 import * as EitherUtils from '../utils/EitherUtils';
 import { parseVersionE, Version } from './Version';
@@ -101,7 +102,7 @@ const findLineStarts = (text: string): TextLines => {
   return { text, lines };
 };
 
-const posToOffset = (lines: number[], position: [number, number]) => {
+const posToOffset = (lines: number[], position: [ number, number ]) => {
   // both line and column count from 1
   const [ line, column ] = position;
   return lines[line - 1] + (column - 1);
@@ -118,7 +119,7 @@ const columnRange = (lines: number[], node: commonmark.Node): Offset => {
 
 // the range including the whole lines that the node is in
 const blockRange = (source: TextLines, node: commonmark.Node): Offset => {
-  const [[ startLine ], [ endLine ]] = node.sourcepos;
+  const [ [ startLine ], [ endLine ] ] = node.sourcepos;
   const start = posToOffset(source.lines, [ startLine, 1 ]);
   const end = (endLine < source.lines.length ? posToOffset(source.lines, [ endLine + 1, 1 ]) : source.text.length) - 1;
   return { start, end };
@@ -131,7 +132,7 @@ const extractText = (source: TextLines, node: commonmark.Node): string => {
 
 const pos = (node: commonmark.Node): string => {
   if (node.sourcepos !== undefined) {
-    const [[ startLine, startColumn ]] = node.sourcepos;
+    const [ [ startLine, startColumn ] ] = node.sourcepos;
     return ` (line: ${startLine} column: ${startColumn})`;
   } else {
     return '';
@@ -186,6 +187,16 @@ const parseItem = (source: TextLines, node: commonmark.Node): E.Either<string[],
   });
 };
 
+export const children = (node: commonmark.Node): commonmark.Node[] => {
+  const items = [];
+  let item = node.firstChild;
+  while (item) {
+    items.push(item);
+    item = item.next;
+  }
+  return items;
+};
+
 const parseList = (source: TextLines, list: commonmark.Node): E.Either<string[], Item[]> => {
   const itemsE: E.Either<string[], Item>[] = [];
   let item = list.firstChild;
@@ -198,7 +209,203 @@ const parseList = (source: TextLines, list: commonmark.Node): E.Either<string[],
 
 const sectionNames: SectionNames[] = [ 'Added', 'Improved', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security' ];
 const sectionRes = sectionNames.map((sectionName) => new RegExp(`^### ${sectionName}$`));
+
+/*
+
+pipe(
+  header
+
+release
+'Added'?, 'Improved'?, 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security'
+
+ */
+
+export interface ParseError {
+  message: string;
+  pos: string;
+}
+
+export const parseError = (message: string, node: commonmark.Node): ParseError => ({
+  message,
+  pos: pos(node)
+});
+
+type ParseResult<I, O> = E.Either<ParseError[], { next: O.Option<I>; output: O }>;
+
+export type Parser<T> = (i: commonmark.Node) => ParseResult<commonmark.Node, T>;
+
+export const map = <I, A, B>(f: (a: A) => B) => (p: Parser<A>): Parser<B> =>
+  (i) =>
+    pipe(
+      p(i),
+      E.map(({ next, output }) => ({ next, output: f(output) }))
+    );
+
+export const flatMap = <A, B>(f: (a: A) => Parser<B>) => (p: Parser<A>): Parser<B> =>
+  (i) =>
+    pipe(
+      p(i),
+      E.fold((e) => E.left(e), ({ next, output }) => pipe(next, O.fold(() => E.left([ parseError('EOF', i) ]), f(output))))
+    );
+
+export const flatMapValue = <I, A, B>(f: (a: A) => E.Either<ParseError[], B>) => (p: Parser<A>): Parser<B> =>
+  (i) =>
+    pipe(
+      p(i),
+      E.chain(({ next, output }) => pipe(f(output), E.map((b) => ({ next, output: b }))))
+    );
+
+export const nextNode = (n: commonmark.Node): O.Option<commonmark.Node> =>
+  O.fromNullable(n.next);
+
+/** Consumes no input, produces a value */
+export const constant = <A>(a: A): Parser<A> =>
+  (i) => E.right({ next: O.some(i), output: a });
+
+/** Consumes and produces the next value */
+export const get = (): Parser<commonmark.Node> =>
+  (i) => E.right({ next: nextNode(i), output: i });
+
+/** Parser that always consumes its input */
+export const nodeParser = <T>(f: (node: commonmark.Node) => E.Either<ParseError[], T>): Parser<T> =>
+  pipe(get(), flatMapValue(f));
+
+/** Repeat a parser until it fails or EOF occurs, and return the results. Always succeeds */
+export const many = <T> (p: Parser<T>): Parser<T[]> =>
+  (i) => {
+    let item: commonmark.Node = i;
+    const r: T[] = [];
+    while (item !== null) {
+      const pr = p(item);
+      if (pr._tag === 'Left') {
+        return E.right({ next: O.some(item), output: r });
+      } else {
+        const next = pr.right.next;
+        if (next._tag === 'None') {
+          return E.right({ next: O.some(item), output: r });
+        } else {
+          r.push(pr.right.output);
+          item = next.value;
+        }
+      }
+    }
+    return E.right({ next: O.some(item), output: r });
+  };
+
+export const many1 = <T> (p: Parser<T>): Parser<T[]> =>
+  pipe(
+    p,
+    flatMap((a) => pipe(
+      many(p),
+      map((output) => [ a, ...output ])
+    ))
+  );
+
+/** Run the first parser until the second one passes. If the first one ever fails, the whole parser fails. Fails if EOF is encountered */
+export const manyUntil = <A, B> (pa: Parser<A>, pb: Parser<B>): Parser<[A[], B]> =>
+  (i) => {
+    let item: commonmark.Node = i;
+    const r: A[] = [];
+    while (item !== null) {
+      const tryB = pb(item);
+      if (tryB._tag === 'Right') {
+        return E.right({ next: O.some(item), output: [r, tryB.right.output ] });
+      }
+
+      const pr = pa(item);
+      if (pr._tag === 'Left') {
+        return pr;
+      } else {
+        const next = pr.right.next;
+        if (next._tag === 'None') {
+          return E.left([ parseError('EOF', i) ]);
+        } else {
+          r.push(pr.right.output);
+          item = next.value;
+        }
+      }
+    }
+    return E.left([ parseError('EOF', i) ]);
+  };
+
+/** consume and ignore tokens until this parser passes */
+export const until = <T> (p: Parser<T>, eofMessage: string = 'EOF'): Parser<T> =>
+  (i) => {
+    let item: commonmark.Node | null = i;
+    while (item !== null) {
+      const pr = p(item);
+      if (pr._tag === 'Right') {
+        return pr;
+      }
+      item = item.next;
+    }
+    return E.left([ parseError(eofMessage, i) ]);
+  };
+
+export const nodeType = <T>(nodeType: commonmark.NodeType): Parser<commonmark.Node> =>
+  nodeParser(
+    (node) =>
+      node.type === nodeType
+        ? E.right(node)
+        : E.left([ parseError(`Expected node type ${nodeType}, but got ${node.type}`, node) ])
+  );
+
+export const headingLevel = (level: number): Parser<commonmark.Node> =>
+  pipe(
+    nodeType('heading'),
+    flatMapValue(
+      (node) =>
+        node.level === level
+          ? E.right(node)
+          : E.left([ parseError(`Expected heading level ${level}, but got ${node.level}`, node) ])
+    )
+  );
+
+// export const unreleasedHeader = (): Parser<commonmark.Node> =>
+//   pipe(
+//     headingLevel(2),
+//     flatMapValue(
+//       (node) => {
+//
+//       })
+//   )
+//
+
+export const parseChangelogNu = ()
+
+/*
+
+changelog =
+pipe(
+  header(),
+  unreleased(),
+  many1(release)
+)
+
+release =
+pipe(
+  releaseHeader(),
+  flatMap(maybe(releaseSection('Added')))
+  flatMap(maybe(releaseSection('Improved')))
+  flatMap(maybe(releaseSection('Changed')))
+  flatMap(maybe(releaseSection('Deprecated')))
+  flatMap(maybe(releaseSection('Removed')))
+  flatMap(maybe(releaseSection('Fixed')))
+  flatMap(maybe(releaseSection('Security')))
+)
+
+releaseSection =
+  many1(releaseEntry)
+
+releaseEntry =
+  bullet()
+
+ */
+
+// export const eat = <I> (): Parser<I> =
+
 const parseFragment = (source: TextLines, sectionHeadings: Heading[]): E.Either<string[], ChangelogFragment> => {
+
   const fragment: ChangelogFragment = { sections: [] };
   let errors: string[] = [];
   const seenSection: Record<number, commonmark.Node> = {};
@@ -215,8 +422,8 @@ const parseFragment = (source: TextLines, sectionHeadings: Heading[]): E.Either<
       errors.push('Heading "### ' + sectionNames[idx] + '" is a repeat' + pos(sectionHeading.header));
     } else if (idx < searchStart) {
       errors.push('Expected heading "### ' + sectionNames[idx] +
-      '" to be listed earlier as headings must be in the order ' +
-      sectionNames.join(', ') + pos(sectionHeading.header));
+        '" to be listed earlier as headings must be in the order ' +
+        sectionNames.join(', ') + pos(sectionHeading.header));
     } else {
       searchStart = idx;
     }
