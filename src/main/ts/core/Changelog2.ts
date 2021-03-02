@@ -6,8 +6,10 @@ import * as P from 'parser-ts/Parser'
 import * as S from 'parser-ts/Stream'
 import * as marked from 'marked';
 import { Version } from './Version';
-import * as OptionUtils from '../utils/OptionUtils';
 import { DateTime } from 'luxon';
+import { sequenceS } from 'fp-ts/Apply';
+import * as Ord from 'fp-ts/Ord';
+import * as Eq from 'fp-ts/Eq';
 
 type Heading = marked.Tokens.Heading;
 
@@ -16,6 +18,29 @@ type Parser<I, A> = P.Parser<I, A>;
 type Token = marked.Token;
 type Def = marked.Tokens.Def;
 type List = marked.Tokens.List;
+
+export interface Release {
+  readonly version: Version;
+  readonly date: DateTime;
+  readonly sections: ReleaseSection[];
+}
+
+export interface Changelog {
+  readonly unreleased: Unreleased;
+  readonly releases: Release[];
+}
+
+type SectionName = 'Added' | 'Improved' | 'Changed' | 'Deprecated' | 'Removed' | 'Fixed' | 'Security';
+
+const sectionNames: SectionName[] = [ 'Added', 'Improved', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security' ];
+
+type Entry = string;
+
+interface ReleaseSection {
+  readonly name: SectionName;
+  readonly entries: Entry[];
+}
+
 
 // Def doesn't have a 'type' field for some reason
 export const isNotDef = (token: Token): token is Exclude<Token, Def> =>
@@ -79,29 +104,20 @@ export interface Unreleased {
   readonly sections: ReleaseSection[]
 }
 
-export interface Release {
-  readonly version: Version;
-  readonly date: DateTime;
-  readonly sections: ReleaseSection[];
-}
+const findSectionName = (s: string): s is SectionName =>
+  (sectionNames as string[]).includes(s)
 
-export interface Changelog {
-  readonly unreleased: Unreleased;
-  readonly releases: Release[];
-}
+const parseSectionHeading: Parser<Token, SectionName> =
+  P.expected(
+    pipe(
+      parseHeadingLevel(3),
+      P.map((token) => token.text),
+      P.filter(findSectionName)
+    ),
+    `Expected heading 3 with one of these titles: ${sectionNames.join(', ')}`
+  );
 
-type SectionName = 'Added' | 'Improved' | 'Changed' | 'Deprecated' | 'Removed' | 'Fixed' | 'Security';
-
-const sectionNames: SectionName[] = [ 'Added', 'Improved', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security' ];
-
-type Entry = string;
-
-interface ReleaseSection {
-  readonly sectionName: SectionName;
-  readonly entries: Entry[];
-}
-
-const releaseSectionEntries: Parser<Token, Entry[]> =
+const parseSectionEntries: Parser<Token, Entry[]> =
   pipe(
     P.optional(bullist),
     P.chain((olist) =>
@@ -115,18 +131,37 @@ const releaseSectionEntries: Parser<Token, Entry[]> =
     )
   );
 
-const releaseSection = (sectionName: SectionName): Parser<Token, ReleaseSection> =>
-  pipe(
-    headingLiteral(3, sectionName),
-    P.apSecond(releaseSectionEntries),
-    P.map((entries) => ({ sectionName, entries }))
-  );
+const releaseSection: Parser<Token, ReleaseSection> =
+  sequenceS(P.parser)({
+    name: parseSectionHeading,
+    entries: parseSectionEntries
+  });
+
+const correctOrder = <T> (input: T[], correct: T[]): boolean => {
+  // Note: inefficient for large arrays
+  const positions = input.map((x) => correct.indexOf(x));
+  const sorted = A.sort(Ord.ordNumber)(positions);
+  return A.getEq(Eq.eqNumber).equals(positions, sorted);
+};
+
+const noDuplicates = (input: string[]): boolean => {
+  const unique = [...new Set(input)];
+  return input.length === unique.length;
+};
 
 const releaseSections: Parser<Token, ReleaseSection[]> =
   pipe(
-    sectionNames,
-    A.traverse(P.Applicative)((name) => P.optional(releaseSection(name))),
-    P.map(OptionUtils.catMaybes)
+    P.many(releaseSection),
+    P.chain((sections) => {
+      const names = sections.map((s) => s.name);
+      if (!correctOrder(names, sectionNames)) {
+        return P.expected(P.fail(), `Sections in incorrect order (${names.join(', ')}). Correct order is ${sectionNames.join(', ')}`);
+      } else if (!noDuplicates(names)) {
+        return P.expected(P.fail(), 'Duplicate section name');
+      } else {
+        return P.succeed(sections);
+      }
+    })
   );
 
 const unreleasedVersion: Parser<Token, Unreleased> =
