@@ -118,9 +118,8 @@ describe('changelog', () => {
 ### Removed
 - hello
 `
-      ), E.left('Duplicate section name')
+      ), E.left('Duplicate section name: Removed')
     );
   });
-
 
 });

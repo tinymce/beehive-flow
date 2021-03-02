@@ -144,9 +144,25 @@ const correctOrder = <T> (input: T[], correct: T[]): boolean => {
   return A.getEq(Eq.eqNumber).equals(positions, sorted);
 };
 
-const noDuplicates = (input: string[]): boolean => {
-  const unique = [...new Set(input)];
-  return input.length === unique.length;
+const parseCorrectOrder = <T> (actual: T[], correct: T[]): Parser<Token, null> => {
+  if (!correctOrder(actual, correct)) {
+    return P.expected(P.fail(), `Sections in incorrect order (${actual.join(', ')}). Correct order is ${correct.join(', ')}`);
+  } else {
+    return P.succeed(null);
+  }
+};
+
+const noDuplicates = (input: string[]): Parser<Token, null> => {
+  const r: Set<string> = new Set<string>();
+  for (const s of input) {
+    if (r.has(s)) {
+      return P.expected(P.fail(), `Duplicate section name: ${s}`);
+    } else {
+      r.add(s);
+    }
+  }
+
+  return P.succeed(null);
 };
 
 const releaseSections: Parser<Token, ReleaseSection[]> =
@@ -154,13 +170,11 @@ const releaseSections: Parser<Token, ReleaseSection[]> =
     P.many(releaseSection),
     P.chain((sections) => {
       const names = sections.map((s) => s.name);
-      if (!correctOrder(names, sectionNames)) {
-        return P.expected(P.fail(), `Sections in incorrect order (${names.join(', ')}). Correct order is ${sectionNames.join(', ')}`);
-      } else if (!noDuplicates(names)) {
-        return P.expected(P.fail(), 'Duplicate section name');
-      } else {
-        return P.succeed(sections);
-      }
+      return pipe(
+        P.succeed<Token, ReleaseSection[]>(sections),
+        P.apFirst(parseCorrectOrder(names, sectionNames)),
+        P.apFirst(noDuplicates(names))
+      );
     })
   );
 
