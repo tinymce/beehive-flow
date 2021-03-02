@@ -5,9 +5,11 @@ import * as E from 'fp-ts/Either';
 import * as Changelog from '../../../main/ts/core/Changelog2';
 import { pipe } from 'fp-ts/function';
 
+type Changelog = Changelog.Changelog;
+
 describe('changelog', () => {
 
-  const go = (input: string) =>
+  const go = (input: string): E.Either<string, Changelog> =>
     pipe(
       Changelog.doParse(input),
       E.bimap(
@@ -37,6 +39,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 `
-    ), E.right(null));
+    ), E.right<string, Changelog>({
+        releases: [
+          { version: 'Unreleased', sections: [] }
+        ]
+      })
+    );
   });
+
+  it('parses changelog header text with Unreleased header and some added entries', () => {
+    assert.deepEqual(go(`# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+### Added
+- hello
+- there
+`
+    ), E.right<string, Changelog>({
+        releases: [
+          {
+            version: 'Unreleased',
+            sections: [
+              {
+                sectionName: 'Added',
+                entries: [ 'hello', 'there']
+              }
+            ]
+          }
+        ]
+      })
+    );
+  });
+
+
 });
