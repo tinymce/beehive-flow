@@ -39,10 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 `
-    ), E.right<string, Changelog>({
-        releases: [
-          { version: 'Unreleased', sections: [] }
-        ]
+      ), E.right<string, Changelog>({
+        unreleased: { sections: [] },
+        releases: []
       })
     );
   });
@@ -59,18 +58,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - hello
 - there
 `
-    ), E.right<string, Changelog>({
-        releases: [
-          {
-            version: 'Unreleased',
-            sections: [
-              {
-                sectionName: 'Added',
-                entries: [ 'hello', 'there']
-              }
-            ]
-          }
-        ]
+      ), E.right<string, Changelog>({
+        unreleased: {
+          sections: [
+            {
+              sectionName: 'Added',
+              entries: [ 'hello', 'there' ]
+            }
+          ]
+        },
+        releases: []
       })
     );
   });

@@ -7,6 +7,7 @@ import * as S from 'parser-ts/Stream'
 import * as marked from 'marked';
 import { Version } from './Version';
 import * as OptionUtils from '../utils/OptionUtils';
+import { DateTime } from 'luxon';
 
 type Heading = marked.Tokens.Heading;
 
@@ -74,12 +75,18 @@ const bullist: Parser<Token, List> =
 const parseChangelogHeader = headingLiteral(1, 'Changelog');
 const parseUnreleasedHeading = headingLiteral(2, 'Unreleased');
 
+export interface Unreleased {
+  readonly sections: ReleaseSection[]
+}
+
 export interface Release {
-  readonly version: Version | 'Unreleased';
+  readonly version: Version;
+  readonly date: DateTime;
   readonly sections: ReleaseSection[];
 }
 
 export interface Changelog {
+  readonly unreleased: Unreleased;
   readonly releases: Release[];
 }
 
@@ -122,11 +129,11 @@ const releaseSections: Parser<Token, ReleaseSection[]> =
     P.map(OptionUtils.catMaybes)
   );
 
-const unreleasedVersion: Parser<Token, Release> =
+const unreleasedVersion: Parser<Token, Unreleased> =
   pipe(
     parseUnreleasedHeading,
     P.apSecond(releaseSections),
-    P.map((sections) => ({ version: 'Unreleased', sections }))
+    P.map((sections) => ({ sections }))
   );
 
 
@@ -135,7 +142,7 @@ export const parseChangelog = (): Parser<Token, Changelog> =>
     parseChangelogHeader,
     P.apSecond(textSection),
     P.apSecond(unreleasedVersion),
-    P.map((unreleased) => ({ releases: [ unreleased ]}))
+    P.map((unreleased) => ({ unreleased, releases: [] }))
   );
 
 export const doParse = (input: string) => {
