@@ -1,10 +1,7 @@
-import * as commonmark from 'commonmark';
-
 import { pipe } from 'fp-ts/function'
 import * as P from 'parser-ts/Parser'
 import * as S from 'parser-ts/Stream'
 import * as marked from 'marked';
-import { DefaultDeserializer } from 'v8';
 
 type Heading = marked.Tokens.Heading;
 
@@ -48,12 +45,11 @@ export const parseHeadingLevel = (level: number): Parser<Token, Heading> =>
 
 type Changelog = string | null;
 
-export const parseChangelog = (): Parser<Token, Changelog> => {
-  return pipe(
+export const parseChangelog = (): Parser<Token, Changelog> =>
+  pipe(
     parseHeadingLevel(1),
     P.map((token) => token.text)
   );
-};
 
 export const doParse = (input: string) => {
   // const markdownParser = new commonmark.Parser();
