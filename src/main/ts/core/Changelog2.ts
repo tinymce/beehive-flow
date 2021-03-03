@@ -1,5 +1,4 @@
 import { pipe } from 'fp-ts/function'
-import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
 import * as P from 'parser-ts/Parser';
 import * as S from 'parser-ts/Stream';
@@ -7,10 +6,10 @@ import * as marked from 'marked';
 import * as Version from './Version';
 import { parseVersionE } from './Version';
 import { DateTime } from 'luxon';
-import { sequenceS } from 'fp-ts/Apply';
+import { sequenceS, sequenceT } from 'fp-ts/Apply';
 import * as Ord from 'fp-ts/Ord';
 import * as Eq from 'fp-ts/Eq';
-import { hardFilter } from '../utils/ParserTsUtils';
+import { hardFilter, fail, fatal, foldO } from '../utils/ParserTsUtils';
 
 type Parser<I, A> = P.Parser<I, A>;
 
@@ -126,14 +125,9 @@ const parseSectionHeading: Parser<Token, SectionName> =
 const parseSectionEntries: Parser<Token, Entry[]> =
   pipe(
     P.optional(bullist),
-    P.chain((olist) =>
-      pipe(
-        olist,
-        O.fold(
-          () => P.succeed([]),
-          (list) => P.succeed(list.items.map((e) => e.text))
-        )
-      )
+    foldO(
+      () => [],
+      (list) => list.items.map((e) => e.text)
     )
   );
 
@@ -152,7 +146,7 @@ const correctOrder = <T> (input: T[], correct: T[]): boolean => {
 
 const parseCorrectOrder = <T> (actual: T[], correct: T[]): Parser<Token, null> => {
   if (!correctOrder(actual, correct)) {
-    return P.expected(P.fail(), `Sections in incorrect order (${actual.join(', ')}). Correct order is ${correct.join(', ')}`);
+    return fail(`Sections in incorrect order (${actual.join(', ')}). Correct order is ${correct.join(', ')}`);
   } else {
     return P.succeed(null);
   }
@@ -162,7 +156,7 @@ const noDuplicates = (input: string[]): Parser<Token, null> => {
   const r: Set<string> = new Set<string>();
   for (const s of input) {
     if (r.has(s)) {
-      return P.expected(P.fail(), `Duplicate section name: ${s}`);
+      return fail(`Duplicate section name: ${s}`);
     } else {
       r.add(s);
     }
@@ -203,12 +197,12 @@ const parseVersionHeader = (text: string): Parser<Token, VersionHeader> => {
     const date = DateTime.fromISO(dateStr, { zone: 'utc' }); // regex already validates this format
 
     if (versionE._tag === 'Left') {
-      return P.cut(P.expected(P.fail(), `Invalid header format parsing version. Expected: "VERSION - yyyy-mm-dd" but got: "${text}"`));
+      return fatal(`Invalid header format parsing version. Expected: "VERSION - yyyy-mm-dd" but got: "${text}"`);
     } else {
       return P.succeed({ version: versionE.right, date })
     }
   } else {
-    return P.cut(P.expected(P.fail(), `Invalid header format. Expected: "VERSION - yyyy-mm-dd" but got: "${text}"`));
+    return fatal(`Invalid header format. Expected: "VERSION - yyyy-mm-dd" but got: "${text}"`);
   }
 };
 
@@ -221,11 +215,8 @@ const releasedVersionHeader: Parser<Token, VersionHeader> =
 
 const releasedVersion: Parser<Token, Release> =
   pipe(
-    sequenceS(P.parser)({
-      header: releasedVersionHeader,
-      sections: releaseSections
-    }),
-    P.map(({ header, sections }) => ({ ...header, sections }))
+    sequenceT(P.parser)(releasedVersionHeader, releaseSections),
+    P.map(([ header, sections ]) => ({ ...header, sections }))
   );
 
 export const parseChangelog = (): Parser<Token, Changelog> =>
