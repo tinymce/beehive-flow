@@ -276,14 +276,5 @@ export const doParse = (input: string) => {
   // TODO: check if this fails
   const tokens = marked.lexer(input, options);
 
-  const result = parseChangelog()(S.stream(tokens));
-
-  // TODO: remove
-  // console.log(JSON.stringify(
-  //   pipe(result, E.map((r) => r.value)),
-  //   null,
-  //   2
-  // ));
-
-  return result;
+  return parseChangelog()(S.stream(tokens));
 };
