@@ -6,11 +6,12 @@ import * as P from 'parser-ts/Parser'
 import * as S from 'parser-ts/Stream'
 import * as ParseResult from 'parser-ts/ParseResult'
 import * as marked from 'marked';
-import { Version } from './Version';
+import * as Version from './Version';
 import { DateTime } from 'luxon';
 import { sequenceS } from 'fp-ts/Apply';
 import * as Ord from 'fp-ts/Ord';
 import * as Eq from 'fp-ts/Eq';
+import { parseVersionE } from './Version';
 
 type Parser<I, A> = P.Parser<I, A>;
 
@@ -19,8 +20,15 @@ type Def = marked.Tokens.Def;
 type List = marked.Tokens.List;
 type Heading = marked.Tokens.Heading;
 
+type Version = Version.Version;
+
 export interface Unreleased {
   readonly sections: ReleaseSection[]
+}
+
+export interface VersionHeader {
+  readonly version: Version;
+  readonly date: DateTime;
 }
 
 export interface Release {
@@ -194,13 +202,57 @@ const unreleasedVersion: Parser<Token, Unreleased> =
     P.map((sections) => ({ sections }))
   );
 
+const releaseRe = /^## (?:\[?)(?<version>\d+\.\d+\.\d+)(?:]?) - (?<date>\d{4}-\d{2}-\d{2})$/;
+
+const parseVersionHeader = (text: string): Parser<Token, VersionHeader> => {
+
+  const m = releaseRe.exec(text);
+  const versionStr = m?.groups?.version;
+  const dateStr = m?.groups?.date;
+
+  const fail: Parser<Token, {version: Version; date: DateTime}> = P.expected(P.fail(), `Invalid header format. Expected: "## VERSION - yyyy-mm-dd" but got: "${text}"`);
+
+  if (m && versionStr !== undefined && dateStr !== undefined) {
+    const versionE = parseVersionE(versionStr);
+    const date = DateTime.fromISO(dateStr, { zone: 'utc' }); // regex already validates this format
+
+    if (versionE._tag === 'Left') {
+      return fail;
+    } else {
+      return P.succeed({ version: versionE.right, date })
+    }
+  } else {
+    return fail;
+  }
+};
+
+const releasedVersionHeader: Parser<Token, VersionHeader> =
+  pipe(
+    parseHeadingLevel(3),
+    P.map((t) => t.text),
+    P.chain(parseVersionHeader)
+  )
+
+const releasedVersion: Parser<Token, Release> =
+  pipe(
+    sequenceS(P.parser)({
+      header: releasedVersionHeader,
+      sections: releaseSections
+    }),
+    P.map(({ header, sections }) => ({ ...header, sections }))
+  );
 
 export const parseChangelog = (): Parser<Token, Changelog> =>
   pipe(
     parseChangelogHeader,
     P.apSecond(textSection),
-    P.apSecond(unreleasedVersion),
-    P.map((unreleased) => ({ unreleased, releases: [] }))
+    P.apSecond(pipe(
+      sequenceS(P.parser)({
+        unreleased: unreleasedVersion,
+        releases: P.many(releasedVersion)
+      })
+    )),
+    P.apFirst(P.eof())
   );
 
 export const doParse = (input: string) => {
