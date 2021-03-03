@@ -1,12 +1,5 @@
-import * as O from 'fp-ts/Option';
-
-type Option<A> = O.Option<A>;
-
-export const hasKey = <T>(o: T, k: keyof T): boolean =>
+export const hasKey = (o: object, k: string): boolean =>
   Object.prototype.hasOwnProperty.call(o, k);
-
-export const lookup = <T>(o: T, k: keyof T): Option<T[keyof T]> =>
-  hasKey(o, k) ? O.some(o[k]) : O.none;
 
 export const map = <A, B>(o: Record<string, A>, f: (a: A) => B): Record<string, B> => {
   const r: Record<string, B> = {};

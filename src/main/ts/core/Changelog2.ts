@@ -9,7 +9,8 @@ import { DateTime } from 'luxon';
 import { sequenceS, sequenceT } from 'fp-ts/Apply';
 import * as Ord from 'fp-ts/Ord';
 import * as Eq from 'fp-ts/Eq';
-import { hardFilter, fail, fatal, foldO } from '../utils/ParserTsUtils';
+import { fail, fatal, foldO, hardFilter } from '../utils/ParserTsUtils';
+import * as ObjUtils from '../utils/ObjUtils';
 
 type Parser<I, A> = P.Parser<I, A>;
 
@@ -52,17 +53,14 @@ interface ReleaseSection {
 }
 
 // Def doesn't have a 'type' field for some reason
-export const isNotDef = (token: Token): token is Exclude<Token, Def> =>
-  Object.prototype.hasOwnProperty.call(token, 'type');
+export const isNotDef = (t: Token): t is Exclude<Token, Def> =>
+  ObjUtils.hasKey(t, 'type');
 
-export const isDef = (token: Token): token is Def =>
-  !Object.prototype.hasOwnProperty.call(token, 'type');
+export const isHeading = (t: Token): t is Heading =>
+  isNotDef(t) && t.type === 'heading';
 
-export const isType = (type: string) => (token: Token): boolean =>
-  isNotDef(token) && token.type === type;
-
-export const isHeading = (token: Token): token is Heading =>
-  isType('heading')(token);
+const isBullist = (t: Token): t is List =>
+  isNotDef(t) && t.type === 'list' && !t.ordered;
 
 const parseHeading: Parser<Token, Heading> =
   P.expected(
@@ -70,7 +68,7 @@ const parseHeading: Parser<Token, Heading> =
       P.item<Token>(),
       P.filter(isHeading)
     ),
-    `Expected heading`
+    'Expected heading'
   );
 
 const parseHeadingLevel = (level: number): Parser<Token, Heading> =>
@@ -96,9 +94,6 @@ const textSection: Parser<Token, Token[]> =
     P.many1(P.sat((t) => isNotDef(t) && ['paragraph', 'space', 'text'].includes(t.type))),
     'Expected section of text'
   );
-
-const isBullist = (t: Token): t is List =>
-  isNotDef(t) && t.type === 'list' && !t.ordered;
 
 const bullist: Parser<Token, List> =
   pipe(
