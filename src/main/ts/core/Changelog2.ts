@@ -1,10 +1,8 @@
-import { pipe, Predicate, Refinement } from 'fp-ts/function'
+import { pipe } from 'fp-ts/function'
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
-import * as E from 'fp-ts/Either';
-import * as P from 'parser-ts/Parser'
-import * as S from 'parser-ts/Stream'
-import * as ParseResult from 'parser-ts/ParseResult'
+import * as P from 'parser-ts/Parser';
+import * as S from 'parser-ts/Stream';
 import * as marked from 'marked';
 import * as Version from './Version';
 import { parseVersionE } from './Version';
@@ -12,6 +10,7 @@ import { DateTime } from 'luxon';
 import { sequenceS } from 'fp-ts/Apply';
 import * as Ord from 'fp-ts/Ord';
 import * as Eq from 'fp-ts/Eq';
+import { hardFilter } from '../utils/ParserTsUtils';
 
 type Parser<I, A> = P.Parser<I, A>;
 
@@ -52,32 +51,6 @@ interface ReleaseSection {
   readonly name: SectionName;
   readonly entries: Entry[];
 }
-
-/** filter that raises fatal errors if it fails */
-export const hardFilter: {
-  <A, B extends A>(refinement: Refinement<A, B>): <I>(p: Parser<I, A>) => Parser<I, B>
-  <A>(predicate: Predicate<A>): <I>(p: Parser<I, A>) => Parser<I, A>
-} = <A>(predicate: Predicate<A>) => <I>(p: Parser<I, A>): Parser<I, A> => (i) =>
-  pipe(
-    p(i),
-    E.chain(next => (predicate(next.value) ? E.right(next) : ParseResult.error(i, undefined, true)))
-  )
-
-export const debug = <I, O> (p: Parser<I, O>): Parser<I, O> => (i) =>
-  pipe(
-    p(i),
-    E.bimap(
-      (l) => {
-        console.log(i, l);
-        return l;
-      },
-      (r) => {
-        console.log(i, r);
-        return r;
-      }
-    )
-  );
-
 
 // Def doesn't have a 'type' field for some reason
 export const isNotDef = (token: Token): token is Exclude<Token, Def> =>
@@ -221,12 +194,9 @@ const unreleasedVersion: Parser<Token, Unreleased> =
 const releaseRe = /^(?:\[?)(?<version>\d+\.\d+\.\d+)(?:]?) - (?<date>\d{4}-\d{2}-\d{2})$/;
 
 const parseVersionHeader = (text: string): Parser<Token, VersionHeader> => {
-
   const m = releaseRe.exec(text);
   const versionStr = m?.groups?.version;
   const dateStr = m?.groups?.date;
-
-  console.log(m, versionStr, dateStr);
 
   if (m && versionStr && dateStr) {
     const versionE = parseVersionE(versionStr);
