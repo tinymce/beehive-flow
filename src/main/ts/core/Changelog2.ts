@@ -7,11 +7,11 @@ import * as S from 'parser-ts/Stream'
 import * as ParseResult from 'parser-ts/ParseResult'
 import * as marked from 'marked';
 import * as Version from './Version';
+import { parseVersionE } from './Version';
 import { DateTime } from 'luxon';
 import { sequenceS } from 'fp-ts/Apply';
 import * as Ord from 'fp-ts/Ord';
 import * as Eq from 'fp-ts/Eq';
-import { parseVersionE } from './Version';
 
 type Parser<I, A> = P.Parser<I, A>;
 
@@ -57,11 +57,27 @@ interface ReleaseSection {
 export const hardFilter: {
   <A, B extends A>(refinement: Refinement<A, B>): <I>(p: Parser<I, A>) => Parser<I, B>
   <A>(predicate: Predicate<A>): <I>(p: Parser<I, A>) => Parser<I, A>
-} = <A>(predicate: Predicate<A>) => <I>(p: Parser<I, A>): Parser<I, A> => i =>
+} = <A>(predicate: Predicate<A>) => <I>(p: Parser<I, A>): Parser<I, A> => (i) =>
   pipe(
     p(i),
     E.chain(next => (predicate(next.value) ? E.right(next) : ParseResult.error(i, undefined, true)))
   )
+
+export const debug = <I, O> (p: Parser<I, O>): Parser<I, O> => (i) =>
+  pipe(
+    p(i),
+    E.bimap(
+      (l) => {
+        console.log(i, l);
+        return l;
+      },
+      (r) => {
+        console.log(i, r);
+        return r;
+      }
+    )
+  );
+
 
 // Def doesn't have a 'type' field for some reason
 export const isNotDef = (token: Token): token is Exclude<Token, Def> =>
@@ -202,7 +218,7 @@ const unreleasedVersion: Parser<Token, Unreleased> =
     P.map((sections) => ({ sections }))
   );
 
-const releaseRe = /^## (?:\[?)(?<version>\d+\.\d+\.\d+)(?:]?) - (?<date>\d{4}-\d{2}-\d{2})$/;
+const releaseRe = /^(?:\[?)(?<version>\d+\.\d+\.\d+)(?:]?) - (?<date>\d{4}-\d{2}-\d{2})$/;
 
 const parseVersionHeader = (text: string): Parser<Token, VersionHeader> => {
 
@@ -210,25 +226,25 @@ const parseVersionHeader = (text: string): Parser<Token, VersionHeader> => {
   const versionStr = m?.groups?.version;
   const dateStr = m?.groups?.date;
 
-  const fail: Parser<Token, {version: Version; date: DateTime}> = P.expected(P.fail(), `Invalid header format. Expected: "## VERSION - yyyy-mm-dd" but got: "${text}"`);
+  console.log(m, versionStr, dateStr);
 
-  if (m && versionStr !== undefined && dateStr !== undefined) {
+  if (m && versionStr && dateStr) {
     const versionE = parseVersionE(versionStr);
     const date = DateTime.fromISO(dateStr, { zone: 'utc' }); // regex already validates this format
 
     if (versionE._tag === 'Left') {
-      return fail;
+      return P.cut(P.expected(P.fail(), `Invalid header format parsing version. Expected: "VERSION - yyyy-mm-dd" but got: "${text}"`));
     } else {
       return P.succeed({ version: versionE.right, date })
     }
   } else {
-    return fail;
+    return P.cut(P.expected(P.fail(), `Invalid header format. Expected: "VERSION - yyyy-mm-dd" but got: "${text}"`));
   }
 };
 
 const releasedVersionHeader: Parser<Token, VersionHeader> =
   pipe(
-    parseHeadingLevel(3),
+    parseHeadingLevel(2),
     P.map((t) => t.text),
     P.chain(parseVersionHeader)
   )
@@ -251,15 +267,10 @@ export const parseChangelog = (): Parser<Token, Changelog> =>
         unreleased: unreleasedVersion,
         releases: P.many(releasedVersion)
       })
-    )),
-    P.apFirst(P.eof())
+    ))
   );
 
 export const doParse = (input: string) => {
-  // const markdownParser = new commonmark.Parser();
-  // const markdown = markdownParser.parse(input);
-
-
   const options: marked.MarkedOptions = { gfm: true };
 
   // TODO: check if this fails
@@ -268,11 +279,11 @@ export const doParse = (input: string) => {
   const result = parseChangelog()(S.stream(tokens));
 
   // TODO: remove
-  console.log(JSON.stringify(
-    pipe(result, E.map((r) => r.value)),
-    null,
-    2
-  ));
+  // console.log(JSON.stringify(
+  //   pipe(result, E.map((r) => r.value)),
+  //   null,
+  //   2
+  // ));
 
   return result;
 };
