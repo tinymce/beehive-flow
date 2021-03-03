@@ -12,13 +12,16 @@ import { sequenceS } from 'fp-ts/Apply';
 import * as Ord from 'fp-ts/Ord';
 import * as Eq from 'fp-ts/Eq';
 
-type Heading = marked.Tokens.Heading;
-
 type Parser<I, A> = P.Parser<I, A>;
 
 type Token = marked.Token;
 type Def = marked.Tokens.Def;
 type List = marked.Tokens.List;
+type Heading = marked.Tokens.Heading;
+
+export interface Unreleased {
+  readonly sections: ReleaseSection[]
+}
 
 export interface Release {
   readonly version: Version;
@@ -109,10 +112,6 @@ const bullist: Parser<Token, List> =
 
 const parseChangelogHeader = headingLiteral(1, 'Changelog');
 const parseUnreleasedHeading = headingLiteral(2, 'Unreleased');
-
-export interface Unreleased {
-  readonly sections: ReleaseSection[]
-}
 
 const findSectionName = (s: string): s is SectionName =>
   (sectionNames as string[]).includes(s)
