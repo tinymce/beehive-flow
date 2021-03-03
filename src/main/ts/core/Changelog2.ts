@@ -1,9 +1,10 @@
-import { pipe } from 'fp-ts/function'
+import { pipe, Predicate, Refinement } from 'fp-ts/function'
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import * as P from 'parser-ts/Parser'
 import * as S from 'parser-ts/Stream'
+import * as ParseResult from 'parser-ts/ParseResult'
 import * as marked from 'marked';
 import { Version } from './Version';
 import { DateTime } from 'luxon';
@@ -41,6 +42,15 @@ interface ReleaseSection {
   readonly entries: Entry[];
 }
 
+/** filter that raises fatal errors if it fails */
+export const hardFilter: {
+  <A, B extends A>(refinement: Refinement<A, B>): <I>(p: Parser<I, A>) => Parser<I, B>
+  <A>(predicate: Predicate<A>): <I>(p: Parser<I, A>) => Parser<I, A>
+} = <A>(predicate: Predicate<A>) => <I>(p: Parser<I, A>): Parser<I, A> => i =>
+  pipe(
+    p(i),
+    E.chain(next => (predicate(next.value) ? E.right(next) : ParseResult.error(i, undefined, true)))
+  )
 
 // Def doesn't have a 'type' field for some reason
 export const isNotDef = (token: Token): token is Exclude<Token, Def> =>
@@ -112,7 +122,7 @@ const parseSectionHeading: Parser<Token, SectionName> =
     pipe(
       parseHeadingLevel(3),
       P.map((token) => token.text),
-      P.filter(findSectionName)
+      hardFilter(findSectionName)
     ),
     `Expected heading 3 with one of these titles: ${sectionNames.join(', ')}`
   );

@@ -122,4 +122,20 @@ describe('changelog', () => {
     );
   });
 
+  it('fails with Unreleased header with invalid section name', () => {
+    assert.deepEqual(go(`${ramble}## Unreleased
+
+### Added
+- the thing
+
+### Chicken
+- hello
+
+### Removed
+- hello
+`
+      ), E.left('Expected heading 3 with one of these titles: Added, Improved, Changed, Deprecated, Removed, Fixed, Security')
+    );
+  });
+
 });
