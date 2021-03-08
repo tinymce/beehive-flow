@@ -142,15 +142,15 @@ const parseHeadings = (changelog: string): Top => {
   const data: Top = { preamble: [], subheadings: [] };
   const reader = new commonmark.Parser();
   const doc = reader.parse(changelog);
-  const stack: (Heading | Top)[] = [ data ];
+  const headingStack: (Heading | Top)[] = [ data ];
   let node: commonmark.Node | null = doc.firstChild;
   while (node !== null) {
     if (node.type === 'heading') {
       // pop headings off the stack that are higher or equal level
       while (true) {
-        const last = stack[stack.length - 1];
+        const last = headingStack[headingStack.length - 1];
         if (node.level <= (last?.header?.level ?? 0)) {
-          stack.pop();
+          headingStack.pop();
         } else {
           break;
         }
@@ -161,10 +161,10 @@ const parseHeadings = (changelog: string): Top => {
         preamble: [],
         subheadings: []
       };
-      stack[stack.length - 1].subheadings.push(heading);
-      stack.push(heading);
+      headingStack[headingStack.length - 1].subheadings.push(heading);
+      headingStack.push(heading);
     } else {
-      stack[stack.length - 1].preamble.push(node);
+      headingStack[headingStack.length - 1].preamble.push(node);
     }
     node = node.next;
   }
