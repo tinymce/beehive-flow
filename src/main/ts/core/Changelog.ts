@@ -55,15 +55,19 @@ interface TextLines {
   readonly lines: number[];
 }
 
+// Represents a heading with content
 interface Heading {
   readonly header: commonmark.Node;
-  readonly preamble: commonmark.Node[];
+  readonly content: commonmark.Node[];
   readonly subheadings: Heading[];
 }
 
+// The top level content and headings
 interface Top {
+  // for easier parsing we create a fake header of level 0 to contain everything,
+  // as it doesn't physically exist the associated node is always undefined.
   readonly header?: undefined;
-  readonly preamble: commonmark.Node[];
+  readonly content: commonmark.Node[];
   readonly subheadings: Heading[];
 }
 
@@ -138,8 +142,24 @@ const pos = (node: commonmark.Node): string => {
   }
 };
 
-const parseHeadings = (changelog: string): Top => {
-  const data: Top = { preamble: [], subheadings: [] };
+// Parses the changelog with commonmark and then groups nodes under the
+// heading that owns them.
+// For example if we had a heading sequence: h1 h4 h5 h3 h2 h3 h4
+// Then we need to structure it into a tree like this:
+// Top
+//  └─h1
+//    ├─h4
+//    │ └─h5
+//    ├─h3
+//    └─h2
+//      └─h3
+//        └─h4
+//
+// Any non-heading nodes will be owned by the heading that preceded it.
+// To handle content before any headings or multiple top-level headings
+// an imaginary heading of level 0 is used (aka Top).
+const parseIntoHeadingsWithContent = (changelog: string): Top => {
+  const data: Top = { content: [], subheadings: [] };
   const reader = new commonmark.Parser();
   const doc = reader.parse(changelog);
   const headingStack: (Heading | Top)[] = [ data ];
@@ -147,6 +167,7 @@ const parseHeadings = (changelog: string): Top => {
   while (node !== null) {
     if (node.type === 'heading') {
       // pop headings off the stack that are higher or equal level
+      // note that we will never empty this stack as Top will never be removed
       while (true) {
         const last = headingStack[headingStack.length - 1];
         if (node.level <= (last?.header?.level ?? 0)) {
@@ -158,13 +179,13 @@ const parseHeadings = (changelog: string): Top => {
       // push this as a new child heading
       const heading: Heading = {
         header: node,
-        preamble: [],
+        content: [],
         subheadings: []
       };
       headingStack[headingStack.length - 1].subheadings.push(heading);
       headingStack.push(heading);
     } else {
-      headingStack[headingStack.length - 1].preamble.push(node);
+      headingStack[headingStack.length - 1].content.push(node);
     }
     node = node.next;
   }
@@ -226,17 +247,17 @@ const parseFragment = (source: TextLines, sectionHeadings: Heading[]): E.Either<
     if (sectionHeading.subheadings.length > 0) {
       errors.push('Unexpected subheadings' + pos(sectionHeading.subheadings[0].header));
     }
-    if (sectionHeading.preamble.length === 0) {
+    if (sectionHeading.content.length === 0) {
       errors.push('Expected a bullet list under the section header but found nothing' + pos(sectionHeading.header));
-    } else if (sectionHeading.preamble.length > 1) {
-      errors.push('Expected a bullet list but found more than one node' + pos(sectionHeading.preamble[1]));
-    } else if (sectionHeading.preamble[0].type !== 'list') {
-      errors.push('Expected a bullet list but found a non-list node' + pos(sectionHeading.preamble[0]));
-    } else if (sectionHeading.preamble[0].listType !== 'bullet') {
-      errors.push('Expected a bullet list but found a ordered list' + pos(sectionHeading.preamble[0]));
+    } else if (sectionHeading.content.length > 1) {
+      errors.push('Expected a bullet list but found more than one node' + pos(sectionHeading.content[1]));
+    } else if (sectionHeading.content[0].type !== 'list') {
+      errors.push('Expected a bullet list but found a non-list node' + pos(sectionHeading.content[0]));
+    } else if (sectionHeading.content[0].listType !== 'bullet') {
+      errors.push('Expected a bullet list but found a ordered list' + pos(sectionHeading.content[0]));
     } else {
       const header = blockRange(source, sectionHeading.header);
-      const node = sectionHeading.preamble[0];
+      const node = sectionHeading.content[0];
       const list = blockRange(source, node);
       fragment.sections.push(sectionNames[idx]);
       fragment[sectionNames[idx]] = pipe(
@@ -277,8 +298,8 @@ const parseRelease = (source: TextLines, release: Heading, first: boolean): E.Ei
   } else {
     errors.push('Unexpected header text to be ' + (first ? '"Unreleased" or ' : '') + '"<version> - <date>"' + pos(release.header));
   }
-  if (release.preamble.length > 0) {
-    errors.push('Unexpected content under release header' + pos(release.preamble[0]));
+  if (release.content.length > 0) {
+    errors.push('Unexpected content under release header' + pos(release.content[0]));
   }
   return pipe(
     parseFragment(source, release.subheadings),
@@ -301,8 +322,8 @@ const parseReleases = (source: TextLines, releases: Heading[]): E.Either<string[
 
 const parseTop = (source: TextLines, top: Top): E.Either<string[], Changelog> => {
   const errors: string[] = [];
-  if (top.preamble.length > 0) {
-    errors.push('Unexpected content without heading' + pos(top.preamble[0]));
+  if (top.content.length > 0) {
+    errors.push('Unexpected content without heading' + pos(top.content[0]));
   }
   if (top.subheadings.length === 0) {
     errors.push('No top level heading');
@@ -325,8 +346,8 @@ const parseTop = (source: TextLines, top: Top): E.Either<string[], Changelog> =>
       const endOfPreamble = (() => {
         if (releases.length > 0) {
           return releases[0].start - 1;
-        } else if (topHeading.preamble.length > 0) {
-          return blockRange(source, topHeading.preamble[topHeading.preamble.length - 1]).end;
+        } else if (topHeading.content.length > 0) {
+          return blockRange(source, topHeading.content[topHeading.content.length - 1]).end;
         } else {
           return blockRange(source, topHeading.header).end;
         }
@@ -345,9 +366,9 @@ const parseTop = (source: TextLines, top: Top): E.Either<string[], Changelog> =>
  */
 export const parseChangelogFragment = (text: string) => {
   const source = findLineStarts(text);
-  const headings = parseHeadings(text);
-  if (headings.preamble.length > 0) {
-    return E.left([ 'Expected a level 3 heading' + pos(headings.preamble[0]) ]);
+  const headings = parseIntoHeadingsWithContent(text);
+  if (headings.content.length > 0) {
+    return E.left([ 'Expected a level 3 heading' + pos(headings.content[0]) ]);
   } else {
     return parseFragment(source, headings.subheadings);
   }
@@ -358,4 +379,4 @@ export const parseChangelogFragment = (text: string) => {
  * @param text the changelog to parse.
  */
 export const parseChangelog = (text: string) =>
-  parseTop(findLineStarts(text), parseHeadings(text));
+  parseTop(findLineStarts(text), parseIntoHeadingsWithContent(text));
