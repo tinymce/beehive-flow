@@ -6,18 +6,18 @@ import * as EitherUtils from '../utils/EitherUtils';
 import { parseVersionE, Version } from './Version';
 
 interface Offset {
-  start: number;
-  end: number;
+  readonly start: number;
+  readonly end: number;
 }
 
 interface Item extends Offset {
-  jira?: string;
+  readonly jira?: string;
 }
 
 interface Section extends Offset {
-  header: Offset;
-  list: Offset;
-  items: Item[];
+  readonly header: Offset;
+  readonly list: Offset;
+  readonly items: Item[];
 }
 
 type SectionNames = 'Added' | 'Improved' | 'Changed' | 'Deprecated' | 'Removed' | 'Fixed' | 'Security';
@@ -34,37 +34,37 @@ interface ChangelogFragment {
 }
 
 interface ReleaseMeta {
-  version: Version;
-  date: DateTime;
+  readonly version: Version;
+  readonly date: DateTime;
 }
 
 interface Release extends ChangelogFragment, Offset {
-  header: Offset;
-  meta?: ReleaseMeta;
+  readonly header: Offset;
+  readonly meta?: ReleaseMeta;
 }
 
 export interface Changelog {
-  source: string;
-  releases: Release[];
-  preamble: Offset;
-  links: Offset;
+  readonly source: string;
+  readonly releases: Release[];
+  readonly preamble: Offset;
+  readonly links: Offset;
 }
 
 interface TextLines {
-  text: string;
-  lines: number[];
+  readonly text: string;
+  readonly lines: number[];
 }
 
 interface Heading {
-  header: commonmark.Node;
-  preamble: commonmark.Node[];
-  subheadings: Heading[];
+  readonly header: commonmark.Node;
+  readonly preamble: commonmark.Node[];
+  readonly subheadings: Heading[];
 }
 
 interface Top {
-  header?: undefined;
-  preamble: commonmark.Node[];
-  subheadings: Heading[];
+  readonly header?: undefined;
+  readonly preamble: commonmark.Node[];
+  readonly subheadings: Heading[];
 }
 
 const findLineStarts = (text: string): TextLines => {
