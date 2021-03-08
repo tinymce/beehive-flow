@@ -46,7 +46,7 @@ describe('Changelog', () => {
             {
               start: 277,
               end: 388,
-              jira: 'TINY-6611'
+              ticket: 'TINY-6611'
             }
           ],
           start: 267,
@@ -79,7 +79,7 @@ describe('Changelog', () => {
             {
               start: 422,
               end: 525,
-              jira: 'TINY-6783'
+              ticket: 'TINY-6783'
             }
           ],
           start: 412,
@@ -112,22 +112,22 @@ describe('Changelog', () => {
             {
               start: 559,
               end: 668,
-              jira: 'TINY-6692'
+              ticket: 'TINY-6692'
             },
             {
               start: 669,
               end: 770,
-              jira: 'TINY-6681'
+              ticket: 'TINY-6681'
             },
             {
               start: 771,
               end: 885,
-              jira: 'TINY-6684'
+              ticket: 'TINY-6684'
             },
             {
               start: 886,
               end: 1005,
-              jira: 'TINY-6683'
+              ticket: 'TINY-6683'
             }
           ],
           start: 549,
@@ -165,57 +165,57 @@ describe('Changelog', () => {
             {
               start: 1039,
               end: 1195,
-              jira: 'TINY-6528'
+              ticket: 'TINY-6528'
             },
             {
               start: 1196,
               end: 1279,
-              jira: 'TINY-6487'
+              ticket: 'TINY-6487'
             },
             {
               start: 1280,
               end: 1379,
-              jira: 'TINY-6629'
+              ticket: 'TINY-6629'
             },
             {
               start: 1380,
               end: 1558,
-              jira: 'TINY-6306'
+              ticket: 'TINY-6306'
             },
             {
               start: 1559,
               end: 1712,
-              jira: 'TINY-6224'
+              ticket: 'TINY-6224'
             },
             {
               start: 1713,
               end: 1829,
-              jira: 'TINY-6483'
+              ticket: 'TINY-6483'
             },
             {
               start: 1830,
               end: 1929,
-              jira: 'TINY-6505'
+              ticket: 'TINY-6505'
             },
             {
               start: 1930,
               end: 2019,
-              jira: 'TINY-6397'
+              ticket: 'TINY-6397'
             },
             {
               start: 2020,
               end: 2136,
-              jira: 'TINY-6479'
+              ticket: 'TINY-6479'
             },
             {
               start: 2137,
               end: 2232,
-              jira: 'TINY-6021'
+              ticket: 'TINY-6021'
             },
             {
               start: 2233,
               end: 2329,
-              jira: 'TINY-6021'
+              ticket: 'TINY-6021'
             }
           ],
           start: 1029,
@@ -234,7 +234,7 @@ describe('Changelog', () => {
             {
               start: 2343,
               end: 2463,
-              jira: 'TINY-4239'
+              ticket: 'TINY-4239'
             }
           ],
           start: 2330,
@@ -253,7 +253,7 @@ describe('Changelog', () => {
             {
               start: 2476,
               end: 2550,
-              jira: 'TINY-6248'
+              ticket: 'TINY-6248'
             }
           ],
           start: 2464,
@@ -272,137 +272,137 @@ describe('Changelog', () => {
             {
               start: 2561,
               end: 2642,
-              jira: 'TINY-6586'
+              ticket: 'TINY-6586'
             },
             {
               start: 2643,
               end: 2745,
-              jira: 'TINY-6648'
+              ticket: 'TINY-6648'
             },
             {
               start: 2746,
               end: 2841,
-              jira: 'TINY-4679'
+              ticket: 'TINY-4679'
             },
             {
               start: 2842,
               end: 2959,
-              jira: 'TINY-6622'
+              ticket: 'TINY-6622'
             },
             {
               start: 2960,
               end: 3073,
-              jira: 'TINY-6540'
+              ticket: 'TINY-6540'
             },
             {
               start: 3074,
               end: 3197,
-              jira: 'TINY-6363'
+              ticket: 'TINY-6363'
             },
             {
               start: 3198,
               end: 3293,
-              jira: 'TINY-6281'
+              ticket: 'TINY-6281'
             },
             {
               start: 3294,
               end: 3390,
-              jira: 'TINY-6600'
+              ticket: 'TINY-6600'
             },
             {
               start: 3391,
               end: 3496,
-              jira: 'TINY-6656'
+              ticket: 'TINY-6656'
             },
             {
               start: 3497,
               end: 3599,
-              jira: 'TINY-6623'
+              ticket: 'TINY-6623'
             },
             {
               start: 3600,
               end: 3695,
-              jira: 'TINY-6282'
+              ticket: 'TINY-6282'
             },
             {
               start: 3696,
               end: 3780,
-              jira: 'TINY-6541'
+              ticket: 'TINY-6541'
             },
             {
               start: 3781,
               end: 3879,
-              jira: 'TINY-6280'
+              ticket: 'TINY-6280'
             },
             {
               start: 3880,
               end: 3979,
-              jira: 'TINY-6291'
+              ticket: 'TINY-6291'
             },
             {
               start: 3980,
               end: 4089,
-              jira: 'TINY-6485'
+              ticket: 'TINY-6485'
             },
             {
               start: 4090,
               end: 4207,
-              jira: 'TINY-6268'
+              ticket: 'TINY-6268'
             },
             {
               start: 4208,
               end: 4300,
-              jira: 'TINY-6615'
+              ticket: 'TINY-6615'
             },
             {
               start: 4301,
               end: 4380,
-              jira: 'TINY-6413'
+              ticket: 'TINY-6413'
             },
             {
               start: 4381,
               end: 4503,
-              jira: 'TINY-6555'
+              ticket: 'TINY-6555'
             },
             {
               start: 4504,
               end: 4591,
-              jira: 'TINY-3321'
+              ticket: 'TINY-3321'
             },
             {
               start: 4592,
               end: 4689,
-              jira: 'TINY-6326'
+              ticket: 'TINY-6326'
             },
             {
               start: 4690,
               end: 4788,
-              jira: 'TINY-6570'
+              ticket: 'TINY-6570'
             },
             {
               start: 4789,
               end: 4887,
-              jira: 'TINY-6601'
+              ticket: 'TINY-6601'
             },
             {
               start: 4888,
               end: 4982,
-              jira: 'TINY-6646'
+              ticket: 'TINY-6646'
             },
             {
               start: 4983,
               end: 5083,
-              jira: 'TINY-6448'
+              ticket: 'TINY-6448'
             },
             {
               start: 5084,
               end: 5192,
-              jira: 'TINY-6495'
+              ticket: 'TINY-6495'
             },
             {
               start: 5193,
               end: 5328,
-              jira: 'GH-4905'
+              ticket: 'GH-4905'
             }
           ],
           start: 2551,
@@ -421,7 +421,7 @@ describe('Changelog', () => {
             {
               start: 5342,
               end: 5448,
-              jira: 'TINY-6518'
+              ticket: 'TINY-6518'
             }
           ],
           start: 5329,
@@ -461,12 +461,12 @@ describe('Changelog', () => {
           items: [
             {
               end: 52,
-              jira: 'BLAH-101',
+              ticket: 'BLAH-101',
               start: 10
             },
             {
               end: 73,
-              jira: undefined,
+              ticket: undefined,
               start: 53
             }
           ],
@@ -485,7 +485,7 @@ describe('Changelog', () => {
           items: [
             {
               end: 137,
-              jira: 'BLAH-49',
+              ticket: 'BLAH-49',
               start: 89
             }
           ],

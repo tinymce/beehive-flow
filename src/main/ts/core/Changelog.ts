@@ -11,7 +11,7 @@ interface Offset {
 }
 
 interface Item extends Offset {
-  readonly jira?: string;
+  readonly ticket?: string;
 }
 
 interface Section extends Offset {
@@ -192,18 +192,18 @@ const parseIntoHeadingsWithContent = (changelog: string): Top => {
   return data;
 };
 
-const jiraRe = /\s+#(?<jira>[A-Z]{2,10}-\d+)\s*$/;
+const ticketRe = /\s+#(?<ticket>[A-Z]{2,10}-\d+)\s*$/;
 const parseItem = (source: TextLines, node: commonmark.Node): E.Either<string[], Item> => {
   if (node.type !== 'item') {
     return E.left([ 'Expected a list item' + pos(node) ]);
   }
   const offset = blockRange(source, node);
   const itemText = extractText(source, node);
-  const m = jiraRe.exec(itemText);
-  const jira = m?.groups?.jira;
+  const m = ticketRe.exec(itemText);
+  const ticket = m?.groups?.ticket;
   return E.right({
     ...offset,
-    jira
+    ticket
   });
 };
 
