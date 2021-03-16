@@ -29,9 +29,9 @@ export const getStatusJson = async (args: StatusArgs): Promise<string> => {
 export const getStatus = async (args: StatusArgs): Promise<Status> => {
   const dir = args.workingDir;
 
-  const { currentBranch, version, branchState, branchType, packageJson } = await BranchLogic.getBranchDetails(dir);
+  const { currentBranch, version, branchState, branchType, rootModule } = await BranchLogic.getBranchDetails(dir);
 
-  const isLatest = await NpmTags.shouldTagLatestNpm(version, dir, packageJson.name);
+  const isLatest = await NpmTags.shouldTagLatestNpm(version, dir, rootModule.packageJson.name);
 
   return {
     currentBranch,

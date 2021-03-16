@@ -59,8 +59,9 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
   console.log(`Creating ${releaseBranchName} branch`);
   await Git.checkoutNewBranch(git, releaseBranchName);
   const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
-  await updatePackageJsonFileForReleaseBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
-  await git.add([ buildPropertiesFile, branchDetails.packageJsonFile ]);
+  const rootModule = branchDetails.rootModule;
+  await updatePackageJsonFileForReleaseBranch(branchDetails.version, rootModule.packageJson, rootModule.packageJsonFile);
+  await git.add([ buildPropertiesFile, rootModule.packageJsonFile ]);
   await git.commit(`Creating release branch: ${releaseBranchName}`);
   await Git.pushUnlessDryRun(dir, git, args.dryRun);
 };
@@ -68,8 +69,9 @@ const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, di
 const updateMainBranch = async (mainBranch: string, git: SimpleGit, branchDetails: BranchDetails, args: PrepareArgs, dir: string): Promise<void> => {
   console.log(`Updating ${mainBranch} branch`);
   await git.checkout(mainBranch);
-  await updatePackageJsonFileForMainBranch(branchDetails.version, branchDetails.packageJson, branchDetails.packageJsonFile);
-  await git.add(branchDetails.packageJsonFile);
+  const rootModule = branchDetails.rootModule;
+  await updatePackageJsonFileForMainBranch(branchDetails.version, rootModule.packageJson, rootModule.packageJsonFile);
+  await git.add(rootModule.packageJsonFile);
   await git.commit(`Updating version`);
   await Git.pushUnlessDryRun(dir, git, args.dryRun);
 };

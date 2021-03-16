@@ -1,6 +1,7 @@
 import * as E from 'fp-ts/Either';
 import * as O from 'fp-ts/Option';
 import * as EitherUtils from './EitherUtils';
+import * as ObjUtils from './ObjUtils';
 import * as Type from './Type';
 
 type Either<R, A> = E.Either<R, A>;
@@ -39,6 +40,12 @@ export const setError = <A> (p: Promise<A>, error: unknown): Promise<A> =>
 
 export const parMap = <A, B> (input: readonly A[], p: (a: A) => Promise<B>): Promise<B[]> =>
   Promise.all(input.map(p));
+
+export const parMapRecord = <A, B> (input: Record<string, A>, p: (value: A, key: string) => Promise<B>): Promise<Record<string, B>> => {
+  const keys = Object.keys(input);
+  const mapper = (k: string) => p(input[k], k).then<[string, B]>((b) => [ k, b ]);
+  return parMap(keys, mapper).then(ObjUtils.fromPairs);
+};
 
 export const filterMap = async <A, B> (input: A[], p: (a: A) => Promise<B>): Promise<B[]> =>
   parMap(input, (a) => tryPromise(p(a))).then(EitherUtils.rights);

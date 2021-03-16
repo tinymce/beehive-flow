@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
 import { CheckRepoActions } from 'simple-git';
@@ -7,6 +8,7 @@ import * as Git from '../utils/Git';
 import * as Version from './Version';
 import * as PreRelease from './PreRelease';
 import * as PackageJson from './PackageJson';
+import * as YarnWorkspaces from './YarnWorkspaces';
 
 type MajorMinorVersion = Version.MajorMinorVersion;
 type Version = Version.Version;
@@ -34,13 +36,19 @@ export const enum BranchState {
   ReleaseCandidate = 'releaseCandidate'
 }
 
+export interface Module {
+  readonly packageJson: PackageJson;
+  readonly packageJsonFile: string;
+}
+
 export interface BranchDetails {
   readonly currentBranch: string;
   readonly version: Version;
-  readonly packageJson: PackageJson;
-  readonly packageJsonFile: string;
+  readonly rootModule: Module;
   readonly branchType: BranchType;
   readonly branchState: BranchState;
+  readonly workspacesEnabled: boolean;
+  readonly modules: Record<string, Module>;
 }
 
 export const versionFromReleaseBranch = async (branchName: string): Promise<MajorMinorVersion> => {
@@ -81,6 +89,31 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
 export const isValidPrerelease = (actual: string | undefined, expected: string): boolean =>
   actual !== undefined && (actual === expected || actual.startsWith(`${expected}.`));
 
+const readModule = async (dir: string): Promise<Module> => {
+  const packageJsonFile = path.join(dir, 'package.json');
+  const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
+  return {
+    packageJson,
+    packageJsonFile
+  };
+};
+
+export const readModules = async (dir: string): Promise<Record<string, Module>> => {
+  const ws = await YarnWorkspaces.info(dir);
+  return PromiseUtils.parMapRecord(ws, (w) => readModule(path.join(dir, w.location)));
+};
+
+export const readModulesIfEnabled = async (
+  dir: string, packageJson: { workspaces?: string[] }
+): Promise<{ workspacesEnabled: boolean; modules: Record<string, Module>}> => {
+  const workspacesEnabled = packageJson.workspaces !== undefined;
+  if (workspacesEnabled) {
+    return { workspacesEnabled, modules: await readModules(dir) };
+  } else {
+    return { workspacesEnabled, modules: {}};
+  }
+};
+
 export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const fail = PromiseUtils.fail;
   const git = gitP(dir);
@@ -89,10 +122,11 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
 
   const currentBranch = await Git.currentBranch(git);
 
-  const packageJsonFile = PackageJson.pjInFolder(dir);
-  const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
+  const rootModule = await readModule(dir);
 
-  const version = packageJson.version;
+  const { workspacesEnabled, modules } = await readModulesIfEnabled(dir, rootModule.packageJson);
+
+  const version = rootModule.packageJson.version;
 
   if (version === undefined) {
     throw new Error('Version missing in package.json file');
@@ -101,8 +135,7 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   const baseState = {
     currentBranch,
     version,
-    packageJson,
-    packageJsonFile
+    rootModule
   };
 
   const loc = `${currentBranch} branch: package.json version`;
@@ -160,7 +193,9 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
       return {
         ...baseState,
         branchState,
-        branchType
+        branchType,
+        workspacesEnabled,
+        modules
       };
     }
   }

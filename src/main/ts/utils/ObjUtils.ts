@@ -15,3 +15,11 @@ export const map = <A, B>(o: Record<string, A>, f: (a: A) => B): Record<string, 
   }
   return r;
 };
+
+export const fromPairs = <A> (pairs: Array<[string, A]>): Record<string, A> => {
+  const r: Record<string, A> = {};
+  pairs.forEach(([ k, v ]) => {
+    r[k] = v;
+  });
+  return r;
+};

@@ -54,7 +54,8 @@ export const stamp = async (args: StampArgs): Promise<void> => {
 
   const branchDetails = await getBranchDetails(dir);
   const newVersion = chooseNewVersion(branchDetails.branchState, branchDetails.version, gitSha, Date.now());
-  await writePackageJsonFileWithNewVersion(branchDetails.packageJson, newVersion, branchDetails.packageJsonFile);
+  const rootModule = branchDetails.rootModule;
+  await writePackageJsonFileWithNewVersion(rootModule.packageJson, newVersion, rootModule.packageJsonFile);
 
   console.log('Note: changes have been made to package.json but they have not been committed.');
 };

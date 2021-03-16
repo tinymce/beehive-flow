@@ -31,9 +31,10 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   const newVersion = updateVersion(branchDetails.version);
   console.log(`Updating version from ${versionToString(branchDetails.version)} to ${versionToString(newVersion)}`);
 
-  await PackageJson.writePackageJsonFileWithNewVersion(branchDetails.packageJson, newVersion, branchDetails.packageJsonFile);
+  const rootModule = branchDetails.rootModule;
+  await PackageJson.writePackageJsonFileWithNewVersion(rootModule.packageJson, newVersion, rootModule.packageJsonFile);
 
-  await git.add(branchDetails.packageJsonFile);
+  await git.add(rootModule.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');
 
   await Git.pushUnlessDryRun(dir, git, args.dryRun);
