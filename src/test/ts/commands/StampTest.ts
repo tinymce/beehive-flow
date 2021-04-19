@@ -26,7 +26,7 @@ describe('Stamp', () => {
 
     it('makes a timestamped version on main branch', async () => {
       const actual = Stamp.chooseNewVersion(BranchState.ReleaseCandidate, await Version.parseVersion('1.2.0-alpha'), 'b0d52ad', timeMillis);
-      assert.equal(Version.versionToString(actual), `1.2.0-alpha.${timeFormatted}.b0d52ad`);
+      assert.equal(Version.versionToString(actual), `1.2.0-alpha.${timeFormatted}.shab0d52ad`);
     });
 
     it('makes a timestamped version on feature branch', async () => {
@@ -34,18 +34,18 @@ describe('Stamp', () => {
         const patch = 0;
         const v = `${major}.${minor}.${patch}-main`;
         const actual = Stamp.chooseNewVersion(BranchState.Feature, await Version.parseVersion(v), 'b0d59ad', timeMillis);
-        assert.equal(Version.versionToString(actual), `${major}.${minor}.${patch}-feature.${timeFormatted}.b0d59ad`);
+        assert.equal(Version.versionToString(actual), `${major}.${minor}.${patch}-feature.${timeFormatted}.shab0d59ad`);
       }));
     });
 
     it('makes a timestamped version on hotfix branch', async () => {
       const actual = Stamp.chooseNewVersion(BranchState.Hotfix, await Version.parseVersion('1.2.0-rc'), 'f0d52ad', timeMillis);
-      assert.equal(Version.versionToString(actual), `1.2.0-hotfix.${timeFormatted}.f0d52ad`);
+      assert.equal(Version.versionToString(actual), `1.2.0-hotfix.${timeFormatted}.shaf0d52ad`);
     });
 
     it('makes a timestamped version in rc state', async () => {
       const actual = Stamp.chooseNewVersion(BranchState.ReleaseCandidate, await Version.parseVersion('1.2.0-rc'), 'f0d52ad', timeMillis);
-      assert.equal(Version.versionToString(actual), `1.2.0-rc.${timeFormatted}.f0d52ad`);
+      assert.equal(Version.versionToString(actual), `1.2.0-rc.${timeFormatted}.shaf0d52ad`);
     });
 
     it('does not change version for release version', async () => {
