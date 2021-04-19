@@ -10,7 +10,7 @@ const main = async () => {
 };
 
 main().catch((e: unknown) => {
-  const msg = e instanceof Error ? e.message : String(e);
+  const msg = e instanceof Error ? e.message : JSON.stringify(e);
   console.error(msg);
   process.exit(1);
 });

@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+### Changed
+ - The prerelease version created by the `stamp` command will now prefix the git hash with "sha". #TINY-7333
+
+### Fixed
+ - Certain unexpected errors would incorrectly print `[Object object]` instead of the object data.
+ - Command header messages weren't being printed to the console.
+
 ## [0.14.0] - 2021-02-16
 ### Added
  - Prep work for monorepo support. #TINY-6986, #TINY-6987
