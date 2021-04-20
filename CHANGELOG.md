@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## [0.15.0] - 2021-04-20
 ### Changed
  - The prerelease version created by the `stamp` command will now prefix the git hash with "sha". #TINY-7333
 
