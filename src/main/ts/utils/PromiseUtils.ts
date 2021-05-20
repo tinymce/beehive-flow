@@ -17,14 +17,10 @@ export const optionToPromise = <A>(o: O.Option<A>, e?: unknown): Promise<A> =>
   });
 
 export const succeed = <A>(a: A): Promise<A> =>
-  new Promise((resolve) => {
-    resolve(a);
-  });
+  Promise.resolve(a);
 
 export const fail = <A>(error?: unknown): Promise<A> =>
-  new Promise(((resolve, reject) => {
-    reject(errorify(error));
-  }));
+  Promise.reject(errorify(error));
 
 const errorify = (error?: unknown): unknown =>
   Type.isString(error) ? new Error(error) : error;

@@ -185,7 +185,7 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
     return fail(`package.json version has an unexpected buildMetaData part`);
   } else {
     const obt = getBranchType(currentBranch);
-    if (obt._tag === 'None') {
+    if (O.isNone(obt)) {
       return fail('Invalid branch name. beehive-flow is strict about branch names. Valid names: main, feature/*, hotfix/*, spike/*, release/x.y');
     } else {
       const branchType = obt.value;
