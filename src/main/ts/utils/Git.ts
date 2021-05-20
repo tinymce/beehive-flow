@@ -1,6 +1,6 @@
-import * as gitP from 'simple-git/promise';
-import { DefaultLogFields, LogResult, PushResult } from 'simple-git';
 import * as O from 'fp-ts/Option';
+import { PushResult } from 'simple-git';
+import * as gitP from 'simple-git/promise';
 import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
@@ -118,9 +118,9 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
 export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
   gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);
 
-export const fetchAndCheckAheadOfOrigin = async (gitUrl: string): Promise<LogResult<DefaultLogFields>> => {
-  const git = gitP(gitUrl);
+export const hasLocalChanges = async (workingDir: string, branchName: string) => {
+  const git = gitP(workingDir);
   await git.fetch();
-  const log = await git.log({ from: 'main', to: 'origin/main', symmetric: false });
-  return log;
+  const log = await git.log({ from: `origin/${branchName}`, to: branchName, symmetric: false });
+  return log.total > 0;
 };

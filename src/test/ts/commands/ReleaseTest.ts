@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import * as Release from '../../../main/ts/commands/Release';
 import * as Version from '../../../main/ts/core/Version';
 import * as Git from '../../../main/ts/utils/Git';
-import { beehiveFlow, makeBranchWithPj, readPjVersionInDir } from './TestUtils';
+import { beehiveFlow, makeBranchWithPj, readPjVersionInDir, writeAndCommitFile } from './TestUtils';
 
 describe('Release', () => {
   describe('updateVersion', () => {
@@ -27,7 +27,7 @@ describe('Release', () => {
       return dir;
     };
 
-    it.only('releases rc version from main', async () => {
+    it('releases rc version from main', async () => {
       const dir = await runScenario('main', '0.0.1-rc', 'main');
       await assert.becomes(readPjVersionInDir(dir), '0.0.1');
     });
@@ -35,6 +35,15 @@ describe('Release', () => {
     it('releases rc version from release branch', async () => {
       const dir = await runScenario('release/88.1', '88.1.9-rc', '88.1');
       await assert.becomes(readPjVersionInDir(dir), '88.1.9');
+    });
+
+    it('fails to release when there are local un-pushed commits', async () => {
+      const hub = await Git.initInTempFolder(true);
+      const { dir, git } = await Git.cloneInTempFolder(hub.dir);
+      await makeBranchWithPj(git, 'main', 'blah://frog', dir, 'test-release', '0.0.1-rc');
+      // create and commit local file
+      await writeAndCommitFile(git, dir, 'main', 'somefile.txt');
+      await assert.isRejected(beehiveFlow([ 'release', 'main', '--working-dir', dir ]));
     });
   });
 });

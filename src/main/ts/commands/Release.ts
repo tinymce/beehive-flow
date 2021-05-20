@@ -1,3 +1,4 @@
+import * as O from 'fp-ts/Option';
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
@@ -17,9 +18,16 @@ export const updateVersion = (version: Version): Version => ({
 
 export const release = async (args: ReleaseArgs): Promise<void> => {
   printHeaderMessage(args);
-  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
-  await Git.fetchAndCheckAheadOfOrigin(gitUrl);
+  // If we are releasing from the working directory, check for un-pushed local changes
+  if (O.isNone(args.gitUrl)) {
+    const hasLocalChanges = await Git.hasLocalChanges(args.workingDir, args.branchName);
+    if (hasLocalChanges) {
+      return PromiseUtils.fail('Local changes are ahead of origin. Push local changes and try again.');
+    }
+  }
+
+  const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
