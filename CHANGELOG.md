@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Added
+- An error will be thrown when attempting to `release` from a repository with un-pushed local changes. #TINY-7407
 
 ## [0.15.0] - 2021-04-20
 ### Changed
@@ -18,7 +20,7 @@
 ## [0.13.0] - 2021-02-02
 ### Changed
  - Publishing beehive-flow from main branch. #TINY-6890
- 
+
 ## [0.12.0] - 2021-01-27
 ### Changed
  - Publish from main branch
@@ -32,4 +34,4 @@
 
 ## [0.10.0] - 2021-01-07
 ### Added
- - Initial implementation. 
+ - Initial implementation.
