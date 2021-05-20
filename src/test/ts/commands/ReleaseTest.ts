@@ -41,7 +41,7 @@ describe('Release', () => {
       const hub = await Git.initInTempFolder(true);
       const { dir, git } = await Git.cloneInTempFolder(hub.dir);
       await makeBranchWithPj(git, 'main', 'blah://frog', dir, 'test-release', '0.0.1-rc');
-      // create and commit local file
+      // create and commit a local file
       await writeAndCommitFile(git, dir, 'main', 'somefile.txt');
       await assert.isRejected(beehiveFlow([ 'release', 'main', '--working-dir', dir ]));
     });

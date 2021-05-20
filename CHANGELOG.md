@@ -1,5 +1,5 @@
 ## [Unreleased]
-### Added
+### Improved
 - An error will be thrown when attempting to `release` from a repository with un-pushed local changes. #TINY-7407
 
 ## [0.15.0] - 2021-04-20
