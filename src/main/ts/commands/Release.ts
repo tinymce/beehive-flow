@@ -19,6 +19,8 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   printHeaderMessage(args);
   const gitUrl = await Git.resolveGitUrl(args.gitUrl, args.workingDir);
 
+  await Git.fetchAndCheckAheadOfOrigin(gitUrl);
+
   const { dir, git } = await Git.cloneInTempFolder(gitUrl, args.temp);
 
   await Git.checkout(git, args.branchName);

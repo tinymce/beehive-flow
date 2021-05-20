@@ -27,7 +27,7 @@ describe('Release', () => {
       return dir;
     };
 
-    it('releases rc version from main', async () => {
+    it.only('releases rc version from main', async () => {
       const dir = await runScenario('main', '0.0.1-rc', 'main');
       await assert.becomes(readPjVersionInDir(dir), '0.0.1');
     });
