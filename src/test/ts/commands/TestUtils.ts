@@ -28,12 +28,11 @@ export const makeBranchWithPj = async (git: SimpleGit, branchName: string, addre
   return pjFile;
 };
 
-export const writeAndCommitFile = async (git: SimpleGit, dir: string, branchName: string, fileName: string, contents: string = 'placeholder') => {
-  await git.checkout([ branchName ]);
-  const file = path.join(dir, fileName);
-  await Files.writeFile(file, contents);
-  await git.add([ file ]);
-  await git.commit('commit msg');
+export const writeAndAddLocalFile = async (git: SimpleGit, dir: string, fileName: string, contents: string = 'placeholder') => {
+  const filePath = path.join(dir, fileName);
+  await Files.writeFile(filePath, contents);
+  await git.add([ filePath ]);
+  return filePath;
 };
 
 export const writeNpmrc = async (address: string, dir: string): Promise<string> => {

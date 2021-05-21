@@ -118,9 +118,15 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
 export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
   gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);
 
+const isWorkingDirDirty = async (git: SimpleGit) => {
+  const diff = await git.diffSummary([ 'HEAD' ]);
+  return diff.changed > 0;
+};
+
 export const hasLocalChanges = async (workingDir: string, branchName: string) => {
   const git = gitP(workingDir);
   await git.fetch();
   const log = await git.log({ from: `origin/${branchName}`, to: branchName, symmetric: false });
-  return log.total > 0;
+  const isDirty = await isWorkingDirDirty(git);
+  return isDirty || log.total > 0;
 };

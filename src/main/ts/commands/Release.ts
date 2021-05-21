@@ -23,7 +23,7 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   if (O.isNone(args.gitUrl)) {
     const hasLocalChanges = await Git.hasLocalChanges(args.workingDir, args.branchName);
     if (hasLocalChanges) {
-      return PromiseUtils.fail('Local changes are ahead of origin. Push local changes and try again.');
+      return PromiseUtils.fail('Local changes are ahead of origin. Commit and/or push local changes and try again.');
     }
   }
 

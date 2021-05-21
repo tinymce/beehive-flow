@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import * as Release from '../../../main/ts/commands/Release';
 import * as Version from '../../../main/ts/core/Version';
 import * as Git from '../../../main/ts/utils/Git';
-import { beehiveFlow, makeBranchWithPj, readPjVersionInDir, writeAndCommitFile } from './TestUtils';
+import { beehiveFlow, makeBranchWithPj, readPjVersionInDir, writeAndAddLocalFile } from './TestUtils';
 
 describe('Release', () => {
   describe('updateVersion', () => {
@@ -37,12 +37,24 @@ describe('Release', () => {
       await assert.becomes(readPjVersionInDir(dir), '88.1.9');
     });
 
+    it('fails to release when the working directory is dirty', async () => {
+      const hub = await Git.initInTempFolder(true);
+      const { dir, git } = await Git.cloneInTempFolder(hub.dir);
+      await makeBranchWithPj(git, 'main', 'blah://frog', dir, 'test-release', '0.0.1-rc');
+      await git.checkout([ 'main' ]);
+      // create a local file
+      await writeAndAddLocalFile(git, dir, 'file.text');
+      await assert.isRejected(beehiveFlow([ 'release', 'main', '--working-dir', dir ]));
+    });
+
     it('fails to release when there are local un-pushed commits', async () => {
       const hub = await Git.initInTempFolder(true);
       const { dir, git } = await Git.cloneInTempFolder(hub.dir);
       await makeBranchWithPj(git, 'main', 'blah://frog', dir, 'test-release', '0.0.1-rc');
+      await git.checkout([ 'main' ]);
       // create and commit a local file
-      await writeAndCommitFile(git, dir, 'main', 'somefile.txt');
+      await writeAndAddLocalFile(git, dir, 'file.text');
+      await git.commit('commit msg');
       await assert.isRejected(beehiveFlow([ 'release', 'main', '--working-dir', dir ]));
     });
   });
