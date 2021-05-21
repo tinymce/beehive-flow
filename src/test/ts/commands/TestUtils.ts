@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as O from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git/promise';
 import * as Git from '../../../main/ts/utils/Git';
 import * as Files from '../../../main/ts/utils/Files';
@@ -44,7 +45,7 @@ export const writeNpmrc = async (address: string, dir: string): Promise<string> 
 
 export const beehiveFlow = async (args: string[]): Promise<void> => {
   const a = await Parser.parseArgs(args);
-  if (a._tag === 'Some') {
+  if (O.isSome(a)) {
     await Dispatch.dispatch(a.value);
   } else {
     throw new Error('Args parse failure');

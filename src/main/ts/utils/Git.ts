@@ -32,7 +32,7 @@ export const cloneIn = async (gitUrl: string, dir: string): Promise<TempGit> => 
 };
 
 export const cloneInTempFolder = async (gitUrl: string, temp: Option<string> = O.none): Promise<TempGit> => {
-  const dir = temp._tag === 'Some' ? temp.value : (await Files.tempFolder());
+  const dir = O.isSome(temp) ? temp.value : (await Files.tempFolder());
   return await cloneIn(gitUrl, dir);
 };
 
@@ -116,7 +116,7 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
 };
 
 export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
-  gitUrlArg._tag === 'Some' ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);
+  O.isSome(gitUrlArg) ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);
 
 const isWorkingDirDirty = async (git: SimpleGit) => {
   const diff = await git.diffSummary([ 'HEAD' ]);
