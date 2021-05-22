@@ -117,3 +117,8 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
 
 export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
   O.isSome(gitUrlArg) ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);
+
+export const getTags = async (g: SimpleGit): Promise<string[]> => {
+  const tags = await g.tags();
+  return tags.all;
+};

@@ -1,6 +1,7 @@
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
+import * as AdvanceVersion from '../core/AdvanceVersion';
 import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { BranchState, getBranchDetails } from '../core/BranchLogic';
@@ -8,12 +9,6 @@ import { printHeaderMessage } from '../core/Messages';
 
 type Version = Version.Version;
 const { versionToString } = Version;
-
-export const updateVersion = (version: Version): Version => ({
-  major: version.major,
-  minor: version.minor,
-  patch: version.patch
-});
 
 export const release = async (args: ReleaseArgs): Promise<void> => {
   printHeaderMessage(args);
@@ -28,7 +23,7 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
     return PromiseUtils.fail('Branch is not in Release Candidate state - can\'t release.');
   }
 
-  const newVersion = updateVersion(branchDetails.version);
+  const newVersion = AdvanceVersion.updateToStable(branchDetails.version);
   console.log(`Updating version from ${versionToString(branchDetails.version)} to ${versionToString(newVersion)}`);
 
   const rootModule = branchDetails.rootModule;

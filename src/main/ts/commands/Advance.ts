@@ -1,29 +1,15 @@
 import * as gitP from 'simple-git/promise';
 import { SimpleGit } from 'simple-git';
 import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
-import { Version, versionToString } from '../core/Version';
+import { Version } from '../core/Version';
 import * as Git from '../utils/Git';
-import { BranchState, getBranchDetails } from '../core/BranchLogic';
-import { PackageJson, writePackageJsonFileWithNewVersion } from '../core/PackageJson';
+import { BranchState, getBranchDetails, Module } from '../core/BranchLogic';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { releaseCandidate } from '../core/PreRelease';
+import * as AdvanceVersion from '../core/AdvanceVersion';
 import { printHeaderMessage } from '../core/Messages';
 
-export const updateVersion = (version: Version): Version => ({
-  major: version.major,
-  minor: version.minor,
-  patch: version.patch + 1,
-  preRelease: releaseCandidate
-});
-
-const go = async (version: Version, pj: PackageJson, pjFile: string, git: SimpleGit, args: BeehiveArgs, dir: string): Promise<void> => {
-  const newVersion = updateVersion(version);
-  console.log(`Updating version from ${versionToString(version)} to ${versionToString(newVersion)}`);
-  await writePackageJsonFileWithNewVersion(pj, newVersion, pjFile);
-
-  await git.add(pjFile);
-  await git.commit('Advancing to release candidate version for next patch release');
-
+const go = async (version: Version, module: Module, git: SimpleGit, args: BeehiveArgs, dir: string): Promise<void> => {
+  await AdvanceVersion.advancePatch(version, module.packageJson, module.packageJsonFile, git);
   await Git.pushUnlessDryRun(dir, git, args.dryRun);
 };
 
@@ -39,8 +25,7 @@ export const advance = async (args: AdvanceArgs): Promise<void> => {
   if (branchDetails.branchState !== BranchState.ReleaseReady) {
     return PromiseUtils.fail('Branch is not in release ready state - can\'t advance. Check that the version is x.y.z with no suffix.');
   }
-  const rootModule = branchDetails.rootModule;
-  await go(branchDetails.version, rootModule.packageJson, rootModule.packageJsonFile, git, args, dir);
+  await go(branchDetails.version, branchDetails.rootModule, git, args, dir);
 };
 
 export const advanceCi = async (args: AdvanceCiArgs): Promise<void> => {
@@ -52,7 +37,6 @@ export const advanceCi = async (args: AdvanceCiArgs): Promise<void> => {
     console.log('Not in release ready state - not advancing version.');
   } else {
     const git = gitP(dir);
-    const rootModule = branchDetails.rootModule;
-    await go(branchDetails.version, rootModule.packageJson, rootModule.packageJsonFile, git, args, dir);
+    await go(branchDetails.version, branchDetails.rootModule, git, args, dir);
   }
 };
