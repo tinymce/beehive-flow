@@ -123,15 +123,15 @@ const isWorkingDirDirty = async (git: SimpleGit) => {
   return diff.changed > 0;
 };
 
-const hasUnPushedChanges = async (git: SimpleGit, branchName: string) => {
+const isAheadOfRemote = async (git: SimpleGit, branchName: string) => {
+  await git.fetch();
   const log = await git.log({ from: `origin/${branchName}`, to: branchName, symmetric: false });
   return log.total > 0;
 };
 
 export const hasLocalChanges = async (workingDir: string, branchName: string) => {
   const git = gitP(workingDir);
-  await git.fetch();
-  const unPushedChanges = await hasUnPushedChanges(git, branchName);
+  const isAhead = await isAheadOfRemote(git, branchName);
   const isDirty = await isWorkingDirDirty(git);
-  return isDirty || unPushedChanges;
+  return isDirty || isAhead;
 };
