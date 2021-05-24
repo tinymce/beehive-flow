@@ -20,7 +20,7 @@ interface TagDetails {
   readonly name: string;
 }
 
-const getLatestTag = async (git: SimpleGit, version: MajorMinorVersion): Promise<TagDetails> => {
+const getLatestTagForVersion = async (git: SimpleGit, version: MajorMinorVersion): Promise<TagDetails> => {
   const tags = await Git.getTags(git);
   const tagDetails = OptionUtils.somes(tags.map((tag) => pipe(
     Version.parseVersionE(tag),
@@ -55,7 +55,7 @@ export const revive = async (args: ReviveArgs): Promise<void> => {
   }
 
   // Find the latest git tag that matches the release branch to be created
-  const latestTag = await getLatestTag(git, version);
+  const latestTag = await getLatestTagForVersion(git, version);
   await Git.checkout(git, latestTag.name);
 
   // Rebuild the release branch from the tag
