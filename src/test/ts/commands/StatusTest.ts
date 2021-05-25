@@ -1,30 +1,14 @@
-import * as path from 'path';
-import { describe, it } from 'mocha';
 import { assert } from 'chai';
 import * as O from 'fp-ts/Option';
-import * as Git from '../../../main/ts/utils/Git';
-import * as Files from '../../../main/ts/utils/Files';
-import * as Status from '../../../main/ts/commands/Status';
+import { describe, it } from 'mocha';
 import * as BeehiveArgs from '../../../main/ts/args/BeehiveArgs';
+import * as Status from '../../../main/ts/commands/Status';
+import * as Git from '../../../main/ts/utils/Git';
+import * as TestUtils from './TestUtils';
 
 const newGit = async (): Promise<Git.TempGit> => {
   const hub = await Git.initInTempFolder(true);
   return Git.cloneInTempFolder(hub.dir, O.none);
-};
-
-const branchWithPj = async ({ dir, git }: Git.TempGit, versionString: string, branchName: string): Promise<void> => {
-  await Git.checkoutNewBranch(git, branchName);
-
-  const pjFile = path.join(dir, 'package.json');
-  await Files.writeFile(pjFile, `
-    {
-      "name": "@beehive-test/lifecycle-test",
-      "version": "${versionString}"
-    }
-  `);
-  await git.add(pjFile);
-  await git.commit('pj');
-  await Git.push(git);
 };
 
 const check = async (dir: string, expected: Object) => {
@@ -35,7 +19,7 @@ const check = async (dir: string, expected: Object) => {
 describe('Status', () => {
   it('shows status for main branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await branchWithPj({ dir, git }, '0.1.0-rc', 'main');
+    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.1.0-rc');
 
     await check(dir, {
       branchState: 'releaseCandidate',
@@ -54,7 +38,7 @@ describe('Status', () => {
 
   it('shows status for main branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
-    await branchWithPj({ dir, git }, '0.7.0', 'main');
+    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.7.0');
 
     await check(dir, {
       branchState: 'releaseReady',
@@ -72,7 +56,7 @@ describe('Status', () => {
 
   it('shows status for release branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await branchWithPj({ dir, git }, '1.98.2-rc', 'release/1.98');
+    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.2-rc');
 
     await check(dir, {
       branchState: 'releaseCandidate',
@@ -91,7 +75,7 @@ describe('Status', () => {
 
   it('shows status for release branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
-    await branchWithPj({ dir, git }, '1.98.7', 'release/1.98');
+    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.7');
 
     await check(dir, {
       branchState: 'releaseReady',
@@ -104,6 +88,25 @@ describe('Status', () => {
         patch: 7
       },
       versionString: '1.98.7'
+    });
+  }).timeout(20000);
+
+  it('shows status for dependabot branch in feature state', async () => {
+    const { dir, git } = await newGit();
+    await TestUtils.makeBranchWithPj(git, 'dependabot/npm_and_yarn/package-1.98.0', dir, 'test-status', '0.1.0-feature.20210525.shaabcdef');
+
+    await check(dir, {
+      branchState: 'feature',
+      isLatest: true,
+      currentBranch: 'dependabot/npm_and_yarn/package-1.98.0',
+      branchType: 'dependabot',
+      version: {
+        major: 0,
+        minor: 1,
+        patch: 0,
+        preRelease: 'feature.20210525.shaabcdef'
+      },
+      versionString: '0.1.0-feature.20210525.shaabcdef'
     });
   }).timeout(20000);
 

@@ -134,6 +134,10 @@ describe('BranchLogic', () => {
       check('feature/BLAH-1234', '0.6.0-alpha', BranchType.Feature, BranchState.Feature)
     );
 
+    it('detects valid dependabot branch', () =>
+      check('dependabot/npm_and_yarn/package-1.0.0', '0.6.0-alpha', BranchType.Dependabot, BranchState.Feature)
+    );
+
     it('detects valid spike branch', () =>
       check('spike/BLAH-1234', '0.6.0-alpha', BranchType.Spike, BranchState.Spike)
     );

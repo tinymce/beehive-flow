@@ -32,7 +32,12 @@ describe('NpmTags', () => {
       it('replaces multiple slashes', () =>
         checkSimple('feature/BLAH/12/3', BranchState.Feature, '100.7.22', [ 'feature-BLAH-12-3' ])
       );
+    });
 
+    describe('dependabot branches', () => {
+      it('uses the branch name without npm_and_yarn component', () =>
+        checkSimple('dependabot/npm_and_yarn/package-1.0.0', BranchState.Feature, '0.1.0', [ 'dependabot-package-1.0.0' ])
+      );
     });
 
     describe('spike branches', () => {
