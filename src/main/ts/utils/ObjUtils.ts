@@ -5,7 +5,7 @@ type Option<A> = O.Option<A>;
 export const hasKey = <T>(o: T, k: keyof T): boolean =>
   Object.prototype.hasOwnProperty.call(o, k);
 
-export const lookup = <T>(o: T, k: keyof T): Option<T[keyof T]> =>
+export const lookup = <K extends keyof T, T>(o: T, k: K): Option<T[K]> =>
   hasKey(o, k) ? O.some(o[k]) : O.none;
 
 export const map = <A, B>(o: Record<string, A>, f: (a: A) => B): Record<string, B> => {
