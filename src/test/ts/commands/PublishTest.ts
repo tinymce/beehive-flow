@@ -65,11 +65,11 @@ describe('Publish', () => {
     const { dir, git } = await Git.cloneInTempFolder(hub.dir);
 
     // publish a dummy version, so we have something as "latest"
-    await makeBranchWithPj(git, 'feature/dummy', address, dir, packageName, '0.0.1-rc');
+    await makeBranchWithPj(git, 'feature/dummy', dir, packageName, '0.0.1-rc', address);
     await publish(dryRun, dir);
 
     // publish the version we care about
-    const pjFile = await makeBranchWithPj(git, branchName, address, dir, packageName, version);
+    const pjFile = await makeBranchWithPj(git, branchName, dir, packageName, version, address);
     await stamp(dir);
     const stampedVersion = await readPjVersion(pjFile);
     await publish(dryRun, dir);

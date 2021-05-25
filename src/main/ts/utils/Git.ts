@@ -135,3 +135,8 @@ export const hasLocalChanges = async (workingDir: string, branchName: string) =>
   const isDirty = await isWorkingDirDirty(git);
   return isDirty || isAhead;
 };
+
+export const getTags = async (g: SimpleGit): Promise<string[]> => {
+  const tags = await g.tags();
+  return tags.all;
+};

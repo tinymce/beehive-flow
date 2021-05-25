@@ -42,6 +42,13 @@ export interface StatusArgs extends BaseArgs {
   readonly kind: 'StatusArgs';
 }
 
+export interface ReviveArgs extends BaseArgs {
+  readonly kind: 'ReviveArgs';
+  readonly temp: Option<string>;
+  readonly branchName: string;
+  readonly gitUrl: Option<string>;
+}
+
 export const prepareArgs = (dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>): PrepareArgs => ({
   kind: 'PrepareArgs',
   dryRun,
@@ -97,7 +104,18 @@ export const statusArgs = (dryRun: boolean, workingDir: string): StatusArgs => (
   workingDir
 });
 
-export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | AdvanceCiArgs | StampArgs | PublishArgs | StatusArgs;
+export const reviveArgs = (
+  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, branchName: string
+): ReviveArgs => ({
+  kind: 'ReviveArgs',
+  dryRun,
+  workingDir,
+  temp,
+  gitUrl,
+  branchName
+});
+
+export type BeehiveArgs = PrepareArgs | ReleaseArgs | AdvanceArgs | AdvanceCiArgs | StampArgs | PublishArgs | StatusArgs | ReviveArgs;
 
 export const fold = <T>(
   bh: BeehiveArgs,
@@ -107,7 +125,8 @@ export const fold = <T>(
   ifAdvanceCi: (a: AdvanceCiArgs) => T,
   ifStamp: (a: StampArgs) => T,
   ifPublish: (a: PublishArgs) => T,
-  ifStatus: (a: StatusArgs) => T
+  ifStatus: (a: StatusArgs) => T,
+  ifRevive: (a: ReviveArgs) => T
 ): T => {
   switch (bh.kind) {
     case 'PrepareArgs':
@@ -124,8 +143,19 @@ export const fold = <T>(
       return ifPublish(bh);
     case 'StatusArgs':
       return ifStatus(bh);
+    case 'ReviveArgs':
+      return ifRevive(bh);
   }
 };
 
 export const commandName = (bh: BeehiveArgs): string =>
-  fold(bh, () => 'prepare', () => 'release', () => 'advance', () => 'advance-ci', () => 'stamp', () => 'publish', () => 'status');
+  fold(bh,
+    () => 'prepare',
+    () => 'release',
+    () => 'advance',
+    () => 'advance-ci',
+    () => 'stamp',
+    () => 'publish',
+    () => 'status',
+    () => 'revive'
+  );

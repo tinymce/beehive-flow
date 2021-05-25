@@ -1,13 +1,11 @@
-import * as path from 'path';
 import { describe, it } from 'mocha';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
 import * as Git from '../../../main/ts/utils/Git';
-import * as Files from '../../../main/ts/utils/Files';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
-import { beehiveFlow } from './TestUtils';
+import { beehiveFlow, makeBranchWithPj } from './TestUtils';
 
 const assert = chai.use(chaiAsPromised).assert;
 
@@ -16,17 +14,7 @@ describe('Lifecycle', () => {
     const hub = await Git.initInTempFolder(true);
 
     const { dir, git } = await Git.cloneInTempFolder(hub.dir, O.none);
-    await Git.checkoutNewBranch(git, 'main');
-    await Files.writeFile(path.join(dir, 'package.json'), `
-    {
-      "name": "@beehive-test/lifecycle-test",
-      "version": "0.1.0-rc"
-    }
-    `);
-
-    await git.add('package.json');
-    await git.commit('Initial');
-    await Git.push(git);
+    await makeBranchWithPj(git, 'main', dir, 'lifecycle-test', '0.1.0-rc');
 
     const assertPjVersion = async (expected: string) => {
       const pj = await PackageJson.parsePackageJsonFileInFolder(dir);

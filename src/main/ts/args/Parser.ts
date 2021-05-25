@@ -22,10 +22,17 @@ const publishDescription = 'Publishes package in current directory to NPM. Tags 
 
 const statusDescription = 'Prints out status of current directory.';
 
+const reviveDescription = 'Revives a release/x.y branch from release tags.';
+
 const gitUrlOptions: yargs.Options = {
   type: 'string',
   default: null,
   description: 'URL of git repo to operate on. Defaults to the git repo in the current directory.'
+};
+
+const majorMinorOptions: yargs.PositionalOptions = {
+  describe: 'major.minor version',
+  type: 'string'
 };
 
 const majorMinorOrMainOptions: yargs.PositionalOptions = {
@@ -103,6 +110,14 @@ const argParser =
       'status',
       statusDescription
     )
+    .command(
+      'revive <majorMinor>',
+      reviveDescription,
+      (y) => y
+        .positional('majorMinor', majorMinorOptions)
+        .option('git-url', gitUrlOptions)
+        .option('temp', tempOptions)
+    )
     .demandCommand(1)
     .wrap(getColumns())
     .strict()
@@ -138,6 +153,11 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
   const temp = () => O.fromNullable(a.temp as string | null);
   const gitUrl = () => O.fromNullable(a['git-url'] as string | null);
 
+  const majorMinor = async (): Promise<string> => {
+    const mm = a.majorMinor as string;
+    return BranchLogic.getReleaseBranchName(await parseMajorMinorVersion(mm));
+  };
+
   const majorMinorOrMain = async (): Promise<string> => {
     const mmm = a.majorMinorOrMain as string;
     if (mmm === 'main') {
@@ -168,6 +188,9 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
 
   } else if (cmd === 'status') {
     return O.some(BeehiveArgs.statusArgs(dryRun, workingDir));
+
+  } else if (cmd === 'revive') {
+    return O.some(BeehiveArgs.reviveArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinor()));
 
   } else {
     return PromiseUtils.fail(`Unknown command: ${cmd}`);

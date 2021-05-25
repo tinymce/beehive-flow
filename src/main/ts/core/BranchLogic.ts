@@ -1,10 +1,11 @@
 import * as path from 'path';
 import * as O from 'fp-ts/Option';
 import * as gitP from 'simple-git/promise';
-import { CheckRepoActions } from 'simple-git';
+import { CheckRepoActions, SimpleGit } from 'simple-git';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
+import { writeBuildPropertiesFile } from './BuildProperties';
 import * as Version from './Version';
 import * as PreRelease from './PreRelease';
 import * as PackageJson from './PackageJson';
@@ -201,3 +202,10 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
   }
 };
 
+export const createReleaseBranch = async (releaseBranchName: string, git: SimpleGit, dir: string): Promise<void> => {
+  console.log(`Creating ${releaseBranchName} branch`);
+  await Git.checkoutNewBranch(git, releaseBranchName);
+  const buildPropertiesFile = await writeBuildPropertiesFile(dir, releaseBranchName);
+  await git.add([ buildPropertiesFile ]);
+  await git.commit(`Creating release branch: ${releaseBranchName}`);
+};
