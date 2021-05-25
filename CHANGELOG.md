@@ -2,6 +2,9 @@
 ### Added
  - `beehive-flow revive a.b` command to recreate a release branch from tags. #TINY-7474
 
+### Improved
+- An error will be thrown when attempting to `release` from a repository with un-pushed local changes. #TINY-7407
+
 ### Fixed
  - The `prepare` command would incorrectly reset the release branch patch version back to 0.
 
@@ -23,7 +26,7 @@
 ## [0.13.0] - 2021-02-02
 ### Changed
  - Publishing beehive-flow from main branch. #TINY-6890
- 
+
 ## [0.12.0] - 2021-01-27
 ### Changed
  - Publish from main branch
@@ -37,4 +40,4 @@
 
 ## [0.10.0] - 2021-01-07
 ### Added
- - Initial implementation. 
+ - Initial implementation.

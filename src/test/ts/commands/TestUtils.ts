@@ -24,6 +24,13 @@ const writePackageJson = async (dir: string, packageName: string, version: strin
   return pjFile;
 };
 
+export const writeAndAddLocalFile = async (git: SimpleGit, dir: string, fileName: string, contents: string = 'placeholder') => {
+  const filePath = path.join(dir, fileName);
+  await Files.writeFile(filePath, contents);
+  await git.add([ filePath ]);
+  return filePath;
+};
+
 export const writeNpmrc = async (address: string, dir: string): Promise<string> => {
   const npmrc = `@beehive-test:registry=${address}`;
   const npmrcFile = path.join(dir, '.npmrc');

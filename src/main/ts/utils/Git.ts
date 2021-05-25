@@ -1,6 +1,6 @@
-import * as gitP from 'simple-git/promise';
-import { PushResult } from 'simple-git';
 import * as O from 'fp-ts/Option';
+import { PushResult } from 'simple-git';
+import * as gitP from 'simple-git/promise';
 import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
@@ -117,6 +117,24 @@ const detectGitUrlFromDir = async (dir: string): Promise<string> => {
 
 export const resolveGitUrl = async (gitUrlArg: Option<string>, workingDirArg: string): Promise<string> =>
   O.isSome(gitUrlArg) ? gitUrlArg.value : await detectGitUrlFromDir(workingDirArg);
+
+const isWorkingDirDirty = async (git: SimpleGit) => {
+  const diff = await git.diffSummary([ 'HEAD' ]);
+  return diff.changed > 0;
+};
+
+const isAheadOfRemote = async (git: SimpleGit, branchName: string) => {
+  await git.fetch();
+  const log = await git.log({ from: `origin/${branchName}`, to: branchName, symmetric: false });
+  return log.total > 0;
+};
+
+export const hasLocalChanges = async (workingDir: string, branchName: string) => {
+  const git = gitP(workingDir);
+  const isAhead = await isAheadOfRemote(git, branchName);
+  const isDirty = await isWorkingDirDirty(git);
+  return isDirty || isAhead;
+};
 
 export const getTags = async (g: SimpleGit): Promise<string[]> => {
   const tags = await g.tags();
