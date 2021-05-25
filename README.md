@@ -291,6 +291,19 @@ if (beehiveFlowStatus.branchState == 'releaseReady' && beehiveFlowStatus.isLates
 }
 ```
 
+### revive a.b
+
+This command allows a `release/a.b` branch to be created from previous release tags. This is useful if a hotfix needs to be backported to an older version. This command does the following:
+
+1. Finds all tags that match the specified `a.b` version.
+2. Sorts the tags and determines the most recent patch release.
+3. Creates the new `release/a.b` branch from the tag.
+4. Advances the version to the next RC patch release.
+
+Version changes:
+
+- `release/a.b`: `a.b.c` -> `a.b.c-rc`
+
 ## CI Instructions
 
 CI needs to check out a real branch, not just a detached head.
