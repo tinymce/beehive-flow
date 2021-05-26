@@ -23,7 +23,7 @@ export const pickTags = async (
 ): Promise<[ string, ...string[] ]> => {
 
   const branchTag = branchName
-    .replace('/npm_and_yarn/', '/') // Strip dependabot secondary prefix
+    .replace(/dependabot\/[^\/]+\//, 'dependabot/') // Strip dependabot secondary/ecosystem component
     .replace(/[^\w.]+/g, '-');
 
   const vs = majorMinorVersionToString(version);

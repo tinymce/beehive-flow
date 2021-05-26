@@ -1,11 +1,12 @@
-import { describe, it } from 'mocha';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import * as NpmTags from '../../../main/ts/core/NpmTags';
+import * as fc from 'fast-check';
+import { describe, it } from 'mocha';
 import { BranchState } from '../../../main/ts/core/BranchLogic';
-import * as PromiseUtils from '../../../main/ts/utils/PromiseUtils';
+import * as NpmTags from '../../../main/ts/core/NpmTags';
 import { parseVersion } from '../../../main/ts/core/Version';
 import * as ArrayUtils from '../../../main/ts/utils/ArrayUtils';
+import * as PromiseUtils from '../../../main/ts/utils/PromiseUtils';
 
 const assert = chai.use(chaiAsPromised).assert;
 const succeed = PromiseUtils.succeed;
@@ -35,9 +36,18 @@ describe('NpmTags', () => {
     });
 
     describe('dependabot branches', () => {
-      it('uses the branch name without npm_and_yarn component', () =>
+      it('uses the branch name without the ecosystem component', () =>
         checkSimple('dependabot/npm_and_yarn/package-1.0.0', BranchState.Feature, '0.1.0', [ 'dependabot-package-1.0.0' ])
       );
+
+      it('handles other potential dependabot branch names', async () => {
+        // See: https://github.com/dependabot/dependabot-core/blob/f26fefadcab70067e3184c0c8743d359d35abd39/common/lib/dependabot/config/file.rb#L40
+        await checkSimple('dependabot/nuget/package-1.0.0', BranchState.Feature, '0.1.0', [ 'dependabot-package-1.0.0' ]);
+        await checkSimple('dependabot/pip/web/package-3.1.8', BranchState.Feature, '0.1.0', [ 'dependabot-web-package-3.1.8' ]);
+        await checkSimple('dependabot/maven/package-0.1.0', BranchState.Feature, '0.1.0', [ 'dependabot-package-0.1.0' ]);
+        await checkSimple('dependabot/composer/package-3.4.2', BranchState.Feature, '0.1.0', [ 'dependabot-package-3.4.2' ]);
+        await checkSimple('dependabot/cargo/package-0.0.5', BranchState.Feature, '0.1.0', [ 'dependabot-package-0.0.5' ]);
+      });
     });
 
     describe('spike branches', () => {
@@ -237,6 +247,23 @@ describe('NpmTags', () => {
           );
         });
       });
+    });
+
+    describe('arbitrary branches', () => {
+      const specialChar = () => fc.char().filter((char) => !/[\w.]/.test(char));
+      const alphanumeric = () => fc.char().filter((char) => /\w/.test(char));
+
+      it('arbitrary branch names should collapse special characters', () =>
+        fc.assert(fc.asyncProperty(fc.stringOf(alphanumeric(), { minLength: 1 }), fc.stringOf(specialChar(), { minLength: 1 }), (str, special) =>
+          checkSimple(`${str}${special}${str}`, BranchState.Spike, '0.1.5', [ `${str}-${str}` ])
+        ))
+      );
+
+      it('arbitrary dependabot prefixed branch names', () =>
+        fc.assert(fc.asyncProperty(fc.stringOf(alphanumeric(), { minLength: 1 }), fc.lorem(), (str, lorem) =>
+          checkSimple(`dependabot/${str}/${lorem}`, BranchState.Feature, '1.5.2', [ `dependabot-${lorem.replace(/ /g, '-')}` ])
+        ))
+      );
     });
   });
 });
