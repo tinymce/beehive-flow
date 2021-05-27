@@ -4,7 +4,7 @@
 
 ### Improved
 - An error will be thrown when attempting to `release` from a repository with un-pushed local changes. #TINY-7407
-- The `release` command will now fail if the package still contains pre-release dependencies. #TINY-7502
+- The `release` command will now fail if the package still contains pre-release dependencies. This can be disabled using the `--allow-pre-releases` option. #TINY-7502
 
 ### Fixed
  - The `prepare` command would incorrectly reset the release branch patch version back to 0.
