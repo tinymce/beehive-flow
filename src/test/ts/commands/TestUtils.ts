@@ -10,7 +10,9 @@ import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
 import * as ObjUtils from '../../../main/ts/utils/ObjUtils';
 
-const writePackageJson = async (dir: string, packageName: string, version: string, address: string = 'blah://frog') => {
+const writePackageJson = async (
+  dir: string, packageName: string, version: string, dependencies: Record<string, string> = {}, address: string = 'blah://frog'
+) => {
   const pjFile = path.join(dir, 'package.json');
   const pjContents = `
       {
@@ -18,7 +20,8 @@ const writePackageJson = async (dir: string, packageName: string, version: strin
         "version": "${version}",
         "publishConfig": {
           "@beehive-test:registry": "${address}"
-        }
+        },
+        "dependencies": ${JSON.stringify(dependencies)}
       }`;
   await Files.writeFile(pjFile, pjContents);
   return pjFile;
@@ -44,11 +47,12 @@ export const makeBranchWithPj = async (
   dir: string,
   packageName: string,
   version: string,
+  dependencies: Record<string, string> = {},
   address: string = 'blah://frog'
 ) => {
   await Git.checkoutNewBranch(git, branchName);
   const npmrcFile = await writeNpmrc(address, dir);
-  const pjFile = await writePackageJson(dir, packageName, version, address);
+  const pjFile = await writePackageJson(dir, packageName, version, dependencies, address);
   await git.add([ npmrcFile, pjFile ]);
   await git.commit('commit');
   await Git.push(git);

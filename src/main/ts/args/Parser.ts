@@ -53,6 +53,12 @@ const distDirOptions: yargs.Options = {
     'The package.json file in this dir must have the same name and version as the one in the working-dir.'
 };
 
+const allowPreReleaseDepsOptions: yargs.Options = {
+  description: 'Allow pre-release dependencies when releasing.',
+  type: 'boolean',
+  default: false
+};
+
 const getColumns = (): number =>
   Math.min(120, yargs.terminalWidth());
 
@@ -83,6 +89,7 @@ const argParser =
         .positional('majorMinorOrMain', majorMinorOrMainOptions)
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
+        .option('allow-pre-releases', allowPreReleaseDepsOptions)
     )
     .command(
       'advance <majorMinorOrMain>',
@@ -172,7 +179,7 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
     return O.some(BeehiveArgs.prepareArgs(dryRun, workingDir, temp(), gitUrl()));
 
   } else if (cmd === 'release') {
-    return O.some(BeehiveArgs.releaseArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain()));
+    return O.some(BeehiveArgs.releaseArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain(), a['allow-pre-releases'] as boolean));
 
   } else if (cmd === 'advance') {
     return O.some(BeehiveArgs.advanceArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain()));

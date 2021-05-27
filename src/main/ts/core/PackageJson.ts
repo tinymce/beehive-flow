@@ -1,9 +1,12 @@
 import * as path from 'path';
+import { pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import * as R from 'fp-ts/Record';
 import * as t from 'io-ts';
 import * as JsonUtils from '../utils/JsonUtils';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as IotsUtils from '../utils/IotsUtils';
+import * as PreRelease from './PreRelease';
 import * as Version from './Version';
 
 type Option<A> = O.Option<A>;
@@ -16,6 +19,8 @@ export interface PackageJson {
   readonly beehiveFlow?: {
     readonly primaryWorkspace?: string;
   };
+  readonly dependencies?: Record<string, string>;
+  readonly devDependencies?: Record<string, string>;
   readonly [k: string]: unknown;
 }
 
@@ -37,7 +42,9 @@ export const packageJsonCodec = (): t.Type<PackageJson, unknown> => {
     workspaces: t.array(t.string),
     beehiveFlow: t.partial({
       primaryWorkspace: t.string
-    })
+    }),
+    dependencies: t.record(t.string, t.string),
+    devDependencies: t.record(t.string, t.string)
   });
 
   return t.intersection([ mandatory, partial ]);
@@ -76,3 +83,32 @@ export const writePackageJsonFileWithNewVersion = async (pj: PackageJson, newVer
   return newPj;
 };
 
+const hasPreReleaseDependency = (version: string) =>
+  version.includes('-' + PreRelease.releaseCandidate) ||
+  version.includes('-' + PreRelease.featureBranch) ||
+  version.includes('-' + PreRelease.hotfixBranch) ||
+  version.includes('-' + PreRelease.spikeBranch);
+
+const lookupDeps = (pj: PackageJson, name: 'dependencies' | 'devDependencies', filter: (name: string) => boolean) => pipe(
+  O.fromNullable(pj[name]),
+  O.getOrElse(() => ({})),
+  R.filterWithIndex(filter)
+);
+
+export const shouldNotHavePreReleasePackages = async (pj: PackageJson): Promise<void> => {
+  const getInvalidDeps = (dependencies: Record<string, string>) => pipe(
+    dependencies,
+    R.filter(hasPreReleaseDependency),
+    R.keys
+  );
+
+  const invalidDeps = getInvalidDeps({
+    ...lookupDeps(pj, 'dependencies', () => true),
+    ...lookupDeps(pj, 'devDependencies', (key) => key === '@tinymce/beehive-flow')
+  });
+
+  if (invalidDeps.length > 0) {
+    const names = invalidDeps.join(', ');
+    return PromiseUtils.fail(`Pre-release versions were found for: ${names}`);
+  }
+};
