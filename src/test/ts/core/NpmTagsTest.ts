@@ -253,13 +253,13 @@ describe('NpmTags', () => {
       const specialChar = () => fc.char().filter((char) => !/[\w.]/.test(char));
       const alphanumeric = () => fc.char().filter((char) => /\w/.test(char));
 
-      it('arbitrary branch names should collapse special characters', () =>
+      it('should collapse special characters', () =>
         fc.assert(fc.asyncProperty(fc.stringOf(alphanumeric(), { minLength: 1 }), fc.stringOf(specialChar(), { minLength: 1 }), (str, special) =>
           checkSimple(`${str}${special}${str}`, BranchState.Spike, '0.1.5', [ `${str}-${str}` ])
         ))
       );
 
-      it('arbitrary dependabot prefixed branch names', () =>
+      it('handles dependabot prefixed branch names', () =>
         fc.assert(fc.asyncProperty(fc.stringOf(alphanumeric(), { minLength: 1 }), fc.lorem(), (str, lorem) =>
           checkSimple(`dependabot/${str}/${lorem}`, BranchState.Feature, '1.5.2', [ `dependabot-${lorem.replace(/ /g, '-')}` ])
         ))
