@@ -22,7 +22,9 @@ export const pickTags = async (
   branchName: string, branchState: BranchState, version: Version, npmTags: () => Promise<NpmTags>
 ): Promise<[ string, ...string[] ]> => {
 
-  const branchTag = branchName.replace(/[^\w.]+/g, '-');
+  const branchTag = branchName
+    .replace(/dependabot\/[^\/]+\//, 'dependabot/') // Strip dependabot secondary/ecosystem component
+    .replace(/[^\w.]+/g, '-');
 
   const vs = majorMinorVersionToString(version);
 

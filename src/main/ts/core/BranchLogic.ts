@@ -25,7 +25,8 @@ export const enum BranchType {
   Feature = 'feature',
   Hotfix = 'hotfix',
   Spike = 'spike',
-  Release = 'release'
+  Release = 'release',
+  Dependabot = 'dependabot'
 }
 
 // eslint-disable-next-line no-shadow
@@ -81,6 +82,8 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
         return O.some(BranchType.Spike);
       case 'release':
         return O.some(BranchType.Release);
+      case 'dependabot':
+        return O.some(BranchType.Dependabot);
       default:
         return O.none;
     }
@@ -172,6 +175,7 @@ export const getBranchDetails = async (dir: string): Promise<BranchDetails> => {
       case BranchType.Main:
         return validateMainBranch();
       case BranchType.Feature:
+      case BranchType.Dependabot:
         return BranchState.Feature;
       case BranchType.Hotfix:
         return BranchState.Hotfix;

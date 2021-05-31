@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Added
  - `beehive-flow revive a.b` command to recreate a release branch from tags. #TINY-7474
+ - Support `dependabot` branch prefixes. #TINY-7165
 
 ### Improved
 - An error will be thrown when attempting to `release` from a repository with un-pushed local changes. #TINY-7407
