@@ -35,7 +35,20 @@ All new work happens in `feature/*` branches which are merged to the `main` bran
   +--------------------+------------+-----
 ```
 
-The `main` branch is branched to `release/x.y` branches to stabilise a minor version. This is done with `beehive-flow prepare`:
+The `main` branch can be branched to `release/x.y` branches to maintain older minor versions. These branches are created from old releases with `behive-flow revive`:
+
+```
+  main
+ (1.2.3)                    (2.1.5-rc)
+  +- - - - - - - - - - - - - +--------------
+  |
+  ↓             [revive 1.2]:
+  - - - - - - - - - - - - - - +-------------
+                              release/1.2
+                             (1.2.4-rc)
+```
+
+For advanced use-cases, a `release/x.y` branch can be created before `x.y.0` is released, using `beehive-flow prepare`:
 
 ```
   main                 
@@ -62,69 +75,71 @@ To make changes to a `release/x.y` branch, create a `hotfix/*` branch, cherry-pi
             (1.2.0-rc)
 ```
 
-The `main` and `release/x.y` branches can either be in a "release candidate" state with a version like `x.y.z-rc`, or
-a "release ready" state with a version like `x.y.z`. This affects what version is published from CI.
-
-`beehive-flow release` changes a branch from an rc version to a release version e.g. `1.2.3-rc` -> `1.2.3`. 
-When CI encounters this, a release version is published. 
+Beehive Flow is designed so that every commit can be published. To avoid conflicts with stable releases, the version in
+the `package.json` will almost always be a "release candidate" version like `x.y.z-rc`. A stable release takes place in
+two stages: `beehive-flow release` and `behive-flow advance-ci`:
 
 ```
-                [release]:
-+-------------------------+---------------
-release/1.2     
-(1.2.0-rc)                (1.2.0)
-
+ main
+(1.2.4-rc)           (1.2.4)              (1.2.5-rc)
+-+--------------------+--------------------+------------
+            [release]:        [advance-ci]:
 ```
 
-CI then runs `beehive-flow advance-ci`, which changes the branch to the next rc version e.g. `1.2.3` -> `1.2.4-rc`.
+To perform a release, run either `beehive-flow release main` or `beehive-flow release x.y`, depending on whether you
+want to release from the `main` branch or a `release/x.y` branch. This will "stabilise" the version number on that
+branch, removing the `-rc`. From there, CI will publish your release and then run `beehive-flow advance-ci` to update
+that branch to the next release candidate version.
+
+To avoid duplicate version numbers, `beehive-flow stamp` is run at the start of any CI build for a release candidate,
+which adds some metadata to the version string, such as the timestamp of the build, and the git SHA of the commit.
+
+## Preparing for release
+
+To release a stable version (such as `a.b.x`) with Beehive Flow, you need to set the version of the branch you plan to
+release from to `a.b.x-rc`. The branch you release from should either be `main`, or `release/a.b`, which one you choose
+is based on the following questions:
+
+1. Does the branch `release/a.b` exist?
+
+If the branch `release/a.b` exists, then all releases of the form `a.b.*` should take place from that branch. The
+version set in this branch will already be `a.b.x-rc`, so no manual editing of the version is necessary.
+
+2. Have you upgraded the `main` branch version past `a.b.*`?
+
+If no `release/a.b` branch exists, but the version on main is already greater than `a.b.*`, you will need to create a
+`release/a.b` branch. Run `beehive-flow revive a.b` to create this branch, which will have its version automatically
+set to `a.b.x-rc`. Prepare your release on this branch.
+
+3. Do you need a stabilisation period before your release?
+
+If no `release/a.b` branch exists, and the version on `main` is `a.b.x-rc`, you have two options for releasing. The
+**simple** variant is to release directly from `main`, with the command `beehive-flow release main`. However, if you
+need to do work to stabilise this release (and want to do work on your next minor release with the `main` branch in
+parallel with this) then you'll need the **advanced** variant. In this case, run `beehive-flow prepare`, which will
+bump the version of the `main` branch to the next minor (`a.c.0-rc`) and create a `release/a.b` branch with version
+`a.b.x-rc`.
+
+## Minor and Major Upgrades
+
+With the exception of `prepare`, which is for advanced use-cases only, the Beehive Flow tool will not perform minor or
+major version upgrades to any branch. You must manually upgrade the version in your package.json, which is allowed on
+any branch except a `release/x.y` branch. Be sure to keep the `-rc` at the end of your version number: changing
+`1.2.3-rc` to `1.3.0-rc` or `2.0.0-rc` is fine, but changing `1.2.3-rc` to `1.3.0` is not.
+
+While Beehive Flow does not specify how to do these upgrades, we recommend upgrading the version number in the
+`feature/*` branch that introduces the first change that would require the upgrade. For example:
 
 ```
-                [release]:           [advance-ci]: 
-+-------------------------+------------------------+------------
-release/1.2     
-(1.2.0-rc)                (1.2.0)                  (1.2.1-rc)
-
+              feature/*
+             (1.2.3-rc)     (1.3.0-rc)
+ main         +--------------+--------+
+(1.2.3-rc)    |                        \
+ +------------+-------------------------+----------
+                                       (1.3.0-rc)
 ```
 
-At the start of any CI build, `beehive-flow stamp` is run, which adds a timestamp to the version (except if it's a release version).
-This enables us to publish release or prerelease packages for every build.
-
-## Process Variations
-
-There are two main process variations, tailored to two different requirements.
-
-1. Basic process (release from `main`)
-
-In this process a team works continuously on a minor version and its patches in the `main` branch. 
-Whenever `main` is ready for release, the team runs `beehive-flow release main`. 
-
-When the team is ready to work on the next minor release, they run `beehive-flow prepare`. 
-This creates the `release/x.y` branch that the team uses to backport fixes to old releases.
-
-Key aspects: 
-- releasing from `main` and `release/x.y` branches
-- stabilising *after* release
-
-This process is suitable for the following scenarios:
-- projects that mostly get bug fixes
-- projects that are more continuously delivered
-- no strict stabilisation or QA phase
-
-2. Advanced process (release from `release/x.y` branches)
-
-In this process, a team is focused on developing the next minor release. 
-When they are ready to stabilise this version for testing, they run `beehive-flow prepare`. 
-The testers can then test the new version, while other developers begin work on the next minor version.
-
-Key aspects:
-- releasing only from `release/x.y`
-- stabilising *before* release
-
-This process is suitable for the following scenarios:
-- projects focused on new feature releases
-- projects that have a strict stabilisation or QA phase
-
-### Feature vs Spike branches
+## Feature vs Spike branches
 
 Feature branches are branched off `main` and are named `feature/*`. Most new work is done here. It doesn't matter if it's a feature, improvement, task, 
 refactor, bugfix or any other type of change... except for spikes.
@@ -148,16 +163,6 @@ Note: the `stamp`, `advance-ci` and `publish` commands operate on a checkout in 
 whereas the other commands make a fresh clone in a temp directory.
 
 For a detailed description about command-line usage and arguments, run `yarn beehive-flow --help` or `yarn beehive-flow --help COMMAND`.
-
-### prepare
-
-This signifies that `main` is ready for stabilization.
-`main` is branched as `release/a.b`, where `a.b` come from package.json
-
-Version changes
-
- - `main`: `a.b.x-rc` -> `a.c.0-rc`
- - `release/a.b`: `a.b.x-rc`
 
 ### release main
 
@@ -203,15 +208,38 @@ The timestamping changes the package.json file. The idea is to build and publish
 
 Versions are changed thus:
 
- - On a feature branch, `a.b.0-*` becomes `a.b.0-feature.TIMESTAMP.GITSHA`
- - On a hotfix branch, `a.b.c-*` becomes `a.b.c-hotfix.TIMESTAMP.GITSHA`
- - On a spike branch, `a.b.c-*` becomes `a.b.c-spike.TIMESTAMP.GITSHA`
- - On a main or release branch in rc state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP.GITSHA`
+ - On a feature branch, `a.b.0-*` becomes `a.b.0-feature.TIMESTAMP.sha-GITSHA`
+ - On a hotfix branch, `a.b.c-*` becomes `a.b.c-hotfix.TIMESTAMP.sha-GITSHA`
+ - On a spike branch, `a.b.c-*` becomes `a.b.c-spike.TIMESTAMP.sha-GITSHA`
+ - On a main or release branch in rc state, `a.b.c-rc` becomes `a.b.c-rc.TIMESTAMP.sha-GITSHA`
  - On a main or release branch in release state, no changes are made.
  
 Timestamp format is `yyyyMMddHHmmssSSS` in UTC. The short git sha format is used.
 
 Note: this command operates on the checkout in the current working directory.
+
+### revive a.b
+
+This command allows a `release/a.b` branch to be created from previous release tags. This is useful if a hotfix needs to be backported to an older version. This command does the following:
+
+1. Finds all tags that match the specified `a.b` version.
+2. Sorts the tags and determines the most recent patch release.
+3. Creates the new `release/a.b` branch from the tag.
+4. Advances the version to the next RC patch release.
+
+Version changes:
+
+- `release/a.b`: `a.b.c` -> `a.b.c-rc`
+
+### prepare
+
+This signifies that `main` is ready for stabilization.
+`main` is branched as `release/a.b`, where `a.b` come from package.json
+
+Version changes
+
+- `main`: `a.b.x-rc` -> `a.c.0-rc`
+- `release/a.b`: `a.b.x-rc`
 
 ### publish
 
@@ -291,19 +319,6 @@ if (beehiveFlowStatus.branchState == 'releaseReady' && beehiveFlowStatus.isLates
 }
 ```
 
-### revive a.b
-
-This command allows a `release/a.b` branch to be created from previous release tags. This is useful if a hotfix needs to be backported to an older version. This command does the following:
-
-1. Finds all tags that match the specified `a.b` version.
-2. Sorts the tags and determines the most recent patch release.
-3. Creates the new `release/a.b` branch from the tag.
-4. Advances the version to the next RC patch release.
-
-Version changes:
-
-- `release/a.b`: `a.b.c` -> `a.b.c-rc`
-
 ## CI Instructions
 
 CI needs to check out a real branch, not just a detached head.
@@ -360,11 +375,6 @@ These instructions assume Jenkins, yarn, TypeScript, mocha and eslint.
     ```
 
 ## FAQ
-
-### How do I update my major version?
-
-Set the version manually in package.json in your `main` branch. 
-The idea is that you should decide what major.minor version you are releasing before running `prepare`.
 
 ### Does beehive-flow work with yarn workspaces, lerna or monorepos?
 
