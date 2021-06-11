@@ -105,7 +105,7 @@ is based on the following questions:
 If the branch `release/a.b` exists, then all releases of the form `a.b.*` should take place from that branch. The
 version set in this branch will already be `a.b.x-rc`, so no manual editing of the version is necessary.
 
-2. Have you upgraded the `main` branch version past `a.b.*`?
+2. Have you upgraded the `main` branch version above `a.b.*`?
 
 If no `release/a.b` branch exists, but the version on main is already greater than `a.b.*`, you will need to create a
 `release/a.b` branch. Run `beehive-flow revive a.b` to create this branch, which will have its version automatically
@@ -229,7 +229,7 @@ This command allows a `release/a.b` branch to be created from previous release t
 
 Version changes:
 
-- `release/a.b`: `a.b.c` -> `a.b.c-rc`
+- `release/a.b`: `a.b.c` -> `a.b.d-rc`
 
 ### prepare
 
