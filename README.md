@@ -77,7 +77,7 @@ To make changes to a `release/x.y` branch, create a `hotfix/*` branch, cherry-pi
 
 Beehive Flow is designed so that every commit can be published. To avoid conflicts with stable releases, the version in
 the `package.json` will almost always be a "release candidate" version like `x.y.z-rc`. A stable release takes place in
-two stages: `beehive-flow release` and `beehive-flow advance-ci`:
+two stages: `beehive-flow release` and `beehive-flow advance-ci`. The two-stage process is shown below:
 
 ```
  main
