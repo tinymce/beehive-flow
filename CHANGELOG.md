@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- `spike` branches now use `alpha` as the pre-release version prefix #TINY-7701
+
 ## 0.16.0 - 2021-07-02
 
 ### Added

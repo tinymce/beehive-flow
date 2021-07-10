@@ -116,13 +116,14 @@ describe('PackageJson', () => {
         dependencies: {
           dep1: '^5.0.0-rc',
           dep2: '^5.0.0-feature.20210525.sha123456',
-          dep3: '^5.0.0-spike.20210525.shaabcdef',
-          dep4: '^5.0.0-hotfix.20210525.sha123abc',
+          dep3: '^5.0.0-alpha.20210525.shaabcdef',
+          dep4: '^5.0.0-spike.20210525.sha456def',
+          dep5: '^5.0.0-hotfix.20210525.sha123abc',
           beehive: '^0.16.0'
         }
       };
       const result = PackageJson.shouldNotHavePreReleasePackages(pj);
-      await assert.isRejected(result, 'Pre-release versions were found for: dep1, dep2, dep3, dep4');
+      await assert.isRejected(result, 'Pre-release versions were found for: dep1, dep2, dep3, dep4, dep5');
     });
 
     it('should fail when the beehive dev dependency is a pre-release version', async () => {
@@ -142,7 +143,7 @@ describe('PackageJson', () => {
         devDependencies: {
           dep1: '^5.0.0-rc',
           dep2: '^5.0.0-feature.20210525.sha123456',
-          dep3: '^5.0.0-spike.20210525.shaabcdef',
+          dep3: '^5.0.0-alpha.20210525.shaabcdef',
           dep4: '^5.0.0-hotfix.20210525.sha123abc'
         }
       };

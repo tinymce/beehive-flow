@@ -87,7 +87,8 @@ const hasPreReleaseDependency = (version: string) =>
   version.includes('-' + PreRelease.releaseCandidate) ||
   version.includes('-' + PreRelease.featureBranch) ||
   version.includes('-' + PreRelease.hotfixBranch) ||
-  version.includes('-' + PreRelease.spikeBranch);
+  version.includes('-' + PreRelease.spikeBranch) ||
+  version.includes('-spike'); // Legacy spike branch prefix
 
 const lookupDeps = (pj: PackageJson, name: 'dependencies' | 'devDependencies', filter: (name: string) => boolean) => pipe(
   O.fromNullable(pj[name]),

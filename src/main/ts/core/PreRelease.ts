@@ -1,4 +1,4 @@
 export const releaseCandidate = 'rc';
 export const featureBranch = 'feature';
 export const hotfixBranch = 'hotfix';
-export const spikeBranch = 'spike';
+export const spikeBranch = 'alpha';

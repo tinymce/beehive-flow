@@ -43,6 +43,11 @@ describe('Stamp', () => {
       assert.equal(Version.versionToString(actual), `1.2.0-hotfix.${timeFormatted}.shaf0d52ad`);
     });
 
+    it('makes a timestamped version on spike branch', async () => {
+      const actual = Stamp.chooseNewVersion(BranchState.Spike, await Version.parseVersion('1.2.0-rc'), 'f0d52ad', timeMillis);
+      assert.equal(Version.versionToString(actual), `1.2.0-alpha.${timeFormatted}.shaf0d52ad`);
+    });
+
     it('makes a timestamped version in rc state', async () => {
       const actual = Stamp.chooseNewVersion(BranchState.ReleaseCandidate, await Version.parseVersion('1.2.0-rc'), 'f0d52ad', timeMillis);
       assert.equal(Version.versionToString(actual), `1.2.0-rc.${timeFormatted}.shaf0d52ad`);
