@@ -21,7 +21,7 @@
     "luxon": "^1.26.0",
     "properties-reader": "^2.2.0",
     "read-pkg": "^5.2.0",
-    "simple-git": "^2.35.1",
+    "simple-git": "^3.3.0",
     "tmp": "^0.2.1",
     "tslib": "^2.1.0",
     "yargs": "^16.2.0"
