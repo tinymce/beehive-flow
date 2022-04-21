@@ -142,10 +142,6 @@ describe('BranchLogic', () => {
       check('spike/BLAH-1234', '0.6.0-alpha', BranchType.Spike, BranchState.Spike)
     );
 
-    it('detects valid feature branch', () =>
-      check('feature/BLAH-ab3', '0.6.0-alpha', BranchType.Feature, BranchState.Feature)
-    );
-
     it('passes for timestamped version on feature branch', () =>
       check('feature/98qenaoects', '0.6.0-alpha.20020202020202.293la9', BranchType.Feature, BranchState.Feature)
     );

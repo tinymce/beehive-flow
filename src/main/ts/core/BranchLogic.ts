@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as O from 'fp-ts/Option';
-import * as gitP from 'simple-git/promise';
-import { CheckRepoActions, SimpleGit } from 'simple-git';
+import { gitP, CheckRepoActions, SimpleGit } from 'simple-git';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import { showStringOrUndefined } from '../utils/StringUtils';
 import * as Git from '../utils/Git';
