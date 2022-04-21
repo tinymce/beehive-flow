@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.18.0 - 2022-04-21
+
+### Security
+- Upgraded `simple-git` to 3.x to fix command injection vulnerability #TINY-8581
+
 ## 0.17.0 - 2021-07-14
 
 ### Changed
