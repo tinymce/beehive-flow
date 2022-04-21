@@ -92,7 +92,7 @@ const hasPreReleaseDependency = (version: string) =>
 
 const lookupDeps = (pj: PackageJson, name: 'dependencies' | 'devDependencies', filter: (name: string) => boolean) => pipe(
   O.fromNullable(pj[name]),
-  O.getOrElse(() => ({})),
+  O.getOrElse((): Record<string, string> => ({})),
   R.filterWithIndex(filter)
 );
 
