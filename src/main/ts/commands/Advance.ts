@@ -1,5 +1,4 @@
-import * as gitP from 'simple-git/promise';
-import { SimpleGit } from 'simple-git';
+import { gitP, SimpleGit } from 'simple-git';
 import { AdvanceArgs, AdvanceCiArgs, BeehiveArgs } from '../args/BeehiveArgs';
 import { Version } from '../core/Version';
 import * as Git from '../utils/Git';

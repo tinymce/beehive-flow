@@ -1,13 +1,11 @@
 import * as O from 'fp-ts/Option';
-import { PushResult } from 'simple-git';
-import * as gitP from 'simple-git/promise';
+import { gitP, PushResult, SimpleGit } from 'simple-git';
 import { mainBranchName } from '../core/BranchLogic';
 import * as Files from './Files';
 import * as ObjUtils from './ObjUtils';
 import * as PromiseUtils from './PromiseUtils';
 import * as StringUtils from './StringUtils';
 
-type SimpleGit = gitP.SimpleGit;
 type Option<A> = O.Option<A>;
 
 const ASSUMED_REMOTE = 'origin'; // This module assumes a single remote called 'origin'

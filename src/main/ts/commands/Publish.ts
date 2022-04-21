@@ -1,5 +1,5 @@
 import * as cs from 'cross-spawn-promise';
-import * as gitP from 'simple-git/promise';
+import { gitP, SimpleGit } from 'simple-git';
 import { PublishArgs } from '../args/BeehiveArgs';
 import { BranchDetails, BranchState, getBranchDetails } from '../core/BranchLogic';
 import * as NpmTags from '../core/NpmTags';
@@ -59,7 +59,7 @@ const npmTag = async (args: PublishArgs, tags: string[], r: BranchDetails, dir: 
   }
 };
 
-const gitTag = async (r: BranchDetails, git: gitP.SimpleGit, args: PublishArgs): Promise<void> => {
+const gitTag = async (r: BranchDetails, git: SimpleGit, args: PublishArgs): Promise<void> => {
   if (r.branchState === BranchState.ReleaseReady) {
 
     // TODO TINY-6994: Implement tagging logic:
