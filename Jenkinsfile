@@ -1,37 +1,35 @@
 #!groovy
-@Library('waluigi@v3.3.0') _
+@Library('waluigi@v6.0.1') _
 
 standardProperties()
 
-node("primary") {
-  stage("checkout") {
-    checkout scm
-  }
-
+tinyPods.node() {
   stage("deps") {
-    sh "yarn install"
+    yarnInstall()
   }
 
   stage("stamp") {
-    sh "yarn beehive-flow stamp"
+    exec("yarn beehive-flow stamp")
   }
 
   stage("build") {
-    sh "yarn build"
+    exec("yarn build")
   }
 
   stage("lint") {
-    sh "yarn lint"
+    exec("yarn lint")
   }
 
   stage("test") {
-    sh "yarn test"
+    exec("yarn test")
   }
 
   stage("publish") {
-    sshagent(credentials: ['jenkins2-github']) {
-      sh "yarn beehive-flow publish"
-      sh "yarn beehive-flow advance-ci"
+    tinyGit.withGitHubSSHCredentials {
+      tinyNpm.withNpmPublishCredentials {
+        sh "yarn beehive-flow publish"
+        sh "yarn beehive-flow advance-ci"
+      }
     }
   }
 }
