@@ -1,4 +1,6 @@
+import * as cp from 'child_process';
 import * as path from 'path';
+import * as getPort from 'get-port';
 import * as O from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git';
 import * as Dispatch from '../../../main/ts/args/Dispatch';
@@ -35,7 +37,10 @@ export const writeAndAddLocalFile = async (git: SimpleGit, dir: string, fileName
 };
 
 export const writeNpmrc = async (address: string, dir: string): Promise<string> => {
-  const npmrc = `@beehive-test:registry=${address}`;
+  // NOTE: NPM 5.3.0 or higher needs an auth token to be able to publish
+  // See https://github.com/verdaccio/verdaccio/issues/212#issuecomment-308578500
+  const noProtocolAddress = address.replace(/^https?:\/\//, '//');
+  const npmrc = `${noProtocolAddress}/:_authToken=anonymous\n@beehive-test:registry=${address}`;
   const npmrcFile = path.join(dir, '.npmrc');
   await Files.writeFile(npmrcFile, npmrc);
   return npmrcFile;
@@ -98,4 +103,27 @@ export const makeReleaseTags = async (git: SimpleGit, dir: string, packageName: 
   await Git.checkoutMainBranch(git);
   await git.deleteLocalBranch(tempBranchName, true);
   await git.push([ '--tags' ]);
+};
+
+export const startVerdaccio = async () => {
+  const configDir = await Files.tempFolder();
+  const config = `
+storage: ${configDir}/storage
+packages:
+  '@beehive-test/*':
+    access: $anonymous
+    publish: $anonymous
+    proxy: npmjs
+web:
+  enable: false
+`;
+  const configFile = path.join(configDir, 'config.yml');
+  await Files.writeFile(configFile, config);
+
+  const port = await getPort();
+  const hostAndPort = `127.0.0.1:${port}`;
+  const verdaccio = cp.spawn('yarn', [ 'verdaccio', '--listen', hostAndPort, '--config', configFile ], { stdio: 'inherit' });
+
+  const address = `http://${hostAndPort}`;
+  return { port, verdaccio, address };
 };

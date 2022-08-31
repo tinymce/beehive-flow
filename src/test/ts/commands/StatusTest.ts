@@ -1,3 +1,4 @@
+import * as cp from 'child_process';
 import { assert } from 'chai';
 import * as O from 'fp-ts/Option';
 import { describe, it } from 'mocha';
@@ -17,9 +18,22 @@ const check = async (dir: string, expected: Object) => {
 };
 
 describe('Status', () => {
+  let verdaccio: cp.ChildProcess;
+  let address: string;
+
+  before(async () => {
+    const v = await TestUtils.startVerdaccio();
+    verdaccio = v.verdaccio;
+    address = v.address;
+  });
+
+  after(() => {
+    verdaccio.kill();
+  });
+
   it('shows status for main branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.1.0-rc');
+    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.1.0-rc', {}, address);
 
     await check(dir, {
       branchState: 'releaseCandidate',
@@ -38,7 +52,7 @@ describe('Status', () => {
 
   it('shows status for main branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.7.0');
+    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.7.0', {}, address);
 
     await check(dir, {
       branchState: 'releaseReady',
@@ -56,7 +70,7 @@ describe('Status', () => {
 
   it('shows status for release branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.2-rc');
+    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.2-rc', {}, address);
 
     await check(dir, {
       branchState: 'releaseCandidate',
@@ -75,7 +89,7 @@ describe('Status', () => {
 
   it('shows status for release branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.7');
+    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.7', {}, address);
 
     await check(dir, {
       branchState: 'releaseReady',
@@ -93,7 +107,7 @@ describe('Status', () => {
 
   it('shows status for dependabot branch in feature state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'dependabot/npm_and_yarn/package-1.98.0', dir, 'test-status', '0.1.0-feature.20210525.shaabcdef');
+    await TestUtils.makeBranchWithPj(git, 'dependabot/npm_and_yarn/package-1.98.0', dir, 'test-status', '0.1.0-feature.20210525.shaabcdef', {}, address);
 
     await check(dir, {
       branchState: 'feature',
