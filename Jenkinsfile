@@ -21,6 +21,9 @@ tinyPods.node() {
   }
 
   stage("test") {
+    // Beehive tests require global git username/email setup
+    exec("git config --global user.name \"ephox\"")
+    exec("git config --global user.email \"is-accounts@tiny.cloud\"")
     exec("yarn test")
   }
 
