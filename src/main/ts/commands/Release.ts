@@ -1,12 +1,27 @@
 import * as O from 'fp-ts/Option';
+import { SimpleGit } from 'simple-git';
 import { ReleaseArgs } from '../args/BeehiveArgs';
-import { versionToString } from '../core/Version';
+import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
 import * as AdvanceVersion from '../core/AdvanceVersion';
 import * as PackageJson from '../core/PackageJson';
 import * as PromiseUtils from '../utils/PromiseUtils';
-import { BranchState, getBranchDetails } from '../core/BranchLogic';
+import { BranchState, getBranchDetails, Module } from '../core/BranchLogic';
+import * as Changelog from '../keepachangelog/Changelog';
 import { printHeaderMessage } from '../core/Messages';
+
+const updateChangelog = async (git: SimpleGit, dryRun: boolean, version: Version.Version, module: Module) => {
+  const changelogFile = module.changelogFile;
+  if (module.changelogFormat === 'none') {
+    console.log('No changelog file found');
+  } else if (dryRun) {
+    console.log('dry-run - not updating the changelog');
+  } else {
+    // NOTE: Add other changelog formats updates here if we support more
+    await Changelog.updateFromFile(changelogFile, version);
+    await git.add(changelogFile);
+  }
+};
 
 export const release = async (args: ReleaseArgs): Promise<void> => {
   printHeaderMessage(args);
@@ -36,8 +51,12 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   }
 
   const newVersion = AdvanceVersion.updateToStable(branchDetails.version);
-  console.log(`Updating version from ${versionToString(branchDetails.version)} to ${versionToString(newVersion)}`);
+  console.log(`Updating version from ${Version.versionToString(branchDetails.version)} to ${Version.versionToString(newVersion)}`);
   await PackageJson.writePackageJsonFileWithNewVersion(rootModule.packageJson, newVersion, rootModule.packageJsonFile);
+
+  if (!args.noChangelog) {
+    await updateChangelog(git, args.dryRun, newVersion, rootModule);
+  }
 
   await git.add(rootModule.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');

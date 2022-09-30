@@ -59,6 +59,12 @@ const allowPreReleaseDepsOptions: yargs.Options = {
   default: false
 };
 
+const noChangelogReleaseOptions: yargs.Options = {
+  description: 'Prevent the changelog from being updated.',
+  type: 'boolean',
+  default: false
+};
+
 const getColumns = (): number =>
   Math.min(120, yargs.terminalWidth());
 
@@ -90,6 +96,7 @@ const argParser =
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
         .option('allow-pre-releases', allowPreReleaseDepsOptions)
+        .option('no-changelog', noChangelogReleaseOptions),
     )
     .command(
       'advance <majorMinorOrMain>',
@@ -179,7 +186,15 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
     return O.some(BeehiveArgs.prepareArgs(dryRun, workingDir, temp(), gitUrl()));
 
   } else if (cmd === 'release') {
-    return O.some(BeehiveArgs.releaseArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain(), a['allow-pre-releases'] as boolean));
+    return O.some(BeehiveArgs.releaseArgs(
+      dryRun,
+      workingDir,
+      temp(),
+      gitUrl(),
+      await majorMinorOrMain(),
+      a['allow-pre-releases'] as boolean,
+      a['no-changelog'] as boolean
+    ));
 
   } else if (cmd === 'advance') {
     return O.some(BeehiveArgs.advanceArgs(dryRun, workingDir, temp(), gitUrl(), await majorMinorOrMain()));

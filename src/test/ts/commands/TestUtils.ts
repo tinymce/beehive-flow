@@ -8,6 +8,7 @@ import * as Parser from '../../../main/ts/args/Parser';
 import * as NpmTags from '../../../main/ts/core/NpmTags';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import { versionToString } from '../../../main/ts/core/Version';
+import * as Changelog from '../../../main/ts/keepachangelog/Changelog';
 import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
 import * as ObjUtils from '../../../main/ts/utils/ObjUtils';
@@ -27,6 +28,35 @@ const writePackageJson = async (
       }`;
   await Files.writeFile(pjFile, pjContents);
   return pjFile;
+};
+
+export const writeChangelog = async (dir: string, version?: string) => {
+  const changelogFile = path.join(dir, 'CHANGELOG.md');
+  const heading = version === undefined ? '## Unreleased' : `## ${version} - 2001-10-05`;
+  await Files.writeFile(changelogFile, `# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+${heading}
+
+### Added
+- Example added entry.
+
+### Improved
+- Some improved example.
+  - Nested entry test.
+
+### Fixed
+- Fixed some bug. #GH-1234
+
+## 0.0.1 - 2000-01-01
+
+### Added
+- Initial release.
+`);
+  return changelogFile;
 };
 
 export const writeAndAddLocalFile = async (git: SimpleGit, dir: string, fileName: string, contents: string = 'placeholder') => {
@@ -52,13 +82,15 @@ export const makeBranchWithPj = async (
   dir: string,
   packageName: string,
   version: string,
+  newVersion?: string,
   dependencies: Record<string, string> = {},
   address: string = 'blah://frog'
 ) => {
   await Git.checkoutNewBranch(git, branchName);
   const npmrcFile = await writeNpmrc(address, dir);
   const pjFile = await writePackageJson(dir, packageName, version, dependencies, address);
-  await git.add([ npmrcFile, pjFile ]);
+  const changelogFile = await writeChangelog(dir, newVersion);
+  await git.add([ npmrcFile, pjFile, changelogFile ]);
   await git.commit('commit');
   await Git.push(git);
   return pjFile;
@@ -87,8 +119,16 @@ export const readPjVersion = async (pjFile: string): Promise<string> => {
   return versionToString(v);
 };
 
+export const readKeepAChangelog = async (changelogFile: string): Promise<Changelog.Changelog> => {
+  const content = await Files.readFileAsString(changelogFile);
+  return Changelog.parse(content);
+};
+
 export const readPjVersionInDir = async (dir: string): Promise<string> =>
   readPjVersion(path.join(dir, 'package.json'));
+
+export const readKeepAChangelogInDir = async (dir: string): Promise<Changelog.Changelog> =>
+  readKeepAChangelog(path.join(dir, 'CHANGELOG.md'));
 
 export const makeReleaseTags = async (git: SimpleGit, dir: string, packageName: string, tags: string[]): Promise<void> => {
   await Git.checkoutMainBranch(git);

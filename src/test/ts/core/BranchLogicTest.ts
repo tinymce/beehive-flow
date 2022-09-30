@@ -16,6 +16,7 @@ import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';
 import * as Version from '../../../main/ts/core/Version';
 import * as Files from '../../../main/ts/utils/Files';
+import * as TestUtils from '../commands/TestUtils';
 
 type PackageJson = PackageJson.PackageJson;
 
@@ -69,7 +70,7 @@ describe('BranchLogic', () => {
       await PackageJson.writePackageJsonFile(packageJsonFile, packageJson);
       await git.add(packageJsonFile);
       await git.commit('commit');
-      return { gitUrl, dir, packageJsonFile, version, packageJson };
+      return { gitUrl, dir, packageJsonFile, version, packageJson, changelogFile: '', changelogFormat: 'none' };
     };
 
     it('fails if dir is not a git repo', async () => {
@@ -85,12 +86,14 @@ describe('BranchLogic', () => {
     });
 
     const check = async (currentBranch: string, sVersion: string, branchType: BranchType, branchState: BranchState): Promise<void> => {
-      const { dir, packageJsonFile, version, packageJson } = await setup(currentBranch, sVersion);
+      const { dir, packageJsonFile, version, packageJson, changelogFile, changelogFormat } = await setup(currentBranch, sVersion);
 
       const expected: BranchDetails = {
         rootModule: {
           packageJsonFile,
-          packageJson
+          packageJson,
+          changelogFile,
+          changelogFormat
         },
         version,
         currentBranch,
@@ -179,8 +182,10 @@ describe('BranchLogic', () => {
             version: '2.71.1'
           });
           const pjFile = path.join(module1Dir, 'package.json');
+          const changelogFile = path.join(module1Dir, 'CHANGELOG.md');
           await PackageJson.writePackageJsonFile(pjFile, pj);
-          return { pj, pjFile };
+          await TestUtils.writeChangelog(module1Dir);
+          return { pj, pjFile, changelogFile, changelogFormat: 'keepachangelog' };
         };
 
         const m1 = await makeModule('module1');
@@ -199,16 +204,22 @@ describe('BranchLogic', () => {
           workspacesEnabled: true,
           rootModule: {
             packageJson: rootPj,
-            packageJsonFile: rootPjFile
+            packageJsonFile: rootPjFile,
+            changelogFile: '',
+            changelogFormat: 'none'
           },
           modules: {
             module1: {
               packageJson: m1.pj,
-              packageJsonFile: m1.pjFile
+              packageJsonFile: m1.pjFile,
+              changelogFile: m1.changelogFile,
+              changelogFormat: m1.changelogFormat
             },
             module2: {
               packageJson: m2.pj,
-              packageJsonFile: m2.pjFile
+              packageJsonFile: m2.pjFile,
+              changelogFile: m2.changelogFile,
+              changelogFormat: m2.changelogFormat
             }
           }
         });
