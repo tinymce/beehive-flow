@@ -43,8 +43,9 @@ class CustomRelease extends KeepAChangelog.Release {
   }
 }
 
-const findRelease = (changelog: Changelog, version?: string): O.Option<CustomRelease> =>
-  O.fromNullable(changelog.findRelease(version));
+// Attempt to find the specific release if not fallback to finding the unreleased section
+export const findRelease = (changelog: Changelog, version: string): O.Option<CustomRelease> =>
+  O.fromNullable(changelog.findRelease(version) ?? changelog.findRelease());
 
 export const parse = (content: string): Changelog =>
   KeepAChangelog.parser(content, {
@@ -60,7 +61,6 @@ export const update = (content: string, version: Version.Version) => {
   // Find the current version, if not find unreleased and update the version
   const release = pipe(
     findRelease(changelog, versionString),
-    O.alt(() => findRelease(changelog)),
     O.filter((current) => !current.isEmpty()),
     O.map((current) => {
       const isUnreleased = current.version === undefined;
