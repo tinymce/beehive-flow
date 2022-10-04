@@ -12,12 +12,11 @@ import { printHeaderMessage } from '../core/Messages';
 
 const updateChangelog = async (git: SimpleGit, version: Version.Version, module: Module) => {
   const changelogFile = module.changelogFile;
-  if (module.changelogFormat === 'none') {
-    console.log('No changelog file found');
-  } else {
-    // NOTE: Add other changelog formats updates here if we support more
+  if (module.changelogFormat === 'keepachangelog') {
     await Changelog.updateFromFile(changelogFile, version);
     await git.add(changelogFile);
+  } else {
+    console.log('No changelog file found');
   }
 };
 

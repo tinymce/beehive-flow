@@ -17,7 +17,7 @@ export type Release = KeepAChangelog.Release;
 export type Change = KeepAChangelog.Change;
 
 class CustomRelease extends KeepAChangelog.Release {
-  public constructor(version?: string, date?: Date | string, description?: string) {
+  public constructor(version?: Semver | string, date?: Date | string, description?: string) {
     super(version, date, description);
     // Add in "improved" and ensure the ordering
     const changeTypes: Array<[ string, Change[] ]> = [
@@ -44,7 +44,7 @@ class CustomRelease extends KeepAChangelog.Release {
 }
 
 // Attempt to find the specific release if not fallback to finding the unreleased section
-export const findRelease = (changelog: Changelog, version: string): O.Option<CustomRelease> =>
+const findRelease = (changelog: Changelog, version: string): O.Option<CustomRelease> =>
   O.fromNullable(changelog.findRelease(version) ?? changelog.findRelease());
 
 export const parse = (content: string): Changelog =>
