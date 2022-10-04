@@ -10,12 +10,10 @@ import { BranchState, getBranchDetails, Module } from '../core/BranchLogic';
 import * as Changelog from '../keepachangelog/Changelog';
 import { printHeaderMessage } from '../core/Messages';
 
-const updateChangelog = async (git: SimpleGit, dryRun: boolean, version: Version.Version, module: Module) => {
+const updateChangelog = async (git: SimpleGit, version: Version.Version, module: Module) => {
   const changelogFile = module.changelogFile;
   if (module.changelogFormat === 'none') {
     console.log('No changelog file found');
-  } else if (dryRun) {
-    console.log('dry-run - not updating the changelog');
   } else {
     // NOTE: Add other changelog formats updates here if we support more
     await Changelog.updateFromFile(changelogFile, version);
@@ -55,7 +53,7 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
   await PackageJson.writePackageJsonFileWithNewVersion(rootModule.packageJson, newVersion, rootModule.packageJsonFile);
 
   if (!args.noChangelog) {
-    await updateChangelog(git, args.dryRun, newVersion, rootModule);
+    await updateChangelog(git, newVersion, rootModule);
   }
 
   await git.add(rootModule.packageJsonFile);
