@@ -34,7 +34,7 @@ describe('Publish', () => {
     await TestUtils.beehiveFlow([ 'stamp', '--working-dir', dir ]);
   };
 
-  const runScenario = async (branchName: string, version: string, dryRun: boolean) => {
+  const runScenario = async (branchName: string, version: string, dryRun: boolean, f: (dir: string) => Promise<void>) => {
     scenario++;
     const packageName = `scenario-${scenario}`;
     const hub = await Git.initInTempFolder(true);
@@ -48,16 +48,20 @@ describe('Publish', () => {
     const pjFile = await TestUtils.makeBranchWithPj(git, branchName, dir, packageName, version, undefined, {}, address);
     await stamp(dir);
     const stampedVersion = await TestUtils.readPjVersion(pjFile);
+    await f(dir);
     await publish(dryRun, dir);
     const npmTags = await TestUtils.getNpmTags(dir, packageName);
     const gitTags = (await git.tags()).all.sort();
     return { stampedVersion, npmTags, dir, git, gitTags, packageName };
   };
 
+  const runNormalScenario = async (branchName: string, version: string, dryRun: boolean) =>
+    runScenario(branchName, version, dryRun, () => Promise.resolve());
+
   const TIMEOUT = 120000;
 
   it('publishes rc from main branch', async () => {
-    const { stampedVersion, npmTags, gitTags } = await runScenario('main', '0.1.0-rc', false);
+    const { stampedVersion, npmTags, gitTags } = await runNormalScenario('main', '0.1.0-rc', false);
     assert.deepEqual(npmTags, {
       'latest': stampedVersion,
       'feature-dummy': '0.0.1-rc',
@@ -68,7 +72,7 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes release from main branch', async () => {
-    const { npmTags, gitTags } = await runScenario('main', '0.1.0', false);
+    const { npmTags, gitTags } = await runNormalScenario('main', '0.1.0', false);
     assert.deepEqual(npmTags, {
       'feature-dummy': '0.0.1-rc',
       'main': '0.1.0',
@@ -79,7 +83,7 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes rc from release branch', async () => {
-    const { stampedVersion, npmTags, gitTags } = await runScenario('release/0.5', '0.5.6-rc', false);
+    const { stampedVersion, npmTags, gitTags } = await runNormalScenario('release/0.5', '0.5.6-rc', false);
     assert.deepEqual(npmTags, {
       'latest': stampedVersion,
       'feature-dummy': '0.0.1-rc',
@@ -89,7 +93,7 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes release from release branch', async () => {
-    const { npmTags, gitTags } = await runScenario('release/0.5', '0.5.444', false);
+    const { npmTags, gitTags } = await runNormalScenario('release/0.5', '0.5.444', false);
     assert.deepEqual(npmTags, {
       'feature-dummy': '0.0.1-rc',
       'latest': '0.5.444',
@@ -99,7 +103,7 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes from feature branch', async () => {
-    const { stampedVersion, npmTags, gitTags } = await runScenario('feature/blah', '0.5.444-frog', false);
+    const { stampedVersion, npmTags, gitTags } = await runNormalScenario('feature/blah', '0.5.444-frog', false);
     assert.deepEqual(npmTags, {
       'latest': '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
@@ -109,7 +113,7 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes from hotfix branch', async () => {
-    const { stampedVersion, npmTags, gitTags } = await runScenario('hotfix/blah', '0.5.444-frog', false);
+    const { stampedVersion, npmTags, gitTags } = await runNormalScenario('hotfix/blah', '0.5.444-frog', false);
     assert.deepEqual(npmTags, {
       'latest': '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
@@ -119,7 +123,7 @@ describe('Publish', () => {
   }).timeout(TIMEOUT);
 
   it('publishes from spike branch', async () => {
-    const { stampedVersion, npmTags, gitTags } = await runScenario('spike/blah', '0.5.11-frog', false);
+    const { stampedVersion, npmTags, gitTags } = await runNormalScenario('spike/blah', '0.5.11-frog', false);
     assert.deepEqual(npmTags, {
       'latest': '0.0.1-rc',
       'feature-dummy': '0.0.1-rc',
@@ -188,4 +192,40 @@ describe('Publish', () => {
     const gitTags = (await git.tags()).all.sort();
     assert.deepEqual(gitTags, [ '1.1.3' ]);
   }).timeout(120000); // Verdaccio runs pretty slowly on the build servers
+
+  it('fails to publish a feature branch if the changelog sections type do not match the release', async () => {
+    await assert.isRejected(runScenario('feature/blah', '0.5.11-frog', false, async (dir) => {
+      const changelogFile = path.join(dir, 'CHANGELOG.md');
+      await Files.writeFile(changelogFile, `# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+
+### Added
+- Added entry
+`);
+    }));
+  }).timeout(TIMEOUT);
+
+  it('fails to publish a release branch if the changelog sections type do not match the release', async () => {
+    await assert.isRejected(runScenario('feature/blah', '1.3.12', false, async (dir) => {
+      const changelogFile = path.join(dir, 'CHANGELOG.md');
+      await Files.writeFile(changelogFile, `# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+
+### Improved
+- Improved entry
+`);
+    }));
+  }).timeout(TIMEOUT);
 });

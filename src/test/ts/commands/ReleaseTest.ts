@@ -62,14 +62,14 @@ describe('Release', () => {
   });
 
   it('Adds the changelog version and date', async () => {
-    const dir = await runScenario('main', '0.1.0-rc', 'main');
-    await assert.becomes(readPjVersionInDir(dir), '0.1.0');
+    const dir = await runScenario('main', '0.2.0-rc', 'main');
+    await assert.becomes(readPjVersionInDir(dir), '0.2.0');
     const changelog = await readKeepAChangelogInDir(dir);
     const unreleased = changelog.releases[0];
     const releaseSection = changelog.releases[1];
     assert.isTrue(unreleased.isEmpty(), 'Unreleased section exists and is empty');
     assert.isFalse(releaseSection.isEmpty(), 'Release section should not be empty');
-    assert.equal(releaseSection.version?.compare('0.1.0'), 0);
+    assert.equal(releaseSection.version?.compare('0.2.0'), 0);
     assert.equal(releaseSection.date?.getFullYear(), new Date().getFullYear());
     assert.equal(releaseSection.date?.getMonth(), new Date().getMonth());
     assert.equal(releaseSection.date?.getDate(), new Date().getDate());

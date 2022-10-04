@@ -1,9 +1,10 @@
 import cs from 'cross-spawn-promise';
 import { gitP, SimpleGit } from 'simple-git';
 import { PublishArgs } from '../args/BeehiveArgs';
-import { BranchDetails, BranchState, getBranchDetails } from '../core/BranchLogic';
+import { BranchDetails, BranchState, getBranchDetails, Module } from '../core/BranchLogic';
 import * as NpmTags from '../core/NpmTags';
 import * as Version from '../core/Version';
+import * as Changelog from '../keepachangelog/Changelog';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as Git from '../utils/Git';
 import { printHeaderMessage } from '../core/Messages';
@@ -14,6 +15,8 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   const git = gitP(dir);
   const r = await getBranchDetails(dir);
 
+  await checkVersion(r.version, r.rootModule);
+
   const tags = await NpmTags.pickTagsNpm(r.currentBranch, r.branchState, r.version, dir, r.rootModule.packageJson.name);
   const [ mainTag ] = tags;
 
@@ -21,6 +24,12 @@ export const publish = async (args: PublishArgs): Promise<void> => {
   await npmPublish(mainTag, dryRunArgs, args.workingDir, args.distDir);
   await npmTag(args, tags, r, args.workingDir);
   await gitTag(r, git, args);
+};
+
+const checkVersion = async (version: Version.Version, module: Module): Promise<void> => {
+  if (module.changelogFormat === 'keepachangelog') {
+    await Changelog.checkVersionFromFile(module.changelogFile, version);
+  }
 };
 
 const npmPublish = async (mainTag: string, dryRunArgs: string[], dir: string, distDir: string): Promise<void> => {
