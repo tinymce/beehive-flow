@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Keep A Changelog files will now get a release header added automatically. This can be prevented with the `--no-changelog` argument. #TINY-9204
 
+### Changed
+- Upgraded dependencies and removed `read-pkg` as it wasn't being used. #TINY-9229
+
 ## 0.18.0 - 2022-04-21
 
 ### Security

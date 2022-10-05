@@ -21,7 +21,6 @@
     "keep-a-changelog": "^2.1.0",
     "luxon": "^3.0.4",
     "properties-reader": "^2.2.0",
-    "read-pkg": "^7.1.0",
     "simple-git": "^3.7.0",
     "tmp": "^0.2.1",
     "tslib": "^2.1.0",
