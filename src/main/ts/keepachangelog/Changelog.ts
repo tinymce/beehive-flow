@@ -1,4 +1,3 @@
-import { Either } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import * as Arr from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
@@ -118,7 +117,7 @@ export const checkVersion = (content: string, version: Version.Version): E.Eithe
         return E.right(true);
       }
     }),
-    O.getOrElse((): Either<string, boolean> => E.right(false))
+    O.getOrElse((): E.Either<string, boolean> => E.right(false))
   );
 };
 
