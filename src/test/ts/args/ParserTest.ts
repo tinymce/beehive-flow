@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha';
 
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised from 'chai-as-promised';
 import fc from 'fast-check';
 import * as O from 'fp-ts/Option';
 import { parseArgs } from '../../../main/ts/args/Parser';

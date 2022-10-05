@@ -1,4 +1,4 @@
-import * as cs from 'cross-spawn-promise';
+import cs from 'cross-spawn-promise';
 import { gitP, SimpleGit } from 'simple-git';
 import { PublishArgs } from '../args/BeehiveArgs';
 import { BranchDetails, BranchState, getBranchDetails } from '../core/BranchLogic';

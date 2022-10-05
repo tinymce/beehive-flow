@@ -1,5 +1,5 @@
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised from 'chai-as-promised';
 import * as fc from 'fast-check';
 import { describe, it } from 'mocha';
 import { BranchState } from '../../../main/ts/core/BranchLogic';

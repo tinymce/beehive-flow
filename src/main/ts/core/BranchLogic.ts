@@ -131,7 +131,7 @@ export const readModules = async (dir: string): Promise<Record<string, Module>> 
 
 export const readModulesIfEnabled = async (
   dir: string, packageJson: { workspaces?: string[] }
-): Promise<{ workspacesEnabled: boolean; modules: Record<string, Module>}> => {
+): Promise<{ workspacesEnabled: boolean; modules: Record<string, Module> }> => {
   const workspacesEnabled = packageJson.workspaces !== undefined;
   if (workspacesEnabled) {
     return { workspacesEnabled, modules: await readModules(dir) };

@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised from 'chai-as-promised';
 import * as O from 'fp-ts/Option';
 import * as Git from '../../../main/ts/utils/Git';
 import * as PackageJson from '../../../main/ts/core/PackageJson';

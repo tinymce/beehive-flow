@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as PropertiesReader from 'properties-reader';
+import PropertiesReader from 'properties-reader';
 import * as Files from '../utils/Files';
 
 export const writeBuildPropertiesFile = async (dir: string, releaseBranchName: string): Promise<string> => {

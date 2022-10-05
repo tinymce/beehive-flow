@@ -1,5 +1,5 @@
 import * as t from 'io-ts';
-import * as cs from 'cross-spawn-promise';
+import cs from 'cross-spawn-promise';
 import * as PromiseUtils from '../utils/PromiseUtils';
 import * as JsonUtils from '../utils/JsonUtils';
 
