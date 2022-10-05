@@ -16,12 +16,12 @@
   "license": "Apache-2.0",
   "dependencies": {
     "cross-spawn-promise": "^0.10.2",
-    "fp-ts": "^2.9.5",
-    "io-ts": "^2.2.14",
+    "fp-ts": "^2.12.3",
+    "io-ts": "^2.2.18",
     "keep-a-changelog": "^2.1.0",
     "luxon": "^3.0.4",
     "properties-reader": "^2.2.0",
-    "simple-git": "^3.7.0",
+    "simple-git": "^3.14.0",
     "tmp": "^0.2.1",
     "tslib": "^2.1.0",
     "yargs": "^17.6.0"
