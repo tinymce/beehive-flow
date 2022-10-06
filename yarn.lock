@@ -178,6 +178,19 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@deno/shim-deno-test@^0.3.2":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@deno/shim-deno-test/-/shim-deno-test-0.3.3.tgz#2dd014a2649507477f904d0172dd88341354086d"
+  integrity sha512-Ge0Tnl7zZY0VvEfgsyLhjid8DzI1d0La0dgm+3m0/A8gZXgp5xwlyIyue5e4SCUuVB/3AH/0lun9LcJhhTwmbg==
+
+"@deno/shim-deno@~0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@deno/shim-deno/-/shim-deno-0.4.3.tgz#3bb6a4e3749133f98e8373ea2e79efaa43fb182a"
+  integrity sha512-m5iXsq3Nvv1aJ1xwUQGnXXOztZ5UUF9dZje3l6EbX41zE5+MioK1NN+2+C3nlWWs9PvSFam4EbZVG3JUbLCeDg==
+  dependencies:
+    "@deno/shim-deno-test" "^0.3.2"
+    which "^2.0.2"
+
 "@eslint/eslintrc@^1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.2.1.tgz#8b5e1c49f4077235516bc9ec7d41378c0f69b8c6"
@@ -2568,6 +2581,13 @@ jws@^3.2.2:
     jwa "^1.4.1"
     safe-buffer "^5.0.1"
 
+keep-a-changelog@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/keep-a-changelog/-/keep-a-changelog-2.1.0.tgz#abedb23407eb6cee3f586e705de457a2b73f3b46"
+  integrity sha512-Svnmt3UTW0U8RdAi24jy2OuU03wEYZkD7vrJuK9u5gIYk6as/BvbSDK0oFtnZLC8xDludDYDsomq7tetEUR0Ow==
+  dependencies:
+    "@deno/shim-deno" "~0.4.3"
+
 keygrip@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/keygrip/-/keygrip-1.1.0.tgz#871b1681d5e159c62a445b0c74b615e0917e7226"
@@ -4353,7 +4373,7 @@ which-module@^2.0.0:
   resolved "https://registry.yarnpkg.com/which-module/-/which-module-2.0.0.tgz#d9ef07dce77b9902b8a3a8fa4b31c3e3f7e6e87a"
   integrity sha1-2e8H3Od7mQK4o6j6SzHD4/fm6Ho=
 
-which@2.0.2, which@^2.0.1:
+which@2.0.2, which@^2.0.1, which@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/which/-/which-2.0.2.tgz#7c6a8dd0a636a0327e10b59c9286eee93f3f51b1"
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==

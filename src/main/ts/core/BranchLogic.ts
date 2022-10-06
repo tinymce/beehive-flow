@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as O from 'fp-ts/Option';
 import { gitP, CheckRepoActions, SimpleGit } from 'simple-git';
@@ -37,7 +38,12 @@ export const enum BranchState {
   ReleaseCandidate = 'releaseCandidate'
 }
 
-export interface Module {
+interface ModuleChangelog {
+  readonly changelogFile: string;
+  readonly changelogFormat: 'keepachangelog' | 'none';
+}
+
+export interface Module extends ModuleChangelog {
   readonly packageJson: PackageJson;
   readonly packageJsonFile: string;
 }
@@ -92,12 +98,29 @@ export const getBranchType = (branchName: string): Option<BranchType> => {
 export const isValidPrerelease = (actual: string | undefined, expected: string): boolean =>
   actual !== undefined && (actual === expected || actual.startsWith(`${expected}.`));
 
+const findChangelog = (dir: string): ModuleChangelog => {
+  const changelogFile = path.join(dir, 'CHANGELOG.md');
+  if (fs.existsSync(changelogFile)) {
+    return {
+      changelogFile,
+      changelogFormat: 'keepachangelog'
+    };
+  } else {
+    return {
+      changelogFile: '',
+      changelogFormat: 'none'
+    };
+  }
+};
+
 const readModule = async (dir: string): Promise<Module> => {
   const packageJsonFile = path.join(dir, 'package.json');
   const packageJson = await PackageJson.parsePackageJsonFile(packageJsonFile);
+  const changelog = findChangelog(dir);
   return {
     packageJson,
-    packageJsonFile
+    packageJsonFile,
+    ...changelog
   };
 };
 

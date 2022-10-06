@@ -33,7 +33,7 @@ describe('Status', () => {
 
   it('shows status for main branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.1.0-rc', {}, address);
+    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.1.0-rc', undefined, {}, address);
 
     await check(dir, {
       branchState: 'releaseCandidate',
@@ -52,7 +52,7 @@ describe('Status', () => {
 
   it('shows status for main branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.7.0', {}, address);
+    await TestUtils.makeBranchWithPj(git, 'main', dir, 'test-status', '0.7.0', undefined, {}, address);
 
     await check(dir, {
       branchState: 'releaseReady',
@@ -70,7 +70,7 @@ describe('Status', () => {
 
   it('shows status for release branch in preRelease state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.2-rc', {}, address);
+    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.2-rc', undefined, {}, address);
 
     await check(dir, {
       branchState: 'releaseCandidate',
@@ -89,7 +89,7 @@ describe('Status', () => {
 
   it('shows status for release branch in releaseReady state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.7', {}, address);
+    await TestUtils.makeBranchWithPj(git, 'release/1.98', dir, 'test-status', '1.98.7', undefined, {}, address);
 
     await check(dir, {
       branchState: 'releaseReady',
@@ -107,7 +107,15 @@ describe('Status', () => {
 
   it('shows status for dependabot branch in feature state', async () => {
     const { dir, git } = await newGit();
-    await TestUtils.makeBranchWithPj(git, 'dependabot/npm_and_yarn/package-1.98.0', dir, 'test-status', '0.1.0-feature.20210525.shaabcdef', {}, address);
+    await TestUtils.makeBranchWithPj(
+      git,
+      'dependabot/npm_and_yarn/package-1.98.0',
+      dir, 'test-status',
+      '0.1.0-feature.20210525.shaabcdef',
+      undefined,
+      {},
+      address
+    );
 
     await check(dir, {
       branchState: 'feature',
