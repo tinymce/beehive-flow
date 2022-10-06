@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ${heading}
 
+### Fixed
+- Fixed some bug. #GH-1234
+
+## 0.1.0 - 2000-02-02
+
 ### Added
 - Example added entry.
 
@@ -48,8 +53,8 @@ ${heading}
 - Some improved example.
   - Nested entry test.
 
-### Fixed
-- Fixed some bug. #GH-1234
+### Security
+- Fixed vulnerability.
 
 ## 0.0.1 - 2000-01-01
 
