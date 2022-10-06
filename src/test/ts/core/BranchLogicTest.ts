@@ -70,7 +70,7 @@ describe('BranchLogic', () => {
       await PackageJson.writePackageJsonFile(packageJsonFile, packageJson);
       await git.add(packageJsonFile);
       await git.commit('commit');
-      return { gitUrl, dir, packageJsonFile, version, packageJson, changelogFile: '', changelogFormat: 'none' };
+      return { gitUrl, dir, packageJsonFile, version, packageJson, changelogFile: '', changelogFormat: 'none' as const };
     };
 
     it('fails if dir is not a git repo', async () => {
@@ -185,7 +185,7 @@ describe('BranchLogic', () => {
           const changelogFile = path.join(module1Dir, 'CHANGELOG.md');
           await PackageJson.writePackageJsonFile(pjFile, pj);
           await TestUtils.writeChangelog(module1Dir);
-          return { pj, pjFile, changelogFile, changelogFormat: 'keepachangelog' };
+          return { pj, pjFile, changelogFile, changelogFormat: 'keepachangelog' as const };
         };
 
         const m1 = await makeModule('module1');

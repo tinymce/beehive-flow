@@ -40,7 +40,7 @@ export const enum BranchState {
 
 interface ModuleChangelog {
   readonly changelogFile: string;
-  readonly changelogFormat: string;
+  readonly changelogFormat: 'keepachangelog' | 'none';
 }
 
 export interface Module extends ModuleChangelog {

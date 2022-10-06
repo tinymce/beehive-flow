@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- Keep A Changelog files will now get a release header added automatically. This can be prevented with the `--no-release` argument. #TINY-9204
+- Keep A Changelog files will now get a release header added automatically. This can be prevented with the `--no-changelog` argument. #TINY-9204
 
 ## 0.18.0 - 2022-04-21
 
