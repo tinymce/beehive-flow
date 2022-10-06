@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { describe, it } from 'mocha';
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised from 'chai-as-promised';
 
 import * as Git from '../../../main/ts/utils/Git';
 import * as ArrayUtils from '../../../main/ts/utils/ArrayUtils';

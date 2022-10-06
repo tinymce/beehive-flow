@@ -147,9 +147,9 @@ export const getRealArgs = (): string[] =>
   process.argv.slice(2);
 
 export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> => {
-  let _a;
+  let _a: Awaited<ReturnType<typeof argParser.parse>>;
   try {
-    _a = argParser.parse(args);
+    _a = await argParser.parse(args);
   } catch (e) {
     // Swallow error, so that the error handler in Main doesn't print it again
     return PromiseUtils.fail('');

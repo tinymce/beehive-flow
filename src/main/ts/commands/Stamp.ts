@@ -13,7 +13,7 @@ type Version = Version.Version;
 export const timeFormat = 'yyyyMMddHHmmssSSS';
 
 export const formatDate = (timeMillis: number): string =>
-  DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat, { timeZone: 'utc' });
+  DateTime.fromMillis(timeMillis, { zone: 'utc' }).toFormat(timeFormat);
 
 export const chooseNewVersion = (branchState: BranchState, version: Version, gitSha: string, timeMillis: number): Version => {
   if (branchState === BranchState.ReleaseReady) {

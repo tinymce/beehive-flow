@@ -1,6 +1,6 @@
 import * as cp from 'child_process';
 import * as path from 'path';
-import * as getPort from 'get-port';
+import getPort from 'get-port';
 import * as O from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git';
 import * as Dispatch from '../../../main/ts/args/Dispatch';

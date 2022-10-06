@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised from 'chai-as-promised';
 import fc from 'fast-check';
 import * as Version from '../../../main/ts/core/Version';
 import { Comparison } from '../../../main/ts/utils/Comparison';
@@ -39,7 +39,7 @@ describe('Version', () => {
     });
 
     it('parses a correct 3-point version with buildmeta', async () => {
-      await fc.assert(fc.asyncProperty(smallNat, smallNat, smallNat, fc.integer(1, 100), async (major, minor, patch, buildMetaData) => {
+      await fc.assert(fc.asyncProperty(smallNat, smallNat, smallNat, fc.integer({ min: 1, max: 100 }), async (major, minor, patch, buildMetaData) => {
         const input = `${major}.${minor}.${patch}+${buildMetaData}`;
         const actual = Version.parseVersion(input);
         const expected = { major, minor, patch, preRelease: undefined, buildMetaData: String(buildMetaData) };
@@ -135,7 +135,7 @@ describe('Version', () => {
     });
 
     it('compares major versions', () => {
-      fc.assert(fc.property(fc.integer(0, 1000), fc.integer(), fc.integer(), fc.integer(), fc.integer(), fc.hexaString(), fc.hexaString(),
+      fc.assert(fc.property(fc.integer({ min: 0, max: 1000 }), fc.integer(), fc.integer(), fc.integer(), fc.integer(), fc.hexaString(), fc.hexaString(),
         (major, minor1, minor2, patch1, patch2, preRelease1, preRelease2) => {
           assert.equal(Version.compareVersions(
             { major, minor: minor1, patch: patch1, preRelease: preRelease1 },
@@ -150,7 +150,7 @@ describe('Version', () => {
     });
 
     it('compares minor versions', () => {
-      fc.assert(fc.property(fc.integer(), fc.integer(0, 1000), fc.integer(), fc.integer(), fc.hexaString(), fc.hexaString(),
+      fc.assert(fc.property(fc.integer(), fc.integer({ min: 0, max: 1000 }), fc.integer(), fc.integer(), fc.hexaString(), fc.hexaString(),
         (major, minor, patch1, patch2, preRelease1, preRelease2) => {
           assert.equal(Version.compareVersions(
             { major, minor, patch: patch1, preRelease: preRelease1 },
@@ -164,7 +164,7 @@ describe('Version', () => {
     });
 
     it('compares patch versions', () => {
-      fc.assert(fc.property(fc.integer(), fc.integer(), fc.integer(0, 1000), fc.hexaString(), fc.hexaString(),
+      fc.assert(fc.property(fc.integer(), fc.integer(), fc.integer({ min: 0, max: 1000 }), fc.hexaString(), fc.hexaString(),
         (major, minor, patch, preRelease1, preRelease2) => {
           assert.equal(Version.compareVersions(
             { major, minor, patch, preRelease: preRelease1 },

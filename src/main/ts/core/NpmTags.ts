@@ -1,6 +1,6 @@
-import { pipe } from 'fp-ts/pipeable';
+import { pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import * as cs from 'cross-spawn-promise';
+import cs from 'cross-spawn-promise';
 import * as PreRelease from '../core/PreRelease';
 import { isGte } from '../utils/Comparison';
 import * as PromiseUtils from '../utils/PromiseUtils';

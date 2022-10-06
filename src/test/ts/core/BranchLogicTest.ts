@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { describe, it } from 'mocha';
 import fc from 'fast-check';
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised from 'chai-as-promised';
 import {
   BranchDetails,
   BranchState,
