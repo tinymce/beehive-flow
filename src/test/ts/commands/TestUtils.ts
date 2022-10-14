@@ -13,6 +13,9 @@ import * as Files from '../../../main/ts/utils/Files';
 import * as Git from '../../../main/ts/utils/Git';
 import * as ObjUtils from '../../../main/ts/utils/ObjUtils';
 
+export const wait = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time));
+
 const writePackageJson = async (
   dir: string, packageName: string, version: string, dependencies: Record<string, string> = {}, address: string = 'blah://frog'
 ) => {

@@ -18,6 +18,8 @@ export interface ReleaseArgs extends BaseArgs {
   readonly gitUrl: Option<string>;
   readonly allowPreReleaseDeps: boolean;
   readonly noChangelog: boolean;
+  readonly noDiff: boolean;
+  readonly yes: boolean;
 }
 
 export interface AdvanceArgs extends BaseArgs {
@@ -60,7 +62,15 @@ export const prepareArgs = (dryRun: boolean, workingDir: string, temp: Option<st
 });
 
 export const releaseArgs = (
-  dryRun: boolean, workingDir: string, temp: Option<string>, gitUrl: Option<string>, branchName: string, allowPreReleaseDeps: boolean, noChangelog: boolean
+  dryRun: boolean,
+  workingDir: string,
+  temp: Option<string>,
+  gitUrl: Option<string>,
+  branchName: string,
+  allowPreReleaseDeps: boolean,
+  noChangelog: boolean,
+  noDiff: boolean,
+  yes: boolean
 ): ReleaseArgs => ({
   kind: 'ReleaseArgs',
   dryRun,
@@ -69,7 +79,9 @@ export const releaseArgs = (
   gitUrl,
   branchName,
   allowPreReleaseDeps,
-  noChangelog
+  noChangelog,
+  noDiff,
+  yes
 });
 
 export const advanceArgs = (

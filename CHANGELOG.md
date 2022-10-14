@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 - The `publish` command will check the changelog to ensure the sections in the release match the type of release. #TINY-9211
+- The `release` command will print out the git diff to show exactly what's been released. This can be prevented with the `--no-diff` argument. #TINY-9252
 
 ### Changed
+- The `release` command will now ask for confirmation before pushing to git. This can be skipped with the `-y/--yes` argument. #TINY-9252
 - Upgraded dependencies and removed `read-pkg` as it wasn't being used. #TINY-9229
 
 ## 0.18.0 - 2022-04-21
