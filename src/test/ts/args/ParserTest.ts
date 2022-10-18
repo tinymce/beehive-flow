@@ -30,11 +30,11 @@ describe('Parser', () => {
       await fc.assert(fc.asyncProperty(fc.nat(100), fc.nat(100), async (major, minor) => {
         await assert.becomes(
           parseArgs([ 'release', `${major}.${minor}` ]),
-          O.some(BeehiveArgs.releaseArgs(false, process.cwd(), O.none, O.none, `release/${major}.${minor}`, false, false))
+          O.some(BeehiveArgs.releaseArgs(false, process.cwd(), O.none, O.none, `release/${major}.${minor}`, false, false, false, false))
         );
         await assert.becomes(
           parseArgs([ 'release', `${major}.${minor}`, '--dry-run' ]),
-          O.some(BeehiveArgs.releaseArgs(true, process.cwd(), O.none, O.none, `release/${major}.${minor}`, false, false))
+          O.some(BeehiveArgs.releaseArgs(true, process.cwd(), O.none, O.none, `release/${major}.${minor}`, false, false, false, false))
         );
       }));
     });
@@ -42,7 +42,7 @@ describe('Parser', () => {
     it('succeeds for release command with main arg', async () => {
       await assert.becomes(
         parseArgs([ 'release', 'main' ]),
-        O.some(BeehiveArgs.releaseArgs(false, process.cwd(), O.none, O.none, 'main', false, false))
+        O.some(BeehiveArgs.releaseArgs(false, process.cwd(), O.none, O.none, 'main', false, false, false, false))
       );
     });
 

@@ -65,6 +65,19 @@ const noChangelogReleaseOptions: yargs.Options = {
   default: false
 };
 
+const noDiffOptions: yargs.Options = {
+  description: 'Prevent the git diff being logged.',
+  type: 'boolean',
+  default: false
+};
+
+const yesOptions: yargs.Options = {
+  description: 'Reply yes to any prompts.',
+  type: 'boolean',
+  default: false,
+  alias: 'y'
+};
+
 const getColumns = (): number =>
   Math.min(120, yargs.terminalWidth());
 
@@ -96,7 +109,9 @@ const argParser =
         .option('git-url', gitUrlOptions)
         .option('temp', tempOptions)
         .option('allow-pre-releases', allowPreReleaseDepsOptions)
-        .option('no-changelog', noChangelogReleaseOptions),
+        .option('no-changelog', noChangelogReleaseOptions)
+        .option('no-diff', noDiffOptions)
+        .option('yes', yesOptions),
     )
     .command(
       'advance <majorMinorOrMain>',
@@ -193,7 +208,9 @@ export const parseArgs = async (args: string[]): Promise<Option<BeehiveArgs>> =>
       gitUrl(),
       await majorMinorOrMain(),
       a['allow-pre-releases'] as boolean,
-      a['no-changelog'] as boolean
+      a['no-changelog'] as boolean,
+      a['no-diff'] as boolean,
+      a.yes as boolean
     ));
 
   } else if (cmd === 'advance') {

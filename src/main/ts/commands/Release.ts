@@ -1,5 +1,6 @@
 import * as O from 'fp-ts/Option';
 import { SimpleGit } from 'simple-git';
+import yesno from 'yesno';
 import { ReleaseArgs } from '../args/BeehiveArgs';
 import * as Version from '../core/Version';
 import * as Git from '../utils/Git';
@@ -57,6 +58,19 @@ export const release = async (args: ReleaseArgs): Promise<void> => {
 
   await git.add(rootModule.packageJsonFile);
   await git.commit('Branch is ready for release - setting release version');
+
+  if (!args.noDiff) {
+    console.log('Changes:');
+    const diff = await git.diff([ '--color', 'HEAD~1' ]);
+    console.log(diff);
+  }
+
+  if (!args.yes) {
+    const kontinue = await yesno({ question: `Push changes and release ${Version.versionToString(newVersion)}? (Y/n)`, defaultValue: true });
+    if (!kontinue) {
+      throw new Error('Aborted!');
+    }
+  }
 
   await Git.pushUnlessDryRun(dir, git, args.dryRun);
 };
