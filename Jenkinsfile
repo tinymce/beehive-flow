@@ -3,7 +3,7 @@
 
 standardProperties()
 
-tinyPods.node() {
+tinyPods.node(tag: '20') {
   stage("deps") {
     yarnInstall()
   }
