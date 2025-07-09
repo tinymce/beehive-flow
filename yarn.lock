@@ -185,18 +185,18 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@deno/shim-deno-test@^0.3.2":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@deno/shim-deno-test/-/shim-deno-test-0.3.3.tgz#2dd014a2649507477f904d0172dd88341354086d"
-  integrity sha512-Ge0Tnl7zZY0VvEfgsyLhjid8DzI1d0La0dgm+3m0/A8gZXgp5xwlyIyue5e4SCUuVB/3AH/0lun9LcJhhTwmbg==
+"@deno/shim-deno-test@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@deno/shim-deno-test/-/shim-deno-test-0.5.0.tgz#7d5dd221c736d182e587b8fd9bfca49b4dc0aa79"
+  integrity sha512-4nMhecpGlPi0cSzT67L+Tm+GOJqvuk8gqHBziqcUQOarnuIax1z96/gJHCSIz2Z0zhxE6Rzwb3IZXPtFh51j+w==
 
-"@deno/shim-deno@~0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@deno/shim-deno/-/shim-deno-0.4.3.tgz#3bb6a4e3749133f98e8373ea2e79efaa43fb182a"
-  integrity sha512-m5iXsq3Nvv1aJ1xwUQGnXXOztZ5UUF9dZje3l6EbX41zE5+MioK1NN+2+C3nlWWs9PvSFam4EbZVG3JUbLCeDg==
+"@deno/shim-deno@~0.18.0":
+  version "0.18.2"
+  resolved "https://registry.yarnpkg.com/@deno/shim-deno/-/shim-deno-0.18.2.tgz#9fe2fe7c91062bf2d127204f3110c09806cbef92"
+  integrity sha512-oQ0CVmOio63wlhwQF75zA4ioolPvOwAoK0yuzcS5bDC1JUvH3y1GS8xPh8EOpcoDQRU4FTG8OQfxhpR+c6DrzA==
   dependencies:
-    "@deno/shim-deno-test" "^0.3.2"
-    which "^2.0.2"
+    "@deno/shim-deno-test" "^0.5.0"
+    which "^4.0.0"
 
 "@eslint/eslintrc@^1.3.2":
   version "1.3.2"
@@ -2379,6 +2379,11 @@ isexe@^2.0.0:
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
 
+isexe@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/isexe/-/isexe-3.1.1.tgz#4a407e2bd78ddfb14bea0c27c6f7072dde775f0d"
+  integrity sha512-LpB/54B+/2J5hqQ7imZHfdU31OlgQqx7ZicVlkm9kzg9/w8GKLEcFfJl/t7DCEDueOyBAD6zCCwTO6Fzs0NoEQ==
+
 isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
@@ -2595,12 +2600,12 @@ jws@^3.2.2:
     jwa "^1.4.1"
     safe-buffer "^5.0.1"
 
-keep-a-changelog@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/keep-a-changelog/-/keep-a-changelog-2.1.0.tgz#abedb23407eb6cee3f586e705de457a2b73f3b46"
-  integrity sha512-Svnmt3UTW0U8RdAi24jy2OuU03wEYZkD7vrJuK9u5gIYk6as/BvbSDK0oFtnZLC8xDludDYDsomq7tetEUR0Ow==
+keep-a-changelog@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/keep-a-changelog/-/keep-a-changelog-2.6.2.tgz#87ba8513a48176be2ceb48a1883d09f7a739bffd"
+  integrity sha512-YSebqNvqzsTcDYJ4jxO1w8vFa74J0R+8Ks0ZOtHQwdJho2EPuzOtAgRkpMd/0NxiQ0toqJgl7CPMz1urZs9pxg==
   dependencies:
-    "@deno/shim-deno" "~0.4.3"
+    "@deno/shim-deno" "~0.18.0"
 
 keygrip@~1.1.0:
   version "1.1.0"
@@ -4295,12 +4300,19 @@ which@^1.2.9:
   dependencies:
     isexe "^2.0.0"
 
-which@^2.0.1, which@^2.0.2:
+which@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/which/-/which-2.0.2.tgz#7c6a8dd0a636a0327e10b59c9286eee93f3f51b1"
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+which@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/which/-/which-4.0.0.tgz#cd60b5e74503a3fbcfbf6cd6b4138a8bae644c1a"
+  integrity sha512-GlaYyEb07DPxYCKhKzplCWBJtvxZcZMrL+4UkrTSJHHPyZU4mYYTv3qaOe77H7EODLSSopAUFAc6W8U4yqvscg==
+  dependencies:
+    isexe "^3.1.1"
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.4"
