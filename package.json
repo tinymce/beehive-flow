@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "cross-spawn-promise": "^0.10.2",
-    "fp-ts": "^2.12.3",
+    "fp-ts": "^2.16.10",
     "io-ts": "^2.2.18",
     "keep-a-changelog": "^2.1.0",
     "luxon": "^3.0.4",
