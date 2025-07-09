@@ -23,7 +23,7 @@
     "properties-reader": "^2.2.0",
     "simple-git": "^3.14.0",
     "tmp": "^0.2.1",
-    "tslib": "^2.1.0",
+    "tslib": "^2.8.1",
     "yargs": "^17.6.0",
     "yesno": "^0.4.0"
   },
